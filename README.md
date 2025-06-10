@@ -16,7 +16,7 @@ _Last Updated: 6th of June 2025_
 I have published 3 blogs posts summarizing the goal of this and how it can be used (also what is unique about it). Feel free to check it out for more context.
 - Part 1: [Building a Scalable Zero Trust Demo environment with Cloudflare and Terraform (Part 1)](https://www.linkedin.com/pulse/building-scalable-zero-trust-demo-environment-part-1-charpentier-ntgoe/?trackingId=bl5ST2%2FDTgW7ueBjhaW0hw%3D%3D)
 - Part 2: [Automating Cloudflare Zero Trust at Scale: Terraform, Multi-Cloud, and Identity (Part 2)](https://www.linkedin.com/pulse/automating-cloudflare-zero-trust-scale-terraform-part-charpentier-ova1e/)
-- Part 3: to be released
+- Part 3: [Zero Trust for Real-World Scenarios: Use Cases and Extensions (Part 3 - Final)](https://www.linkedin.com/pulse/zero-trust-real-world-scenarios-use-cases-extensions-part-matthieu-t5qee/)
 
 ## Prerequisites
 

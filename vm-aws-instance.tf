@@ -153,10 +153,6 @@ resource "aws_instance" "cloudflared_aws" {
 
   subnet_id = aws_subnet.aws_private_subnet.id
 
-  # In case you need to troubleshoot comment the above line and uncomment the below two lines
-  # subnet_id                   = aws_subnet.aws_public_subnet.id # Changed from private to public
-  # associate_public_ip_address = true                            # Add this line
-
   vpc_security_group_ids = [aws_security_group.aws_cloudflared_sg.id]
 
   key_name = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
@@ -185,10 +181,6 @@ resource "aws_instance" "aws_ec2_service_instance" {
   instance_type = var.aws_ec2_instance_config_type
 
   subnet_id = aws_subnet.aws_private_subnet.id
-
-  # In case you need to troubleshoot comment the above line and uncomment the below two lines
-  # subnet_id                   = aws_subnet.aws_public_subnet.id # Changed from private to public
-  # associate_public_ip_address = true                            # Add this line
 
   vpc_security_group_ids = [aws_security_group.aws_ssh_server_sg.id]
 

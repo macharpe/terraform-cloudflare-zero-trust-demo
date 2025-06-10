@@ -216,7 +216,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = var.cf_warp_cgnat_cidr #"0.0.0.0/0"
+    source_address_prefix      = var.cf_warp_cgnat_cidr
     destination_address_prefix = "*"
   }
 
@@ -228,7 +228,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Icmp"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = "*" #${data.http.my_ip.response_body}/32
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 

@@ -5,7 +5,7 @@ gcp_users                     = ["matthieu", "jose", "bob"]
 gcp_region                    = "europe-west3"
 gcp_cloudflared_instance_name = "cloudflare-infrastructure-access-gcp"
 
-gcp_windows_user_name         = "inod"
+gcp_windows_user_name         = "user_gcp_rdp"
 gcp_windows_admin_password    = "8gnnkcejnL_3aY_aif6c"
 gcp_service_account_email     = "terraform@terraform-macharpe.iam.gserviceaccount.com"
 

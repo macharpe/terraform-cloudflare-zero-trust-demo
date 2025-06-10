@@ -108,7 +108,6 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
   network_interface {
     network    = google_compute_network.gcp_custom_vpc.id
     subnetwork = google_compute_subnetwork.gcp_cloudflared_subnet.id
-    #    access_config {}
   }
 
   // Optional config to make instance ephemeral 
