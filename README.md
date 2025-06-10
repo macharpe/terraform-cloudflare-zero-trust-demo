@@ -1,6 +1,6 @@
 # Disclaimer
 
-This is a work in progress 🚧 and therefore no everything is perfect but I intend to maintain it and improve it along the way
+This is a work in progress 🚧 and therefore no everything is perfect but I intend to maintain it and improve it along the way (with cost analysis)
 
 ## Architecture
 
