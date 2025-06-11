@@ -304,6 +304,7 @@ To remove this cluter, I have created this script which will run as part of the 
 | [google_compute_subnetwork.gcp_cloudflared_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.gcp_cloudflared_windows_rdp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.gcp_warp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
+| [null_resource.cleanup_devices](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.cleanup_known_hosts](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [http_http.my_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
@@ -350,7 +351,6 @@ To remove this cluter, I have created this script which will run as part of the 
 | <a name="input_cf_browser_rendering_app_name"></a> [cf\_browser\_rendering\_app\_name](#input\_cf\_browser\_rendering\_app\_name) | Name of the Browser Rendering App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_custom_cgnat_routes"></a> [cf\_custom\_cgnat\_routes](#input\_cf\_custom\_cgnat\_routes) | List of custom CGNAT routes to add to the device profile | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_cf_default_cgnat_routes"></a> [cf\_default\_cgnat\_routes](#input\_cf\_default\_cgnat\_routes) | default cgnat routes | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "address": "100.64.0.0/10",<br/>    "description": "Default CGNAT Range"<br/>  }<br/>]</pre> | no |
-| <a name="input_cf_default_fallback_domains"></a> [cf\_default\_fallback\_domains](#input\_cf\_default\_fallback\_domains) | n/a | <pre>list(object({<br/>    suffix      = string<br/>    dns_server  = list(string)<br/>    description = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_cf_device_os"></a> [cf\_device\_os](#input\_cf\_device\_os) | This is the OS you are running on your own client machine | `string` | n/a | yes |
 | <a name="input_cf_domain_controller_rdp_port"></a> [cf\_domain\_controller\_rdp\_port](#input\_cf\_domain\_controller\_rdp\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_email_domain"></a> [cf\_email\_domain](#input\_cf\_email\_domain) | Email Domain used for email authentication in App policies | `string` | n/a | yes |
