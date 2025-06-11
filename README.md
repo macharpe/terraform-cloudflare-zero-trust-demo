@@ -2,7 +2,7 @@
 
 This is a work in progress 🚧 and therefore no everything is perfect but I intend to maintain it and improve it along the way.
 
-## Architecture
+## 1. Architecture
 
 This is the diagram showing at a high-level the architecture and the components involved (and how they are connected together)
 
@@ -11,18 +11,18 @@ _Last Updated: 6th of June 2025_
 
 [![Generate terraform docs on main](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml)
 
-## Introduction
+## 2. Introduction
 
 I have published 3 blogs posts summarizing the goal of this and how it can be used (also what is unique about it). Feel free to check it out for more context.
 - Part 1: [Building a Scalable Zero Trust Demo environment with Cloudflare and Terraform (Part 1)](https://www.linkedin.com/pulse/building-scalable-zero-trust-demo-environment-part-1-charpentier-ntgoe/?trackingId=bl5ST2%2FDTgW7ueBjhaW0hw%3D%3D)
 - Part 2: [Automating Cloudflare Zero Trust at Scale: Terraform, Multi-Cloud, and Identity (Part 2)](https://www.linkedin.com/pulse/automating-cloudflare-zero-trust-scale-terraform-part-charpentier-ova1e/)
 - Part 3: [Zero Trust for Real-World Scenarios: Use Cases and Extensions (Part 3 - Final)](https://www.linkedin.com/pulse/zero-trust-real-world-scenarios-use-cases-extensions-part-matthieu-t5qee/)
 
-## Prerequisites
+## 3. Prerequisites
 
 These are some of the steps you will need to perform before running the Terraform script.
 
-### Integration with other accounts
+### 3.1 Integration with other accounts
 
 For this demo to work, you will need to have the following accounts created:
 
@@ -36,7 +36,7 @@ For this demo to work, you will need to have the following accounts created:
 - Salesforce Account
 - Datadog Account
 
-### WARP Connector setup in Cloudflare UI
+### 3.2 WARP Connector setup in Cloudflare UI
 
 Because, the Cloudflare Terraform provider does not support the creation and management of a "warp connector" ressource in Cloudflare, you need to manually create them in the UI
 
@@ -54,7 +54,7 @@ Then you need to attach "Private Routes" to these WARP Connector Tunnels so that
 
 Finally, you will need to retrive the tunnel IDs and store them in the following Terraform variables **cf_tunnel_warp_connector_azure_id** and **cf_tunnel_warp_connector_gcp_id** respectively.
 
-### Device enrollment Policies permissions in Cloudflare UI
+### 3.3 Device enrollment Policies permissions in Cloudflare UI
 
 Create two policies:
 - Employee Enrollment Policy
@@ -72,12 +72,12 @@ This is what your Device Enrollment Permissions should look like:<br>
 ### WARP Client checks
 <img src="doc/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
 
-### Policy assignment
+### 3.4 Policy assignment
 
 1. *After* you have created all the ressources with Terraform, the policies for the "SaaS" type App in Cloudflare need to be assigned manually (Okta, Meraki, etc...)
 2. *Before* you destroy everything, the policies assigned manually to the "SaaS" type App in Cloudflare need to be removed manually (Okta, Meraki, etc...)
 
-### Summary of the connectivity you can expect
+### 3.5 Summary of the connectivity you can expect
 
 | Host | Cloud Provider | ping Status | Notes |
 |------|----------------|---------|-------|
@@ -92,23 +92,17 @@ This is what your Device Enrollment Permissions should look like:<br>
 
 _NB: I am working on resolving the ping failing between the client and AWS workload. It should be working._
 
-## Roadmap
-- Use the Entra ID integration
-- Use case for WARP Connector (Site-to-Site, Site-to-Internet...) [documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/warp-connector/)
-- SaaS Application in Cloudflare Access managed by Terraform
-- Observability use case with Datadog
-
-## Terraform.tfvars
+## 4. Terraform.tfvars
 
 All the variables needed are listed in the file called **terraform.tfvars.example** that you can rename **terraform.tfvars** after you have filled in the blancks.
 
-## Initialisation and Apply
+## 5. Initialisation and Apply
 
 <pre>
 git clone https://github.com/macharpe/terraform-cloudflare-zero-trust-demo
 cp terraform.tfvars.example terraform.tfvars</pre>
 
-### Manually retrieved
+### 5.1 Manually retrieved
 
 All the variables with "\# Manually retrieved" tag before will need to be retrieved manually. This is due to the fact that I also use some of these accounts for personnal use and I don't want to destroy everything as part of the **terraform destroy** command.
 
@@ -149,7 +143,7 @@ cf_osx_version_posture_rule_id = ""
 cf_tunnel_warp_connector_azure_id = "185f0bc0-986d-46c............."
 cf_tunnel_warp_connector_gcp_id   = "ad04a3ed-a1a1-460........"</pre>
 
-## Environment variables
+## 6. Environment variables
 
 You will need to have environment variables defined. Here is the list that I have setup in a .envrc file at the root
 
@@ -174,6 +168,59 @@ export TF_VAR_gcp_project_id=""
 
 # Datadog
 export TF_VAR_datadog_api_key=""</pre>
+
+## 7. Script for cleanup (optional)
+
+This demo environment creates a number of things in the cloudflare dashboard as well as in your .ssh/known_hosts. For the sake of helping automate as much as I can, I have created two scripts.
+1. known_hosts_cleanup.py
+2. cloudflare_devices_cleanup.sh
+
+### _7.1 known_hosts_cleanup.py_
+
+known_hosts_cleanup.py will run as part of the main.tf. It will remove everything below a line that I have defined in the file known_hosts.
+If this line is not present, the script will do nothing.
+
+How to use set it up?
+
+<pre> sudo nano ~/.ssh/known_hosts
+
+#Add the following without the hyphen below the last line
+"#################### BELOW IS SAFE TO DELETE #########################"</pre>
+
+
+I find it quite practical since the VMs often have the same private IPs and when you want to ssh into it you get this message:
+
+<pre>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.</pre>
+
+Again, the script will run automatically as part of the *Terraform main.tf* file
+
+### _7.2 cloudflare_devices_cleanup.sh_
+
+This script will clean up your Dashboard under _My Team > devices_ which will record a new cloudflare-warp-connector-azure-* and cloudflare-warp-connector-gcp-* everytime a warp connector connects to Cloudflare.
+To remove this cluter, I have created this script which can be manually run as follows:
+
+<pre># Make it executable
+chmod +x scripts/working_cloudflare_cleanup.sh
+
+cd scripts/
+
+# Dry run first (see what would be deleted)
+./working_cloudflare_cleanup.sh
+
+# Actually delete the devices
+./working_cloudflare_cleanup.sh --live</pre>
+
+# Roadmap
+- Use the Entra ID integration
+- Use case for WARP Connector (Site-to-Site, Site-to-Internet...) [documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/warp-connector/)
+- SaaS Application in Cloudflare Access managed by Terraform
+- Observability use case with Datadog
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
