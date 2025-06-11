@@ -230,7 +230,6 @@ resource "google_compute_instance" "gcp_vm_instance" {
       warp_token      = module.cloudflare.gcp_extracted_warp_token
       datadog_api_key = var.datadog_api_key
       datadog_region  = var.datadog_region
-      timezone        = "Europe/Paris"
     })
   }
 }

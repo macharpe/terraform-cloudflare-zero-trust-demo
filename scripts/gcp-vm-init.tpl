@@ -16,7 +16,7 @@ until ping -c1 8.8.8.8 &>/dev/null; do
 done
 
 # Set timezone
-timedatectl set-timezone ${timezone}
+timedatectl set-timezone Europe/Paris
 
 # Update and install common packages
 apt-get update -y

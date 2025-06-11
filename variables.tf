@@ -322,14 +322,6 @@ variable "cf_warp_cgnat_cidr" {
   type        = string
 }
 
-variable "cf_default_fallback_domains" {
-  type = list(object({
-    suffix      = string
-    dns_server  = list(string)
-    description = string
-  }))
-}
-
 
 
 #======================================

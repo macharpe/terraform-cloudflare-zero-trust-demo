@@ -203,20 +203,12 @@ Again, the script will run automatically as part of the *Terraform main.tf* file
 ### _7.2 cloudflare_devices_cleanup.sh_
 
 This script will clean up your Dashboard under _My Team > devices_ which will record a new cloudflare-warp-connector-azure-* and cloudflare-warp-connector-gcp-* everytime a warp connector connects to Cloudflare.
-To remove this cluter, I have created this script which can be manually run as follows:
-
-<pre># Make it executable
-chmod +x scripts/working_cloudflare_cleanup.sh
-
-cd scripts/
-
-# Dry run first (see what would be deleted)
-./working_cloudflare_cleanup.sh
-
-# Actually delete the devices
-./working_cloudflare_cleanup.sh --live</pre>
+To remove this cluter, I have created this script which will run as part of the main.tf
 
 # Roadmap
+- Implement SSM Parameter store for AWS and its equivalent for other cloud providers
+- Enhance Security Groups
+- Implement VNC usecase
 - Use the Entra ID integration
 - Use case for WARP Connector (Site-to-Site, Site-to-Internet...) [documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/warp-connector/)
 - SaaS Application in Cloudflare Access managed by Terraform

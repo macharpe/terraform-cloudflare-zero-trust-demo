@@ -317,14 +317,6 @@ variable "cf_custom_cgnat_routes" {
   }))
 }
 
-variable "cf_default_fallback_domains" {
-  type = list(object({
-    suffix      = string
-    dns_server  = list(string)
-    description = string
-  }))
-}
-
 variable "cf_azure_json_subnet_generation" {
   description = "Results of the Azure Subnet generation in json format"
   type        = any

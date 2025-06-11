@@ -8,7 +8,7 @@ resource "null_resource" "update_macos_version_rule" {
   }
 
   provisioner "local-exec" {
-    command = "chmod +x ${path.module}/scripts/latest_osx_version_posture.sh && ${path.module}/scripts/latest_osx_version_posture.sh"
+    command = "chmod u+x ${path.module}/scripts/latest_osx_version_posture.sh && ${path.module}/scripts/latest_osx_version_posture.sh"
 
     environment = {
       CLOUDFLARE_ACCOUNT_ID      = var.cloudflare_account_id
@@ -110,30 +110,12 @@ locals {
 
 
 #============================================================================
-# Random integer to be used for "precedence in Customized profile for demo
+# Define fixed precedence values that ensure Terraform profiles always have priority
 #============================================================================
-resource "random_integer" "client_precedence" {
-  min = 1
-  max = 10
-  keepers = {
-    profile_name = "client-profile"
-  }
-}
-
-resource "random_integer" "vm_precedence" {
-  min = 11
-  max = 20
-  keepers = {
-    profile_name = "vm-profile"
-  }
-}
-
-resource "random_integer" "warp_precedence" {
-  min = 21
-  max = 30
-  keepers = {
-    profile_name = "warp-profile"
-  }
+locals {
+  laptop_precedence         = 10 # Highest priority - specific OS match
+  vm_precedence             = 20 # Medium priority - group-based match  
+  warp_connector_precedence = 30 # Lower priority - service account match
 }
 
 
@@ -147,7 +129,7 @@ resource "cloudflare_zero_trust_device_custom_profile" "client_custom_route_prof
 
   name                  = "Zero-Trust demo local laptop (mac)"
   description           = "This profile is for the local laptop (running macos) for my zero-trust demo"
-  precedence            = random_integer.client_precedence.result
+  precedence            = local.laptop_precedence # Fixed value: 10
   match                 = "os.name == \"${var.cf_device_os}\""
   allow_mode_switch     = false
   tunnel_protocol       = "masque"
@@ -167,22 +149,16 @@ resource "cloudflare_zero_trust_device_custom_profile" "client_custom_route_prof
     description = route.description
   }]
 
-  # Fallback domains configuration
-  # fallback_domains = [
-  #   for domain in var.cf_default_fallback_domains : {
-  #     suffix      = domain.suffix
-  #     dns_server  = domain.dns_server
-  #     description = domain.description
-  #   }
-  # ]
-
   lan_allow_minutes     = 30
   lan_allow_subnet_size = 16
   exclude_office_ips    = true
   captive_portal        = 180
+
+  # it will get applied once and will be ignored any subsequent terraform apply
+  lifecycle {
+    ignore_changes = all
+  }
 }
-
-
 
 #=======================================================
 # Customized profile for demo to be used in local VMs
@@ -193,7 +169,7 @@ resource "cloudflare_zero_trust_device_custom_profile" "vms_custom_route_profile
 
   name                  = "Zero-Trust demo VMs (Ubuntu and Windows 11)"
   description           = "This profile is for my VMs for my zero-trust demo"
-  precedence            = random_integer.vm_precedence.result
+  precedence            = local.vm_precedence # Fixed value: 20
   match                 = "any(identity.saml_attributes[*] in {\"groups=${var.okta_infrastructureadmin_saml_group_name}\"}) or any(identity.saml_attributes[*] in {\"groups=${var.okta_contractors_saml_group_name}\"}) or identity.email matches \"${var.cf_email_domain}\""
   allow_mode_switch     = false
   tunnel_protocol       = "masque"
@@ -214,22 +190,16 @@ resource "cloudflare_zero_trust_device_custom_profile" "vms_custom_route_profile
     description = route.description
   }]
 
-  # Fallback domains configuration
-  # fallback_domains = [
-  #   for domain in var.cf_default_fallback_domains : {
-  #     suffix      = domain.suffix
-  #     dns_server  = domain.dns_server
-  #     description = domain.description
-  #   }
-  # ]
-
   lan_allow_minutes     = 30
   lan_allow_subnet_size = 16
   exclude_office_ips    = true
   captive_portal        = 180
+
+  # it will get applied once and will be ignored any subsequent terraform apply
+  lifecycle {
+    ignore_changes = all
+  }
 }
-
-
 
 #===============================================================
 # Customized profile for demo to be used in WARP Connector
@@ -240,7 +210,7 @@ resource "cloudflare_zero_trust_device_custom_profile" "warpconnector_custom_rou
 
   name                  = "Zero-Trust demo WarpConnector"
   description           = "This profile is dedicated for WARP Connector"
-  precedence            = random_integer.warp_precedence.result
+  precedence            = local.warp_connector_precedence # Fixed value: 30
   match                 = "identity.email == \"warp_connector@${var.cf_team_name}.cloudflareaccess.com\""
   allow_mode_switch     = false
   tunnel_protocol       = "masque"
@@ -262,17 +232,13 @@ resource "cloudflare_zero_trust_device_custom_profile" "warpconnector_custom_rou
     }
   ]
 
-  # Fallback domains configuration
-  # fallback_domains = [
-  #   for domain in var.cf_default_fallback_domains : {
-  #     suffix      = domain.suffix
-  #     dns_server  = domain.dns_server
-  #     description = domain.description
-  #   }
-  # ]
-
   lan_allow_minutes     = 30
   lan_allow_subnet_size = 16
   exclude_office_ips    = true
   captive_portal        = 180
+
+  # it will get applied once and will be ignored any subsequent terraform apply
+  lifecycle {
+    ignore_changes = all
+  }
 }

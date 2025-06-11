@@ -358,9 +358,18 @@ resource "aws_security_group" "aws_ssh_server_sg" {
     cidr_blocks = [var.cf_warp_cgnat_cidr]
   }
 
+  # Allow SSH ingress from my VM running cloudflared
   ingress {
     from_port       = 22
     to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aws_cloudflared_sg.id]
+  }
+
+  # Allow VNC ingress from my VM running cloudflared
+  ingress {
+    from_port       = 5901
+    to_port         = 5901
     protocol        = "tcp"
     security_groups = [aws_security_group.aws_cloudflared_sg.id]
   }

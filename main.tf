@@ -1,6 +1,7 @@
 #==========================================
-# Known Host cleanup in ~/.ssh/known_hosts
+# Cleanup scripts before the demo
 #==========================================
+# Known Host cleanup in ~/.ssh/known_hosts
 resource "null_resource" "cleanup_known_hosts" {
   triggers = {
     always_run = timestamp()
@@ -11,6 +12,20 @@ resource "null_resource" "cleanup_known_hosts" {
   }
 }
 
+# Cleanup device in Cloudflare Dashboard
+resource "null_resource" "cleanup_devices" {
+  provisioner "local-exec" {
+    command = "chmod u+x ${path.root}/scripts/cloudflare_devices_cleanup.sh && ${path.root}/scripts/cloudflare_devices_cleanup.sh"
+    environment = {
+      CLOUDFLARE_EMAIL      = var.cloudflare_email
+      CLOUDFLARE_API_KEY    = var.cloudflare_api_key
+      CLOUDFLARE_ACCOUNT_ID = var.cloudflare_account_id
+      DRY_RUN               = "false"
+      FORCE_DELETE          = "true"
+      PREFIX                = "cloudflare-warp-connector-"
+    }
+  }
+}
 
 
 #==========================================
@@ -103,7 +118,6 @@ module "cloudflare" {
   cf_osx_version_posture_rule_id = var.cf_osx_version_posture_rule_id
   cf_default_cgnat_routes        = var.cf_default_cgnat_routes
   cf_custom_cgnat_routes         = var.cf_custom_cgnat_routes
-  cf_default_fallback_domains    = var.cf_default_fallback_domains
 
   # Subnet generation
   cf_azure_json_subnet_generation = module.warp-routing.cf_azure_json_subnet_generation

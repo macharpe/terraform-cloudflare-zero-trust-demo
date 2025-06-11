@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Cloudflare Zero Trust Device Cleanup Script - Working Version
+# Cloudflare Zero Trust Device Cleanup Script - Terraform Compatible Version
 # This script removes devices with names starting with "cloudflare-warp-connector-"
+# Designed for automation/CI/CD without interactive prompts
 
 set -euo pipefail
 
 # Configuration
 PREFIX="${PREFIX:-cloudflare-warp-connector-}"
 DRY_RUN="${DRY_RUN:-true}"
+FORCE_DELETE="${FORCE_DELETE:-false}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -26,7 +28,7 @@ print_color() {
 # Function to show usage
 show_usage() {
     cat << EOF
-Cloudflare Zero Trust Device Cleanup Script
+Cloudflare Zero Trust Device Cleanup Script - Terraform Compatible
 
 Usage: $0 [OPTIONS]
 
@@ -34,22 +36,29 @@ OPTIONS:
     -h, --help          Show this help message
     -d, --dry-run       Show what would be deleted without actually deleting (default)
     -l, --live          Actually delete devices (turns off dry-run)
+    -f, --force         Force deletion without confirmation (required for live mode)
     -p, --prefix PREFIX Set device name prefix to filter (default: cloudflare-warp-connector-)
 
 ENVIRONMENT VARIABLES:
-    TF_VAR_cloudflare_email         Your Cloudflare account email (required)
-    TF_VAR_cloudflare_api_key       Your Cloudflare Global API Key (required)
-    TF_VAR_cloudflare_account_id    Your Cloudflare account ID (required)
+    CLOUDFLARE_EMAIL            Your Cloudflare account email (required)
+    CLOUDFLARE_API_KEY          Your Cloudflare Global API Key (required)
+    CLOUDFLARE_ACCOUNT_ID       Your Cloudflare account ID (required)
+    PREFIX                          Device name prefix to filter (optional)
+    DRY_RUN                         Set to "false" to enable live deletion (optional)
+    FORCE_DELETE                    Set to "true" to skip confirmation (required for live mode)
 
 EXAMPLES:
     # Dry run (default)
     $0
 
-    # Actually delete devices
-    $0 --live
+    # Actually delete devices (Terraform-friendly)
+    DRY_RUN=false FORCE_DELETE=true $0
+
+    # Actually delete devices with flags
+    $0 --live --force
 
     # Use custom prefix
-    $0 --prefix "my-connector-"
+    $0 --prefix "my-connector-" --live --force
 EOF
 }
 
@@ -68,6 +77,10 @@ while [[ $# -gt 0 ]]; do
             DRY_RUN="false"
             shift
             ;;
+        -f|--force)
+            FORCE_DELETE="true"
+            shift
+            ;;
         -p|--prefix)
             PREFIX="$2"
             shift 2
@@ -81,18 +94,18 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check environment variables
-if [[ -z "${TF_VAR_cloudflare_email:-}" ]]; then
-    print_color $RED "Error: TF_VAR_cloudflare_email environment variable is required"
+if [[ -z "${CLOUDFLARE_EMAIL:-}" ]]; then
+    print_color $RED "Error: CLOUDFLARE_EMAIL environment variable is required"
     exit 1
 fi
 
-if [[ -z "${TF_VAR_cloudflare_api_key:-}" ]]; then
-    print_color $RED "Error: TF_VAR_cloudflare_api_key environment variable is required"
+if [[ -z "${CLOUDFLARE_API_KEY:-}" ]]; then
+    print_color $RED "Error: CLOUDFLARE_API_KEY environment variable is required"
     exit 1
 fi
 
-if [[ -z "${TF_VAR_cloudflare_account_id:-}" ]]; then
-    print_color $RED "Error: TF_VAR_cloudflare_account_id environment variable is required"
+if [[ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+    print_color $RED "Error: CLOUDFLARE_ACCOUNT_ID environment variable is required"
     exit 1
 fi
 
@@ -107,23 +120,33 @@ if ! command -v jq &> /dev/null; then
     exit 1
 fi
 
+# Validate live mode requirements
+if [[ "$DRY_RUN" == "false" && "$FORCE_DELETE" != "true" ]]; then
+    print_color $RED "Error: Live deletion mode requires --force flag or FORCE_DELETE=true environment variable"
+    print_color $YELLOW "This is required for automation to prevent hanging on confirmation prompts"
+    exit 1
+fi
+
 # Show configuration
 print_color $BLUE "Cloudflare Zero Trust Device Cleanup"
 print_color $BLUE "=================================================="
-echo "Email: $TF_VAR_cloudflare_email"
-echo "Account ID: $TF_VAR_cloudflare_account_id"
+echo "Email: $CLOUDFLARE_EMAIL"
+echo "Account ID: $CLOUDFLARE_ACCOUNT_ID"
 echo "Filter prefix: $PREFIX"
 echo "Mode: $(if [[ "$DRY_RUN" == "true" ]]; then echo "DRY RUN"; else echo "LIVE DELETION"; fi)"
+if [[ "$DRY_RUN" == "false" ]]; then
+    echo "Force delete: $FORCE_DELETE"
+fi
 print_color $BLUE "=================================================="
 
 # Get all devices
 print_color $BLUE "Fetching devices from Cloudflare Zero Trust..."
 
 devices_response=$(curl -s \
-    -H "X-Auth-Email: $TF_VAR_cloudflare_email" \
-    -H "X-Auth-Key: $TF_VAR_cloudflare_api_key" \
+    -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+    -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
     -H "Content-Type: application/json" \
-    "https://api.cloudflare.com/client/v4/accounts/$TF_VAR_cloudflare_account_id/devices/physical-devices")
+    "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/devices/physical-devices")
 
 # Check if API call was successful
 if ! echo "$devices_response" | jq -e '.success' > /dev/null; then
@@ -159,16 +182,12 @@ echo
 print_color $BLUE "Device details:"
 echo "$filtered_devices" | jq -r '.[] | "  Device: " + .name + "\n    ID: " + .id + "\n    Created: " + .created_at + "\n    Last seen: " + (.last_seen_at // "Never") + "\n    User: " + (.last_seen_user.email // "Unknown") + "\n"'
 
-# Confirm deletion if not dry run
+# Show warning for live mode but proceed automatically
 if [[ "$DRY_RUN" == "false" ]]; then
     echo
     print_color $RED "⚠️  WARNING: This will permanently delete $filtered_count devices!"
-    echo -n "Type 'DELETE' to confirm: "
-    read -r confirm
-    if [[ "$confirm" != "DELETE" ]]; then
-        print_color $YELLOW "Deletion cancelled."
-        exit 0
-    fi
+    print_color $YELLOW "FORCE_DELETE is enabled - proceeding automatically without confirmation"
+    sleep 2  # Brief pause to allow reading the warning
 fi
 
 # Process devices
@@ -195,10 +214,10 @@ while IFS= read -r device_data; do
         # Actually delete the device
         delete_response=$(curl -s \
             -X DELETE \
-            -H "X-Auth-Email: $TF_VAR_cloudflare_email" \
-            -H "X-Auth-Key: $TF_VAR_cloudflare_api_key" \
+            -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+            -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
             -H "Content-Type: application/json" \
-            "https://api.cloudflare.com/client/v4/accounts/$TF_VAR_cloudflare_account_id/devices/physical-devices/$device_id")
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/devices/physical-devices/$device_id")
         
         # Check if deletion was successful
         if echo "$delete_response" | jq -e '.success' > /dev/null; then
@@ -232,4 +251,11 @@ else
 fi
 echo "Completed at: $(date '+%Y-%m-%d %H:%M:%S')"
 
-print_color $GREEN "\\nScript completed successfully!"
+# Set appropriate exit code
+if [[ "$DRY_RUN" == "false" && $failed_count -gt 0 ]]; then
+    print_color $RED "\\nScript completed with errors!"
+    exit 1
+else
+    print_color $GREEN "\\nScript completed successfully!"
+    exit 0
+fi
