@@ -22,9 +22,8 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     lock_passwd: false
 %{ endfor ~}
-  - name: oktauser2.bcey3
-    passwd: bob
-    groups: sudo
+  - name: ${okta_bob_username}
+    passwd: ${okta_bob_password}
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     lock_passwd: false
@@ -32,8 +31,7 @@ users:
 runcmd:
   - echo "${ca_cloudflare_browser}" > /etc/ssh/ca_cloudflare_browser.pub
   - chmod 600 /etc/ssh/ca_cloudflare_browser.pub
-  - sed -i '/#MaxSessions 10/a PubkeyAuthentication yes' /etc/ssh/sshd_config
+  - sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
   - sed -i '/PubkeyAuthentication yes/a TrustedUserCAKeys /etc/ssh/ca_cloudflare_browser.pub' /etc/ssh/sshd_config
   - timedatectl set-timezone Europe/Paris
-  - echo "DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region}" > /tmp/dd_env.log
   - DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)" > /tmp/dd_install.log 2>&1

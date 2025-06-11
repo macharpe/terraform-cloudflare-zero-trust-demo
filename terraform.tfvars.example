@@ -187,6 +187,7 @@ okta_jose_user_login     = "....."
 okta_matthieu_user_login = "....."
 okta_stephane_user_login = "....."
 
+okta_bob_user_linux_password = "bob"
 
 
 

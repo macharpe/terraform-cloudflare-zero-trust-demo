@@ -72,7 +72,6 @@ else
 fi
 
 # Datadog Agent installation
-echo "DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region}" > /tmp/dd_env.log
 DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
 
 echo "Startup script completed at $(date)"

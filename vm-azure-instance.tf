@@ -142,6 +142,12 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
   }
 
   tags = var.azure_default_tags
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
 }
 
 

@@ -444,6 +444,11 @@ variable "okta_matthieu_user_login" {
   type        = string
 }
 
+variable "okta_bob_user_linux_password" {
+  description = "Linux password for user bob in EC2 instance"
+  type        = string
+  sensitive   = true
+}
 
 
 #======================================

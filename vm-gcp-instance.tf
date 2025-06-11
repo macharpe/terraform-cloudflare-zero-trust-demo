@@ -309,7 +309,7 @@ resource "google_compute_firewall" "allow_icmp_from_any" {
     protocol = "icmp"
   }
 
-  source_ranges = [var.cf_warp_cgnat_cidr] #${data.http.my_ip.response_body}/32 or 0.0.0.0/0
+  source_ranges = [var.cf_warp_cgnat_cidr, var.azure_address_prefixes]
   target_tags   = ["infrastructure-access-instances", "warp-instances"]
 }
 
