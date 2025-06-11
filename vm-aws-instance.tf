@@ -296,8 +296,8 @@ resource "aws_instance" "aws_ec2_service_instance" {
     # aws_region     = var.aws_region
     datadog_region = var.datadog_region
     # Linux user for contractor
-    okta_bob_username = split("@", var.okta_bob_user_login)[0]
-    okta_bob_password = var.okta_bob_user_linux_password
+    okta_contractor_username = split("@", var.okta_bob_user_login)[0]
+    okta_contractor_password = var.okta_bob_user_linux_password
   })
 
   tags = {

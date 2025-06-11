@@ -207,7 +207,7 @@ resource "azurerm_network_interface_security_group_association" "main" {
 
 
 #==========================================================
-# Security Group
+# Network Security Group
 #==========================================================
 resource "azurerm_network_security_group" "nsg" {
   name                = "nsg-ssh-and-icmp-from-myIP-allowed"
@@ -226,15 +226,29 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
 
+  # Allow ping from Cloudflare WARP CGNAT range
   security_rule {
-    name                       = "AllowPingInbound"
+    name                       = "AllowPingInbound_WARP_client"
     priority                   = 1002
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Icmp"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = "*"
+    source_address_prefix      = var.cf_warp_cgnat_cidr
+    destination_address_prefix = "*"
+  }
+
+  # Allow ping from GCP WARP Subnet
+  security_rule {
+    name                       = "AllowPingInbound_GCP_WARP"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.gcp_ip_cidr_warp
     destination_address_prefix = "*"
   }
 

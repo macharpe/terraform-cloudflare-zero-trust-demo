@@ -1,3 +1,21 @@
+#==========================================
+# Known Host cleanup in ~/.ssh/known_hosts
+#==========================================
+resource "null_resource" "cleanup_known_hosts" {
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "python3 ${path.module}/scripts/known_hosts_cleanup.py"
+  }
+}
+
+
+
+#==========================================
+# main.tf
+#==========================================
 data "http" "my_ip" {
   url = "https://4.ident.me/"
 }

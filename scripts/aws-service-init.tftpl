@@ -22,8 +22,8 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     lock_passwd: false
 %{ endfor ~}
-  - name: ${okta_bob_username}
-    passwd: ${okta_bob_password}
+  - name: ${okta_contractor_username}
+    passwd: ${okta_contractor_password}
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     lock_passwd: false

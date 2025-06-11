@@ -165,10 +165,7 @@ data "http" "cloudflare_warp_connector_token_azure" {
   }
 }
 
-# data "cloudflare_zero_trust_tunnel_warp_connector_token" "azure_warp_connector_token" {
-#   account_id = var.cloudflare_account_id
-#   tunnel_id  = var.cf_tunnel_warp_connector_azure_id
-# }
+
 
 
 #=====================================
@@ -186,8 +183,3 @@ data "http" "cloudflare_warp_connector_token_gcp" {
     "Content-Type" = "application/json"
   }
 }
-
-# data "cloudflare_zero_trust_tunnel_warp_connector_token" "gcp_warp_connector_token_test" {
-#   account_id = var.cloudflare_account_id
-#   tunnel_id  = var.cf_tunnel_warp_connector_gcp_id
-# }
