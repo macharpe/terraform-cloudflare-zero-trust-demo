@@ -5,62 +5,68 @@ gcp_users                     = ["matthieu", "jose", "bob"]
 gcp_region                    = "europe-west3"
 gcp_cloudflared_instance_name = "cloudflare-infrastructure-access-gcp"
 
-gcp_windows_user_name         = "user_gcp_rdp"
-gcp_windows_admin_password    = "8gnnkcejnL_3aY_aif6c"
-gcp_service_account_email     = "terraform@terraform-macharpe.iam.gserviceaccount.com"
+gcp_cloudflared_windows_rdp_name = "windows-rdp-server-gcp"
+gcp_windows_user_name            = "windowsuser"
+gcp_windows_admin_password       = ""
+gcp_service_account_email        = "***@****.iam.gserviceaccount.com"
 
 gcp_vm_count               = 2
 gcp_vm_default_user        = "ubuntu"
-gcp_vm_name                = "cloudflare-zero-trust-demo-gcp"
 gcp_warp_connector_vm_name = "cloudflare-warp-connector-gcp"
+gcp_vm_name                = "cloudflare-zero-trust-demo-gcp"
 
-gcp_enable_oslogin        = "false"
-gcp_machine_size          = "e2-micro"
-gcp_windows_machine_size  = "e2-medium"
+gcp_enable_oslogin       = "false"
+gcp_machine_size         = "e2-micro"
+gcp_windows_machine_size = "e2-medium"
 
 # Networking
 gcp_ip_cidr_infra       = "10.156.70.0/24"
 gcp_ip_cidr_warp        = "10.156.85.0/24"
 gcp_ip_cidr_windows_rdp = "10.156.90.0/24"
 
+
 #=====================================
 # Cloudflare variables
 #=====================================
-cf_team_name               = "your_team_name"
-cf_subdomain_ssh           = "url_for_aws"
-cf_subdomain_web           = "url_for_gcp2"
-cf_subdomain_web_sensitive = "url_for_gcp1"
-cf_target_name             = "name_for_target_in_cloudflare"
+cf_team_name               = "macharpe"
+cf_subdomain_ssh           = "ssh-database***"
+cf_subdomain_vnc           = "vnc***"
+cf_subdomain_web           = "administration-app***"
+cf_subdomain_web_sensitive = "competition-app****"
+cf_target_name             = "GCP-database"
 
-cf_tunnel_name_gcp = "Tunnel GCP"
-cf_tunnel_name_aws = "Tunnel AWS"
+cf_tunnel_name_gcp             = "Tunnel GCP (Access For Infrastructure)"
+cf_tunnel_name_aws             = "Tunnel AWS (SSH Browser Rendered)"
+cf_windows_rdp_tunnel_name_gcp = "Tunnel GCP (Windows RDP)"
 
 #Manually retrieved
-cf_tunnel_warp_connector_azure_id = "185f0bc0-986d-4......."
-cf_tunnel_warp_connector_gcp_id   = "ad04a3ed-a1a1-460........"
+cf_tunnel_warp_connector_azure_id = "185f0bc0-986d-********"
+cf_tunnel_warp_connector_gcp_id   = "ad04a3ed-a1a1-********"
 
-cf_infra_app_name              = "name_for_your_infrastructure_access_app"
-cf_browser_rendering_app_name  = "name_for_app_browser_rendered"
-cf_sensitive_web_app_name      = "name_for_your_app1_in_gcp"
-cf_administration_web_app_name = "name_for_your_app2_in_gcp"
-cf_sensitive_web_app_port      = 8080
-cf_administration_web_app_port = 8181
-
-cf_saml_group_name = "group_of_your_choice" #This is the group name 
+cf_infra_app_name                 = "GCP Infrastructure SSH database"
+cf_browser_rendering_ssh_app_name = "AWS Browser SSH database"
+cf_browser_rendering_vnc_app_name = "AWS Browser VNC database"
+cf_sensitive_web_app_name         = "Competition App"
+cf_administration_web_app_name    = "Administration App"
+cf_sensitive_web_app_port         = 8080
+cf_administration_web_app_port    = 8181
+cf_domain_controller_rdp_port     = 3389
 
 # Manually retrieved
-cf_gateway_posture_id                     = "oject_id_in_cloudflare_for_gateway_presence"
-cf_latest_macOS_version_posture_id        = "custom_rule_checking_lastest_version_of_osx"
-cf_latest_windows_version_posture_id      = "custom_rule_checking_lastest_version_of_windows"
-cf_latest_linux_kernel_version_posture_id = "custom_rule_checking_lastest_version_of_linux"
-cf_okta_identity_provider_id              = "object_id_okta_identity_provider_in_cloudflare"
-cf_onetimepin_identity_provider_id        = "object_id_onetimePIN_identity_provider_in_cloudflare"
-cf_azure_identity_provider_id             = "object_id_azureAD_identity_provider_in_cloudflare"
-cf_azure_administrators_rule_group_id     = "custom_rule_group_in_cloudflare_pointing_to_azure_administrators_group_custom"
+cf_gateway_posture_id                     = "4d8d7499-38c3-4bf0-********"
+cf_latest_macOS_version_posture_id        = "6d64ff80-1308-4462-********"
+cf_latest_windows_version_posture_id      = "67b05735-3b9b-4bcc-********"
+cf_latest_linux_kernel_version_posture_id = "ed5639c7-3305-4a91-********"
+cf_okta_identity_provider_id              = "8fd4786e-97d7-4257-********"
+cf_onetimepin_identity_provider_id        = "a6dfbf35-0e20-4244-********"
+cf_azure_identity_provider_id             = "8c593fe8-aee3-4075-********"
+cf_azure_administrators_rule_group_id     = "5f253130-a400-4215-********"
+
+cf_email_domain = "passfwd.com"
 
 # Device profile
-cf_device_os                   = "mac" # "linux", "windows" or "mac"
-cf_osx_version_posture_rule_id = ""
+cf_device_os                   = "mac"                                  # "linux", "windows" or "mac"
+cf_osx_version_posture_rule_id = "6d64ff80-1308-4462-********" # Manually retrieved
 
 cf_custom_cgnat_routes = [
   {
@@ -78,80 +84,8 @@ cf_default_cgnat_routes = [{
   description = "Default CGNAT Range"
 }]
 
-cf_default_fallback_domains = [
-  {
-    suffix      = "home.arpa"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "intranet"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "local"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "internal"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "private"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "localdomain"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "domain"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "lan"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "home"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "host"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "corp"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "localhost"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "invalid"
-    dns_server  = []
-    description = "Manually added (default)"
-  },
-  {
-    suffix      = "test"
-    dns_server  = []
-    description = "Manually added (default)"
-  }
-]
-
 cf_warp_cgnat_cidr = "100.96.0.0/12"
+
 
 
 #=====================================
@@ -160,13 +94,13 @@ cf_warp_cgnat_cidr = "100.96.0.0/12"
 
 # SAML Group IDs
 #Manually retrieved
-okta_zerotrust_group_id           = "00grzrv....."
-okta_salesengineering_group_id    = "00grzriy....."
-okta_itadmin_group_id             = "00grzrpy....."
-okta_infrastructureadmin_group_id = "00grzrr....."
-okta_contractors_group_id         = "00grzr....."
-okta_meraki_group_id              = "00grzrm....."
-okta_sales_group_id               = "00grzrp7....."
+okta_zerotrust_group_id           = "00grzr********"
+okta_salesengineering_group_id    = "00grzr********"
+okta_itadmin_group_id             = "00grzr********"
+okta_infrastructureadmin_group_id = "00grzr********"
+okta_contractors_group_id         = "00grzr********"
+okta_meraki_group_id              = "00grzr********"
+okta_sales_group_id               = "00grzr********"
 
 # SAML Group names
 okta_salesengineering_saml_group_name    = "SalesEngineering"
@@ -177,45 +111,46 @@ okta_infrastructureadmin_saml_group_name = "InfrastructureAdmin"
 
 # User IDs
 #Manually retrieved
-okta_stephane_user_id = "00urz....."
-okta_matthieu_user_id = "00urz....."
-okta_jose_user_id     = "00urzr....."
+okta_stephane_user_id = "00urzr********"
+okta_matthieu_user_id = "00urzr********"
+okta_jose_user_id     = "00urzr********"
 
 # User logins
-okta_bob_user_login      = ".....@passfwd.com"
-okta_jose_user_login     = "....."
-okta_matthieu_user_login = "....."
-okta_stephane_user_login = "....."
+okta_bob_user_login      = "********3@passfwd.com"
+okta_jose_user_login     = "********"
+okta_matthieu_user_login = "********"
+okta_stephane_user_login = "b********"
 
 okta_bob_user_linux_password = "bob"
-
 
 
 #=====================================
 # AWS variables
 #=====================================
-aws_profile                    = ""
 aws_region                     = "eu-central-1"
-aws_ec2_instsance_name         = ""
-aws_ec2_instance_config_ami_id = ""
+aws_ec2_browser_ssh_name       = "cloudflare-zero-trust-demo-ssh-aws"
+aws_ec2_browser_vnc_name       = "cloudflare-zero-trust-demo-vnc-aws"
+aws_ec2_instance_config_ami_id = "ami-03250b0e01c28d196"
 aws_ec2_instance_config_type   = "t2.micro"
 
-aws_ec2_cloudflared_replica_count = 2
-aws_ec2_cloudflared_name          = "name_of_cloudflare_replica"
+aws_ec2_cloudflared_replica_count = 1
+aws_ec2_cloudflared_name          = "cloudflared-replica-aws"
 
-aws_users = ["user1", "user2", "user3", "user4"]
+aws_users           = ["matthieu", "jose", "bob", "andy"]
 aws_vm_default_user = "ubuntu"
+aws_vnc_password    = "vnc"
 
 # networking
 aws_vpc_cidr            = "172.16.0.0/16"
 aws_private_subnet_cidr = "172.16.69.0/24"
 aws_public_subnet_cidr  = "172.16.84.0/24"
 
+
 #=====================================
 # Azure variables
 #=====================================
 azure_resource_group_location = "germanywestcentral"
-azure_resource_group_name     = "ressource_group_name"
+azure_resource_group_name     = "cloudflare-ressource-group"
 
 # 4 users
 azure_developer1_name = "developer1"
@@ -223,28 +158,31 @@ azure_developer2_name = "developer2"
 azure_sales1_name     = "sales1"
 azure_sales2_name     = "sales2"
 
-azure_user_password         = ""
-azure_user_principal_domain = "your_domain"
+azure_user_password         = "********"
+azure_user_principal_domain = "********.onmicrosoft.com"
 
-azure_vm_count          = 2
-azure_vm_size           = "Standard_B1s"
-azure_vm_admin_username = ""
-azure_vm_admin_password = ""
-azure_vm_name           = "cloudflare-warp-connector-azure"
-azure_vm_fqdn           = "cloudflare-azure"
+azure_vm_count               = 2
+azure_vm_size                = "Standard_B1s"
+azure_vm_admin_username      = "ubuntu"
+azure_vm_admin_password      = "********"
+azure_warp_connector_vm_name = "cloudflare-warp-connector-azure"
+azure_vm_name                = "cloudflare-zero-trust-demo-azure"
 
-# Networking
+# networking
 azure_address_prefixes  = "192.168.71.0/24"
 azure_address_vnet      = "192.168.0.0/16"
 azure_public_dns_domain = "westeurope.cloudapp.azure.com"
 
 # Manually retrieved
-azure_matthieu_user_object_id = "custome_user_matthieu_azuread_in_AzureAD"
+azure_matthieu_user_object_id = "58c64a9c-df3c-********"
+
 
 #=====================================
 # Datadog variables
 #=====================================
 datadog_region = "datadoghq.eu"
+
+
 
 #=====================================
 # AWS and Cloudflare Tag

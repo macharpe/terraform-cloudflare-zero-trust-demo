@@ -8,14 +8,14 @@ resource "null_resource" "cleanup_known_hosts" {
   }
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/scripts/known_hosts_cleanup.py"
+    command = "python3 ${path.module}/scripts/cleanup/known_hosts_cleanup.py"
   }
 }
 
 # Cleanup device in Cloudflare Dashboard
 resource "null_resource" "cleanup_devices" {
   provisioner "local-exec" {
-    command = "chmod u+x ${path.root}/scripts/cloudflare_devices_cleanup.sh && ${path.root}/scripts/cloudflare_devices_cleanup.sh"
+    command = "chmod u+x ${path.root}/scripts/cleanup/cloudflare_devices_cleanup.sh && ${path.root}/scripts/cleanup/cloudflare_devices_cleanup.sh"
     environment = {
       CLOUDFLARE_EMAIL      = var.cloudflare_email
       CLOUDFLARE_API_KEY    = var.cloudflare_api_key
@@ -68,6 +68,7 @@ module "cloudflare" {
 
   # Domain
   cf_subdomain_ssh           = var.cf_subdomain_ssh
+  cf_subdomain_vnc           = var.cf_subdomain_vnc
   cf_subdomain_web           = var.cf_subdomain_web
   cf_subdomain_web_sensitive = var.cf_subdomain_web_sensitive
   cf_target_name             = var.cf_target_name
@@ -84,19 +85,21 @@ module "cloudflare" {
   cf_email_domain = var.cf_email_domain
 
   # App names and ports
-  cf_browser_rendering_app_name  = var.cf_browser_rendering_app_name
-  cf_infra_app_name              = var.cf_infra_app_name
-  cf_sensitive_web_app_name      = var.cf_sensitive_web_app_name
-  cf_administration_web_app_name = var.cf_administration_web_app_name
-  cf_team_name                   = var.cf_team_name
-  cf_administration_web_app_port = var.cf_administration_web_app_port
-  cf_sensitive_web_app_port      = var.cf_sensitive_web_app_port
-  cf_domain_controller_rdp_port  = var.cf_domain_controller_rdp_port
+  cf_browser_rendering_ssh_app_name = var.cf_browser_rendering_ssh_app_name
+  cf_browser_rendering_vnc_app_name = var.cf_browser_rendering_vnc_app_name
+  cf_infra_app_name                 = var.cf_infra_app_name
+  cf_sensitive_web_app_name         = var.cf_sensitive_web_app_name
+  cf_administration_web_app_name    = var.cf_administration_web_app_name
+  cf_team_name                      = var.cf_team_name
+  cf_administration_web_app_port    = var.cf_administration_web_app_port
+  cf_sensitive_web_app_port         = var.cf_sensitive_web_app_port
+  cf_domain_controller_rdp_port     = var.cf_domain_controller_rdp_port
 
   # AWS
-  aws_ec2_service_private_ip = aws_instance.aws_ec2_service_instance.private_ip
-  aws_private_subnet_cidr    = var.aws_private_subnet_cidr
-  aws_public_subnet_cidr     = var.aws_public_subnet_cidr
+  aws_ec2_ssh_service_private_ip = aws_instance.aws_ec2_service_instance.private_ip
+  aws_ec2_vnc_service_private_ip = aws_instance.aws_ec2_vnc_instance.private_ip
+  aws_private_subnet_cidr        = var.aws_private_subnet_cidr
+  aws_public_subnet_cidr         = var.aws_public_subnet_cidr
 
   # Azure
   azure_engineering_group_id = module.azure-ad.azure_engineering_group_id

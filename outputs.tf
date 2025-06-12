@@ -64,10 +64,16 @@ output "AWS_EC2_INSTANCES" {
       ssh           = "ssh ${var.aws_vm_default_user}@${instance.private_ip} -i ${module.ssh_keys.aws_cloudflared_key_paths[idx]}"
     }],
     [{
-      name          = var.aws_ec2_instsance_name
+      name          = var.aws_ec2_browser_ssh_name
       internal_ip   = aws_instance.aws_ec2_service_instance.private_ip
       public_ip_nat = aws_eip.nat_eip.public_ip
       ssh           = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_ec2_service_instance.private_ip} -i ${module.ssh_keys.aws_service_key_path}"
+    }],
+    [{
+      name          = var.aws_ec2_browser_vnc_name
+      internal_ip   = aws_instance.aws_ec2_vnc_instance.private_ip
+      public_ip_nat = aws_eip.nat_eip.public_ip
+      ssh           = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_ec2_vnc_instance.private_ip} -i ${module.ssh_keys.aws_vnc_key_path}"
     }]
   )
 }

@@ -180,6 +180,11 @@ variable "cf_subdomain_ssh" {
   type        = string
 }
 
+variable "cf_subdomain_vnc" {
+  description = "Name of the subdomain for VNC public hostname of tunnel"
+  type        = string
+}
+
 variable "cf_subdomain_web" {
   description = "Name of the subdomain for web public hostname of tunnel"
   type        = string
@@ -190,8 +195,13 @@ variable "cf_subdomain_web_sensitive" {
   type        = string
 }
 
-variable "cf_browser_rendering_app_name" {
-  description = "Name of the Browser Rendering App in Cloudflare"
+variable "cf_browser_rendering_ssh_app_name" {
+  description = "Name of the Browser Rendering SSH App in Cloudflare"
+  type        = string
+}
+
+variable "cf_browser_rendering_vnc_app_name" {
+  description = "Name of the Browser Rendering VNC App in Cloudflare"
   type        = string
 }
 
@@ -464,8 +474,13 @@ variable "aws_ec2_instance_config_ami_id" {
   default     = "ami-086ecbd485d8bb032"
 }
 
-variable "aws_ec2_instsance_name" {
-  description = "Name of the EC2 instance"
+variable "aws_ec2_browser_ssh_name" {
+  description = "Name of the EC2 instance browser rendered SSH"
+  type        = string
+}
+
+variable "aws_ec2_browser_vnc_name" {
+  description = "Name of the EC2 instance browser rendered VNC"
   type        = string
 }
 
@@ -505,7 +520,11 @@ variable "aws_vm_default_user" {
   type        = string
 }
 
-
+variable "aws_vnc_password" {
+  description = "default user for AWS VM"
+  type        = string
+  sensitive   = true
+}
 
 #======================================
 # AZURE Variables

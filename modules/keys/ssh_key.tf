@@ -99,6 +99,24 @@ resource "local_file" "aws_service_public_key" {
   file_permission = "0600"
 }
 
+# AWS Key Pair for SERVICE VNC VM
+resource "tls_private_key" "aws_vnc_service_key" {
+  #algorithm = "ED25519"
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "local_file" "aws_vnc_private_key" {
+  content         = tls_private_key.aws_vnc_service_key.private_key_pem
+  filename        = "${path.module}/out/aws_vnc_service_key_pair"
+  file_permission = "0600"
+}
+
+resource "local_file" "aws_vnc_public_key" {
+  content         = tls_private_key.aws_vnc_service_key.public_key_openssh
+  filename        = "${path.module}/out/aws_vnc_service_key_pair.pub"
+  file_permission = "0600"
+}
 
 
 

@@ -7,7 +7,7 @@ resource "aws_key_pair" "aws_ec2_service_key_pair" {
   public_key = module.ssh_keys.aws_ssh_service_public_key
 
   tags = {
-    Name        = "SSH Key for Service EC2"
+    Name        = "SSH Key for SSH Service EC2"
     Environment = var.cf_aws_tag
   }
 }
@@ -20,6 +20,17 @@ resource "aws_key_pair" "aws_ec2_cloudflared_key_pair" {
 
   tags = {
     Name        = "SSH Key for Cloudflared EC2"
+    Environment = var.cf_aws_tag
+  }
+}
+
+# AWS Key Pair for VNC Service
+resource "aws_key_pair" "aws_ec2_vnc_key_pair" {
+  key_name   = "aws_ssh_vnc_service"
+  public_key = module.ssh_keys.aws_vnc_service_public_key
+
+  tags = {
+    Name        = "SSH Key for VNC EC2"
     Environment = var.cf_aws_tag
   }
 }
@@ -55,59 +66,59 @@ resource "aws_ssm_parameter" "datadog_api_key" {
 
 
 
-#==========================================================
-# IAM Role for EC2 Instances to access SSM Parameter Store
-#==========================================================
-# IAM role for EC2 instances to access SSM parameters
-resource "aws_iam_role" "ec2_ssm_role" {
-  name = "ec2-ssm-access-role"
+# #==========================================================
+# # IAM Role for EC2 Instances to access SSM Parameter Store
+# #==========================================================
+# # IAM role for EC2 instances to access SSM parameters
+# resource "aws_iam_role" "ec2_ssm_role" {
+#   name = "ec2-ssm-access-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = "sts:AssumeRole"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "ec2.amazonaws.com"
+#         }
+#       }
+#     ]
+#   })
 
-  tags = {
-    Name        = "EC2 SSM Access Role"
-    Environment = var.cf_aws_tag
-  }
-}
+#   tags = {
+#     Name        = "EC2 SSM Access Role"
+#     Environment = var.cf_aws_tag
+#   }
+# }
 
-# IAM policy for accessing SSM parameters
-resource "aws_iam_role_policy" "ec2_ssm_policy" {
-  name = "ec2-ssm-parameter-policy"
-  role = aws_iam_role.ec2_ssm_role.id
+# # IAM policy for accessing SSM parameters
+# resource "aws_iam_role_policy" "ec2_ssm_policy" {
+#   name = "ec2-ssm-parameter-policy"
+#   role = aws_iam_role.ec2_ssm_role.id
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ssm:GetParameter",
-          "ssm:GetParameters"
-        ]
-        Resource = [
-          "arn:aws:ssm:${var.aws_region}:*:parameter/myapp/*"
-        ]
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "ssm:GetParameter",
+#           "ssm:GetParameters"
+#         ]
+#         Resource = [
+#           "arn:aws:ssm:${var.aws_region}:*:parameter/myapp/*"
+#         ]
+#       }
+#     ]
+#   })
+# }
 
-# Instance profile for EC2
-resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "ec2-ssm-profile"
-  role = aws_iam_role.ec2_ssm_role.name
-}
+# # Instance profile for EC2
+# resource "aws_iam_instance_profile" "ec2_profile" {
+#   name = "ec2-ssm-profile"
+#   role = aws_iam_role.ec2_ssm_role.name
+# }
 
 
 
@@ -250,14 +261,13 @@ resource "aws_instance" "cloudflared_aws" {
 
   key_name = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
 
-  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+  #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
   user_data = templatefile("${path.module}/scripts/aws-cloudflared-init.yaml", {
     hostname          = "${var.aws_ec2_cloudflared_name}-${count.index}"
     tunnel_secret_aws = module.cloudflare.aws_extracted_token
     datadog_api_key   = var.datadog_api_key
-    # aws_region     = var.aws_region
-    datadog_region = var.datadog_region
+    datadog_region    = var.datadog_region
   })
 
   tags = {
@@ -269,7 +279,7 @@ resource "aws_instance" "cloudflared_aws" {
 
 
 #==========================================================
-# EC2 Instances: SERVICE EC2 Instances
+# EC2 Instances: SERVICE Browser SSH EC2 Instances
 #==========================================================
 resource "aws_instance" "aws_ec2_service_instance" {
   #  count         = 1
@@ -286,22 +296,54 @@ resource "aws_instance" "aws_ec2_service_instance" {
 
   key_name = aws_key_pair.aws_ec2_service_key_pair.key_name
 
-  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+  #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = templatefile("${path.module}/scripts/aws-service-init.tftpl", {
-    hostname              = "${var.aws_ec2_instsance_name}"
+  user_data = templatefile("${path.module}/scripts/aws-browser-ssh-init.tftpl", {
+    hostname              = "${var.aws_ec2_browser_ssh_name}"
     ca_cloudflare_browser = module.cloudflare.pubkey_short_lived_certificate
     users                 = var.aws_users
     datadog_api_key       = var.datadog_api_key
-    # aws_region     = var.aws_region
-    datadog_region = var.datadog_region
+    datadog_region        = var.datadog_region
     # Linux user for contractor
     okta_contractor_username = split("@", var.okta_bob_user_login)[0]
     okta_contractor_password = var.okta_bob_user_linux_password
   })
 
   tags = {
-    Name        = "${var.aws_ec2_instsance_name}"
+    Name        = "${var.aws_ec2_browser_ssh_name}"
+    Environment = var.cf_aws_tag
+  }
+}
+
+
+#==========================================================
+# EC2 Instance: VNC Browser Service
+#==========================================================
+resource "aws_instance" "aws_ec2_vnc_instance" {
+  ami           = var.aws_ec2_instance_config_ami_id
+  instance_type = var.aws_ec2_instance_config_type
+
+  subnet_id = aws_subnet.aws_private_subnet.id
+
+  # Troubleshoot (remove after)
+  # subnet_id                   = aws_subnet.aws_public_subnet.id
+  # associate_public_ip_address = true
+
+  vpc_security_group_ids = [aws_security_group.aws_vnc_server_sg.id]
+
+  key_name = aws_key_pair.aws_ec2_vnc_key_pair.key_name
+
+  #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  user_data = templatefile("${path.module}/scripts/aws-browser-vnc-init.tftpl", {
+    hostname        = var.aws_ec2_browser_vnc_name
+    vnc_password    = var.aws_vnc_password
+    datadog_api_key = var.datadog_api_key
+    datadog_region  = var.datadog_region
+  })
+
+  tags = {
+    Name        = var.aws_ec2_browser_vnc_name
     Environment = var.cf_aws_tag
   }
 }
@@ -343,9 +385,9 @@ resource "aws_security_group" "aws_cloudflared_sg" {
 }
 
 
-### Security Group for Service EC2 ###
+### Security Group for Browser SSH EC2 ###
 resource "aws_security_group" "aws_ssh_server_sg" {
-  name        = "ssh-server-sg"
+  name        = "browser-ssh-sg"
   description = "Allow SSH only from tunnel replicas"
   vpc_id      = aws_vpc.aws_custom_vpc.id
   depends_on  = [aws_security_group.aws_cloudflared_sg]
@@ -366,14 +408,6 @@ resource "aws_security_group" "aws_ssh_server_sg" {
     security_groups = [aws_security_group.aws_cloudflared_sg.id]
   }
 
-  # Allow VNC ingress from my VM running cloudflared
-  ingress {
-    from_port       = 5901
-    to_port         = 5901
-    protocol        = "tcp"
-    security_groups = [aws_security_group.aws_cloudflared_sg.id]
-  }
-
   # Allow ICMP (ping)
   ingress {
     from_port   = -1
@@ -387,6 +421,68 @@ resource "aws_security_group" "aws_ssh_server_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+### Security Group for Browser VNC EC2 ###
+resource "aws_security_group" "aws_vnc_server_sg" {
+  name        = "browser-vnc-sg"
+  description = "Security group for VNC browser service"
+  vpc_id      = aws_vpc.aws_custom_vpc.id
+  depends_on  = [aws_security_group.aws_cloudflared_sg]
+
+  # Allow SSH ingress from WARP CGNAT range
+  ingress {
+    description = "Allow SSH from WARP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.cf_warp_cgnat_cidr]
+  }
+
+  # Allow SSH ingress from cloudflared instances
+  ingress {
+    description     = "Allow SSH from cloudflared instances"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aws_cloudflared_sg.id]
+  }
+
+  # Allow VNC ingress from cloudflared instances
+  ingress {
+    description     = "Allow VNC from cloudflared instances"
+    from_port       = 5901
+    to_port         = 5901
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aws_cloudflared_sg.id]
+  }
+
+  # Allow ICMP (ping)
+  ingress {
+    description = "Allow ICMP from everywhere"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow all outbound traffic
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "VNC Browser Security Group"
+    Environment = var.cf_aws_tag
   }
 
   lifecycle {

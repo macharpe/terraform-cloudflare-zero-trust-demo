@@ -48,7 +48,7 @@ resource "cloudflare_zero_trust_gateway_policy" "block_pdf_file_download_policy"
   account_id  = var.cloudflare_account_id
   name        = "Zero-Trust demo Block PDF Files download"
   description = "Block Downloading PDF Files for Sales Engineering group"
-  enabled     = true
+  enabled     = false
   action      = "block"
   precedence  = local.pdf_block_precedence
 

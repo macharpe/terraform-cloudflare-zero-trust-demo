@@ -126,6 +126,11 @@ variable "cf_subdomain_ssh" {
   type        = string
 }
 
+variable "cf_subdomain_vnc" {
+  description = "Name of the subdomain for VNC public hostname of tunnel"
+  type        = string
+}
+
 variable "cf_subdomain_web" {
   description = "Name of the subdomain for web public hostname of tunnel"
   type        = string
@@ -150,8 +155,13 @@ variable "cf_infra_app_name" {
   type        = string
 }
 
-variable "cf_browser_rendering_app_name" {
-  description = "Name of the Browser Rendering App in Cloudflare"
+variable "cf_browser_rendering_ssh_app_name" {
+  description = "Name of the Browser Rendering SSH App in Cloudflare"
+  type        = string
+}
+
+variable "cf_browser_rendering_vnc_app_name" {
+  description = "Name of the Browser Rendering VNC App in Cloudflare"
   type        = string
 }
 
@@ -251,10 +261,16 @@ variable "gcp_ip_cidr_windows_rdp" {
 #==========================================
 # AWS
 #==========================================
-variable "aws_ec2_service_private_ip" {
-  description = "private ip address of the service running in AWS"
+variable "aws_ec2_ssh_service_private_ip" {
+  description = "private ip address of the SSH service running in AWS"
   type        = string
 }
+
+variable "aws_ec2_vnc_service_private_ip" {
+  description = "private ip address of the VNC service running in AWS"
+  type        = string
+}
+
 
 variable "aws_private_subnet_cidr" {
   description = "AWS private subnet, subnet for VMs in AWS"

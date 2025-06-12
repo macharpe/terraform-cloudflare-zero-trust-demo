@@ -2,7 +2,7 @@
 # Access for Infrastructure App
 #======================================================
 # Creating the Target
-resource "cloudflare_zero_trust_access_infrastructure_target" "ssh-gcp-instance" {
+resource "cloudflare_zero_trust_access_infrastructure_target" "ssh_gcp_instance" {
   account_id = var.cloudflare_account_id
   hostname   = var.cf_target_name
   ip = {
@@ -19,7 +19,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
   name             = var.cf_infra_app_name
   logo_url         = "https://upload.wikimedia.org/wikipedia/commons/0/01/Google-cloud-platform.svg"
   tags             = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration = "1h"
+  session_duration = "0s"
 
   target_criteria = [{
     port     = "22",
@@ -92,17 +92,17 @@ resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
 
 
 #======================================================
-# SELF-HOSTED Aaa: AWS Database
+# SELF-HOSTED: AWS Database (Browser rendered SSH)
 #======================================================
 # Creating the Self-hosted Application for Browser rendering SSH
 resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" {
   account_id           = var.cloudflare_account_id
   type                 = "ssh"
-  name                 = var.cf_browser_rendering_app_name
+  name                 = var.cf_browser_rendering_ssh_app_name
   app_launcher_visible = true
   logo_url             = "https://cdn.iconscout.com/icon/free/png-256/free-database-icon-download-in-svg-png-gif-file-formats--ui-elements-pack-user-interface-icons-444649.png"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "1h"
+  session_duration     = "0s"
 
   destinations = [{
     type = "public"
@@ -116,11 +116,45 @@ resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" 
   policies = [
     {
       decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.employees_ssh_browser_rendering_policy.id
+      id       = cloudflare_zero_trust_access_policy.employees_browser_rendering_policy.id
     },
     {
       decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.contractors_ssh_browser_rendering_policy.id
+      id       = cloudflare_zero_trust_access_policy.contractors_browser_rendering_policy.id
+    },
+  ]
+}
+
+#======================================================
+# SELF-HOSTED: AWS Browser Rendered VNC
+#======================================================
+# Creating the Self-hosted Application for Browser rendering VNC
+resource "cloudflare_zero_trust_access_application" "vnc_aws_browser_rendering" {
+  account_id           = var.cloudflare_account_id
+  type                 = "vnc"
+  name                 = var.cf_browser_rendering_vnc_app_name
+  app_launcher_visible = true
+  logo_url             = "https://blog.zwindler.fr/2015/07/vnc.png"
+  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration     = "0s"
+
+  destinations = [{
+    type = "public"
+    uri  = var.cf_subdomain_vnc
+  }]
+
+  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_onetimepin_identity_provider_id]
+  auto_redirect_to_identity   = false
+  allow_authenticate_via_warp = false
+
+  policies = [
+    {
+      decision = "allow"
+      id       = cloudflare_zero_trust_access_policy.employees_browser_rendering_policy.id
+    },
+    {
+      decision = "allow"
+      id       = cloudflare_zero_trust_access_policy.contractors_browser_rendering_policy.id
     },
   ]
 }
@@ -169,7 +203,7 @@ resource "cloudflare_zero_trust_access_application" "administration_web_app" {
   app_launcher_visible = true
   logo_url             = "https://raw.githubusercontent.com/uditkumar489/Icon-pack/master/Entrepreneur/digital-marketing/svg/computer-1.svg"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "1h"
+  session_duration     = "0s"
 
   destinations = [{
     type = "public"

@@ -8,10 +8,10 @@ resource "cloudflare_zero_trust_access_policy" "web_app_policy" {
   session_duration = "0s"
 
   include = [{
-      group = {
-        id = cloudflare_zero_trust_access_group.it_admin_rule_group.id
-      }
-    }]
+    group = {
+      id = cloudflare_zero_trust_access_group.it_admin_rule_group.id
+    }
+  }]
   require = [{
     device_posture = {
       integration_uid = var.cf_gateway_posture_id
@@ -72,9 +72,9 @@ resource "cloudflare_zero_trust_access_policy" "sensitive_web_server_policy" {
 
 
 #======================================================
-# POLICY for Employees AWS Browser SSH database
+# POLICY for Employees AWS Browser Rendering
 #======================================================
-resource "cloudflare_zero_trust_access_policy" "employees_ssh_browser_rendering_policy" {
+resource "cloudflare_zero_trust_access_policy" "employees_browser_rendering_policy" {
   account_id       = var.cloudflare_account_id
   decision         = "allow"
   name             = "Employees AWS Database Policy"
@@ -110,7 +110,7 @@ resource "cloudflare_zero_trust_access_policy" "employees_ssh_browser_rendering_
 #======================================================
 # POLICY for Contractors AWS Browser SSH database
 #======================================================
-resource "cloudflare_zero_trust_access_policy" "contractors_ssh_browser_rendering_policy" {
+resource "cloudflare_zero_trust_access_policy" "contractors_browser_rendering_policy" {
   account_id       = var.cloudflare_account_id
   decision         = "allow"
   name             = "Contractors AWS Database Policy"

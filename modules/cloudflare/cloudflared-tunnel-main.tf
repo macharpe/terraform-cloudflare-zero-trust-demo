@@ -130,7 +130,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
   config = {
     ingress = [{
       hostname = var.cf_subdomain_ssh
-      service  = "ssh://${var.aws_ec2_service_private_ip}:22"
+      service  = "ssh://${var.aws_ec2_ssh_service_private_ip}:22"
       origin_request = {
         access = {
           aud_tag   = [cloudflare_zero_trust_access_application.ssh_aws_browser_rendering.aud]
@@ -138,6 +138,17 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
           team_name = var.cf_team_name
         }
       }
+      },
+      {
+        hostname = var.cf_subdomain_vnc
+        service  = "tcp://${var.aws_ec2_vnc_service_private_ip}:5901"
+        origin_request = {
+          access = {
+            aud_tag   = [cloudflare_zero_trust_access_application.vnc_aws_browser_rendering.aud]
+            required  = true
+            team_name = var.cf_team_name
+          }
+        }
       },
       {
         service = "http_status:404"
