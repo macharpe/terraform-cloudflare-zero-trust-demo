@@ -6,7 +6,7 @@ This is a work in progress 🚧 and therefore no everything is perfect but I int
 
 This is the diagram showing at a high-level the architecture and the components involved (and how they are connected together)
 
-_Last Updated: 6th of June 2025_
+_Last Updated: 12th of June 2025_
 ![Architecture Diagram](doc/Architecture-diagram.svg)
 
 [![Generate terraform docs on main](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml)

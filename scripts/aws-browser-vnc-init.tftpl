@@ -9,11 +9,39 @@ packages:
   - net-tools
 
 write_files:
-  - path: /tmp/create-files.sh
+  - path: /tmp/setup-vnc-complete.sh
     content: |
       #!/bin/bash
 
-      # Create bashrc with green prompt
+      # Create log file with proper permissions
+      touch /tmp/vnc-setup.log
+      chmod 666 /tmp/vnc-setup.log
+
+      echo "=== Starting Complete VNC Setup ===" >> /tmp/vnc-setup.log
+
+      # Install packages with retry logic
+      echo "Installing packages..." >> /tmp/vnc-setup.log
+      for i in {1..3}; do
+          apt-get update && break
+          echo "Package update attempt $i failed, retrying..." >> /tmp/vnc-setup.log
+          sleep 10
+      done
+
+      # Install VNC and desktop packages
+      PACKAGES="xfce4 xfce4-goodies tightvncserver dbus-x11 thunar firefox"
+      for package in $PACKAGES; do
+          echo "Installing $package..." >> /tmp/vnc-setup.log
+          if apt-get install -y $package; then
+              echo "$package installed successfully" >> /tmp/vnc-setup.log
+          else
+              echo "WARNING: $package installation failed" >> /tmp/vnc-setup.log
+          fi
+      done
+
+      # Create ubuntu user files
+      echo "Creating user files..." >> /tmp/vnc-setup.log
+
+      # Create .bashrc with green prompt
       cat > /home/ubuntu/.bashrc << 'BASHEND'
       case $- in *i*) ;; *) return;; esac
       HISTCONTROL=ignoreboth
@@ -47,7 +75,7 @@ write_files:
       alias l='ls -CF'
       BASHEND
 
-      # Create VNC startup script
+      # Create VNC directory and startup script
       mkdir -p /home/ubuntu/.vnc
       cat > /home/ubuntu/.vnc/xstartup << 'VNCEND'
       #!/bin/bash
@@ -62,158 +90,112 @@ write_files:
       xfce4-terminal &
       VNCEND
 
-      # Set ownership and permissions
+      # Fix ownership and permissions
       chown ubuntu:ubuntu /home/ubuntu/.bashrc
       chown -R ubuntu:ubuntu /home/ubuntu/.vnc
       chmod +x /home/ubuntu/.vnc/xstartup
       chmod 644 /home/ubuntu/.bashrc
 
-      echo "Files created successfully" >> /tmp/vnc-setup.log
-    permissions: "0755"
+      # Find VNC binaries
+      VNCSERVER=$(which vncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1)
+      VNCPASSWD=$(which vncpasswd 2>/dev/null || find /usr -name "vncpasswd" 2>/dev/null | head -1)
 
-  - path: /tmp/install-packages.sh
-    content: |
-      #!/bin/bash
-      echo "=== Package Installation Started ===" >> /tmp/vnc-setup.log
+      echo "VNC Server found at: $VNCSERVER" >> /tmp/vnc-setup.log
+      echo "VNC Passwd found at: $VNCPASSWD" >> /tmp/vnc-setup.log
 
-      # Update package lists with retries
-      for i in {1..3}; do
-          apt-get update && break
-          echo "Package update attempt $i failed, retrying..." >> /tmp/vnc-setup.log
-          sleep 10
-      done
+      if [ -z "$VNCSERVER" ] || [ -z "$VNCPASSWD" ]; then
+          echo "ERROR: VNC binaries not found!" >> /tmp/vnc-setup.log
+          exit 1
+      fi
 
-      # Install packages one by one for better error handling
-      PACKAGES="xfce4 xfce4-goodies tightvncserver dbus-x11 thunar firefox"
+      # Set VNC password as ubuntu user
+      echo "Setting VNC password..." >> /tmp/vnc-setup.log
+      sudo -u ubuntu bash << VNCSUDO
+      mkdir -p ~/.vnc
+      echo "${vnc_password}" | $VNCPASSWD -f > ~/.vnc/passwd
+      chmod 600 ~/.vnc/passwd
+      VNCSUDO
 
-      for package in $PACKAGES; do
-          echo "Installing $package..." >> /tmp/vnc-setup.log
-          if apt-get install -y $package; then
-              echo "$package installed successfully" >> /tmp/vnc-setup.log
-          else
-              echo "WARNING: $package installation failed" >> /tmp/vnc-setup.log
-          fi
-      done
+      # Create systemd service BEFORE starting VNC
+      echo "Creating systemd service..." >> /tmp/vnc-setup.log
+      cat > /etc/systemd/system/vncserver@.service << SERVICEEND
+      [Unit]
+      Description=TightVNC server
+      After=syslog.target network.target
 
-      # Verify VNC installation
-      which vncserver >> /tmp/vnc-setup.log 2>&1 || echo "vncserver not found in PATH" >> /tmp/vnc-setup.log
-      find /usr -name "vncserver" 2>/dev/null >> /tmp/vnc-setup.log || echo "vncserver not found anywhere" >> /tmp/vnc-setup.log
+      [Service]
+      Type=forking
+      User=ubuntu
+      Group=ubuntu
+      WorkingDirectory=/home/ubuntu
+      PIDFile=/home/ubuntu/.vnc/%H:%i.pid
+      ExecStartPre=-$VNCSERVER -kill :%i > /dev/null 2>&1
+      ExecStart=$VNCSERVER -depth 24 -geometry 1280x720 :%i
+      ExecStop=$VNCSERVER -kill :%i
 
-      echo "=== Package Installation Complete ===" >> /tmp/vnc-setup.log
+      [Install]
+      WantedBy=multi-user.target
+      SERVICEEND
+
+      # Reload systemd and enable service
+      systemctl daemon-reload
+      systemctl enable vncserver@1.service
+
+      # Start VNC through systemd (not manually)
+      echo "Starting VNC service..." >> /tmp/vnc-setup.log
+      systemctl start vncserver@1.service
+
+      # Wait a moment for service to start
+      sleep 5
+
+      # Check if VNC is running
+      if systemctl is-active --quiet vncserver@1.service; then
+          echo "VNC service started successfully!" >> /tmp/vnc-setup.log
+      else
+          echo "VNC service failed to start, trying manual start..." >> /tmp/vnc-setup.log
+          sudo -u ubuntu $VNCSERVER :1 -geometry 1280x720 -depth 24 >> /tmp/vnc-setup.log 2>&1
+      fi
+
+      # Final status check
+      netstat -tlnp | grep 5901 >> /tmp/vnc-setup.log 2>&1 || echo "Port 5901 not listening" >> /tmp/vnc-setup.log
+      systemctl status vncserver@1.service >> /tmp/vnc-setup.log 2>&1
+
+      echo "=== VNC Setup Complete ===" >> /tmp/vnc-setup.log
     permissions: "0755"
 
 runcmd:
+  # Set hostname
   - hostnamectl set-hostname ${hostname}
 
-  # Install Datadog Agent first (simpler, more reliable)
+  # Install Datadog Agent
   - DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)" > /tmp/dd_install.log 2>&1
 
-  # Install packages with robust error handling
-  - /tmp/install-packages.sh
+  # Run the complete VNC setup
+  - /tmp/setup-vnc-complete.sh
 
-  # Create user files
-  - /tmp/create-files.sh
-
-  # Create robust VNC setup script
+  # Create info file
   - |
-    cat > /home/ubuntu/start-vnc-robust.sh << 'VNCSCRIPT'
-    #!/bin/bash
-    echo "=== VNC Setup Started ===" >> /tmp/vnc-setup.log
-
-    # Find VNC binaries with multiple fallbacks
-    VNCSERVER=$(which vncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1)
-    VNCPASSWD=$(which vncpasswd 2>/dev/null || find /usr -name "vncpasswd" 2>/dev/null | head -1)
-
-    echo "VNC Server: $VNCSERVER" >> /tmp/vnc-setup.log
-    echo "VNC Passwd: $VNCPASSWD" >> /tmp/vnc-setup.log
-
-    if [ -z "$VNCSERVER" ] || [ -z "$VNCPASSWD" ]; then
-        echo "ERROR: VNC binaries not found!" >> /tmp/vnc-setup.log
-        exit 1
-    fi
-
-    # Create VNC directory
-    mkdir -p ~/.vnc
-
-    # Set VNC password
-    echo "${vnc_password}" | $VNCPASSWD -f > ~/.vnc/passwd
-    chmod 600 ~/.vnc/passwd
-
-    # Start VNC server
-    $VNCSERVER :1 -geometry 1280x720 -depth 24
-
-    echo "VNC server started!" >> /tmp/vnc-setup.log
-    $VNCSERVER -list >> /tmp/vnc-setup.log 2>&1
-    VNCSCRIPT
-
-    chown ubuntu:ubuntu /home/ubuntu/start-vnc-robust.sh
-    chmod +x /home/ubuntu/start-vnc-robust.sh
-
-  # Run VNC setup as ubuntu user
-  - sudo -u ubuntu /home/ubuntu/start-vnc-robust.sh
-
-  # Create systemd service with correct VNC paths
-  - |
-    VNCSERVER_PATH=$(which vncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1)
-
-    if [ -n "$VNCSERVER_PATH" ]; then
-        echo "Creating systemd service with VNC path: $VNCSERVER_PATH" >> /tmp/vnc-setup.log
-        
-        cat > /etc/systemd/system/vncserver@.service << SERVICEEND
-    [Unit]
-    Description=TightVNC server
-    After=syslog.target network.target
-
-    [Service]
-    Type=forking
-    User=ubuntu
-    Group=ubuntu
-    WorkingDirectory=/home/ubuntu
-    PIDFile=/home/ubuntu/.vnc/%H:%i.pid
-    ExecStartPre=-$VNCSERVER_PATH -kill :%i > /dev/null 2>&1
-    ExecStart=$VNCSERVER_PATH -depth 24 -geometry 1280x720 :%i
-    ExecStop=$VNCSERVER_PATH -kill :%i
-
-    [Install]
-    WantedBy=multi-user.target
-    SERVICEEND
-        
-        systemctl daemon-reload
-        systemctl enable vncserver@1.service
-        echo "Systemd service created and enabled" >> /tmp/vnc-setup.log
-    else
-        echo "ERROR: Could not find vncserver for systemd service" >> /tmp/vnc-setup.log
-    fi
-
-  # Create info file with actual status
-  - |
-    cat > /home/ubuntu/VNC_INFO.txt << INFOEND
+    cat > /home/ubuntu/VNC_INFO.txt << 'INFOEND'
     VNC Server Setup Complete!
 
     Hostname: ${hostname}
     VNC Port: 5901
     VNC Password: ${vnc_password}
 
-    VNC server should be running automatically.
+    VNC server should be running via systemd service.
 
-    To restart VNC: ./start-vnc-robust.sh
-    To check status: sudo systemctl status vncserver@1.service
-    To check logs: cat /tmp/vnc-setup.log
+    Commands:
+    - Check status: sudo systemctl status vncserver@1.service
+    - Restart VNC:  sudo systemctl restart vncserver@1.service
+    - Check logs:   cat /tmp/vnc-setup.log
+    - Check port:   sudo netstat -tlnp | grep 5901
 
     Connect your Cloudflare tunnel to: tcp://localhost:5901
     INFOEND
 
     chown ubuntu:ubuntu /home/ubuntu/VNC_INFO.txt
 
-  # Final status logging
-  - |
-    echo "=== Final Setup Status ===" >> /tmp/vnc-setup.log
-    echo "Setup completed at: $(date)" >> /tmp/vnc-setup.log
-    ls -la /home/ubuntu/ >> /tmp/vnc-setup.log
-    netstat -tlnp | grep 5901 >> /tmp/vnc-setup.log 2>&1 || echo "Port 5901 not listening" >> /tmp/vnc-setup.log
-    systemctl status vncserver@1.service >> /tmp/vnc-setup.log 2>&1 || echo "VNC service not running" >> /tmp/vnc-setup.log
-
 final_message: |
-  VNC setup complete!
-  Instance: ${hostname}
-  Check setup logs: cat /tmp/vnc-setup.log
+  VNC setup complete on ${hostname}!
+  VNC should be accessible on port 5901.
+  Check logs: cat /tmp/vnc-setup.log
