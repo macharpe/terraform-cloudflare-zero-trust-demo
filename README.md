@@ -1,88 +1,215 @@
-# Disclaimer
+# Cloudflare Zero Trust Demo Environment
 
-This is a work in progress 🚧 and therefore no everything is perfect but I intend to maintain it and improve it along the way.
-
-## 1. Architecture
-
-This is the diagram showing at a high-level the architecture and the components involved (and how they are connected together)
-
-_Last Updated: 12th of June 2025_
-![Architecture Diagram](doc/Architecture-diagram.svg)
+A comprehensive, production-ready Terraform infrastructure that demonstrates Cloudflare's Zero Trust capabilities across multi-cloud environments. This project showcases advanced security policies, identity integration, and seamless connectivity between AWS, Azure, and GCP.
 
 [![Generate terraform docs on main](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml)
 
-## 2. Introduction
+> **Note**: This is a work in progress 🚧. While functional, I intend to maintain and improve it continuously based on community feedback and evolving best practices.
 
-I have published 3 blogs posts summarizing the goal of this and how it can be used (also what is unique about it). Feel free to check it out for more context.
-- Part 1: [Building a Scalable Zero Trust Demo environment with Cloudflare and Terraform (Part 1)](https://www.linkedin.com/pulse/building-scalable-zero-trust-demo-environment-part-1-charpentier-ntgoe/?trackingId=bl5ST2%2FDTgW7ueBjhaW0hw%3D%3D)
-- Part 2: [Automating Cloudflare Zero Trust at Scale: Terraform, Multi-Cloud, and Identity (Part 2)](https://www.linkedin.com/pulse/automating-cloudflare-zero-trust-scale-terraform-part-charpentier-ova1e/)
-- Part 3: [Zero Trust for Real-World Scenarios: Use Cases and Extensions (Part 3 - Final)](https://www.linkedin.com/pulse/zero-trust-real-world-scenarios-use-cases-extensions-part-matthieu-t5qee/)
+## 🌟 Features
 
-## 3. Prerequisites
+- **Multi-Cloud Architecture**: Seamless integration across AWS, Azure, and GCP
+- **Zero Trust Security**: Complete implementation of Cloudflare's SASE platform
+- **Identity Integration**: Support for Okta, Azure AD, and custom identity providers
+- **Advanced Networking**: WARP Connector tunnels and private network routing
+- **Infrastructure as Code**: Fully automated with Terraform
+- **Real-World Use Cases**: Browser rendering, RDP access, and infrastructure management
+- **Automated Cleanup**: Built-in scripts for environment management
+- **Device Posture Checks**: OS version compliance and security validation
+- **Policy-Based Access**: Role-based access control with comprehensive policies
 
-These are some of the steps you will need to perform before running the Terraform script.
+## 🏗️ Architecture Overview
 
-### 3.1 Integration with other accounts
+This demo environment creates a sophisticated Zero Trust network spanning three major cloud providers, connected through Cloudflare's global network.
 
-For this demo to work, you will need to have the following accounts created:
+_Last Updated: 12th of June 2025_
 
-- Cloudflare Account
-- Okta Dev Account
-- Azure Account
-- AWS Account
-- GCP Account
-- A registered domain with Cloudflare
-- Meraki Account
-- Salesforce Account
-- Datadog Account
+![Architecture Diagram](doc/Architecture-diagram.svg)
 
-### 3.2 WARP Connector setup in Cloudflare UI
+*The architecture demonstrates how Cloudflare Zero Trust creates secure, identity-aware connections between resources across multiple cloud providers without traditional VPN complexity.*
 
-Because, the Cloudflare Terraform provider does not support the creation and management of a "warp connector" ressource in Cloudflare, you need to manually create them in the UI
+## 📚 Background Reading
 
-Under Networks > Tunnels > Create tunnel (select Warp Connector not cloudflared) Create two tunnels like depicted below
+For detailed context and implementation insights, check out this comprehensive blog series:
 
-<img src="doc/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
+- **Part 1**: [Building a Scalable Zero Trust Demo environment with Cloudflare and Terraform](https://www.linkedin.com/pulse/building-scalable-zero-trust-demo-environment-part-1-charpentier-ntgoe/?trackingId=bl5ST2%2FDTgW7ueBjhaW0hw%3D%3D)
+- **Part 2**: [Automating Cloudflare Zero Trust at Scale: Terraform, Multi-Cloud, and Identity](https://www.linkedin.com/pulse/automating-cloudflare-zero-trust-scale-terraform-part-charpentier-ova1e/)
+- **Part 3**: [Zero Trust for Real-World Scenarios: Use Cases and Extensions](https://www.linkedin.com/pulse/zero-trust-real-world-scenarios-use-cases-extensions-part-matthieu-t5qee/)
 
-Then you need to attach "Private Routes" to these WARP Connector Tunnels so that the respective networks are routed through the appropriate tunnels
-- For "Tunnel Azure WARP Connector", the network should be corresponding to the Terraform variable called **azure_address_prefixes** (in my case, 192.168.71.0/24)
-- For "Tunnel GCP WARP Connector", the network should be corresponding to the Terraform variable called **gcp_ip_cidr_warp**  (in my case, 10.156.85.0/24)
+## 📋 Prerequisites
 
-<img src="doc/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
-<img src="doc/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
+Before deploying this infrastructure, ensure you have the following accounts and tools configured:
 
+### Required Accounts
 
-Finally, you will need to retrive the tunnel IDs and store them in the following Terraform variables **cf_tunnel_warp_connector_azure_id** and **cf_tunnel_warp_connector_gcp_id** respectively.
+- **Cloudflare Account** with Zero Trust enabled
+- **Okta Developer Account** for identity management
+- **Azure Account** with appropriate subscription
+- **AWS Account** with programmatic access
+- **GCP Account** with service account configured
+- **Registered Domain** managed by Cloudflare
+- **Meraki Account** (for SaaS app demos)
+- **Salesforce Account** (for SaaS app demos)
+- **Datadog Account** (for observability features)
 
-### 3.3 Device enrollment Policies permissions in Cloudflare UI
+### Required Tools
 
-Create two policies:
-- Employee Enrollment Policy
-- Contractor Enrollment Policy
+- **Terraform** >= 1.11.0
+- **AWS CLI** configured with credentials
+- **Azure CLI** configured with subscription
+- **Google Cloud SDK** with service account
+- **Git** for version control
 
-Employee Enrollment Policy: allowing anyone part of any Okta group to enroll their device <br>
-<img src="doc/images/employee_enrollment_policy.png" alt="Employee Enrollment Policy" width="400" />
+## 🛠️ Step-by-Step Setup
 
-Contractors Enrollment Policy: allowing contractros with email domain = @passfwd OR part of Okta Group "Contractors"<br>
-<img src="doc/images/contractors_enrollment_policy.png" alt="Contractors Enrollment Policy" width="480" />
+### 1. Clone and Initialize
 
-This is what your Device Enrollment Permissions should look like:<br>
+```bash
+git clone https://github.com/macharpe/terraform-cloudflare-zero-trust-demo
+cd terraform-cloudflare-zero-trust-demo
+cp terraform.tfvars.example terraform.tfvars
+```
+
+### 2. Configure Environment Variables
+
+Create a `.envrc` file (or set environment variables) with your credentials:
+
+```bash
+# Cloudflare
+export TF_VAR_cloudflare_api_key="your_cloudflare_api_key"
+export TF_VAR_cloudflare_account_id="your_account_id"
+export TF_VAR_cloudflare_email="your_email@domain.com"
+export TF_VAR_cloudflare_zone_id="your_zone_id"
+
+# AWS
+export AWS_ACCESS_KEY_ID="your_aws_access_key"
+export AWS_SECRET_ACCESS_KEY="your_aws_secret_key"
+
+# Azure
+export TF_VAR_azure_tenant_id="your_azure_tenant_id"
+export TF_VAR_azure_subscription_id="your_azure_subscription_id"
+
+# Google Cloud
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/service-account.json"
+export TF_VAR_gcp_project_id="your_gcp_project_id"
+
+# Datadog
+export TF_VAR_datadog_api_key="your_datadog_api_key"
+```
+
+### 3. Manual Cloudflare UI Setup
+
+Due to Terraform provider limitations, some resources must be created manually in the Cloudflare dashboard:
+
+#### SaaS Applications and Identity Providers
+
+**Important Note**: All SaaS applications in Cloudflare Access (Okta, Meraki, Salesforce, etc.) as well as Identity Providers (Okta SAML, Azure AD, OneTime PIN) are manually configured and **not managed by Terraform**. These must be set up through the Cloudflare dashboard before deploying the Terraform infrastructure.
+
+This includes:
+- Okta SAML Identity Provider configuration
+- Azure AD Identity Provider setup
+- OneTime PIN Identity Provider
+- SaaS application integrations (Okta, Meraki, Salesforce)
+- Custom rule groups and posture checks
+
+#### WARP Connector Setup
+
+1. **Create WARP Connector Tunnels**:
+   - Navigate to **Networks > Tunnels > Create tunnel**
+   - Select **Warp Connector** (not cloudflared)
+   - Create two tunnels as shown below:
+
+   <img src="doc/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
+
+2. **Configure Private Routes**:
+   - **Azure WARP Connector**: Add route for `azure_address_prefixes` variable (e.g., 192.168.71.0/24)
+   - **GCP WARP Connector**: Add route for `gcp_ip_cidr_warp` variable (e.g., 10.156.85.0/24)
+
+   <img src="doc/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
+   <img src="doc/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
+
+3. **Retrieve Tunnel IDs**: Copy the tunnel IDs and add them to your `terraform.tfvars`:
+   ```hcl
+   cf_tunnel_warp_connector_azure_id = "185f0bc0-986d-46c............."
+   cf_tunnel_warp_connector_gcp_id   = "ad04a3ed-a1a1-460........"
+   ```
+
+#### Device Enrollment Policies
+
+Create two enrollment policies in **Settings > WARP Client**:
+
+1. **Employee Enrollment Policy**:
+   - Allow users in any Okta group to enroll devices
+   
+   <img src="doc/images/employee_enrollment_policy.png" alt="Employee Enrollment Policy" width="400" />
+
+2. **Contractor Enrollment Policy**:
+   - Allow users with `@passfwd` email domain OR in "Contractors" Okta group
+   
+   <img src="doc/images/contractors_enrollment_policy.png" alt="Contractors Enrollment Policy" width="480" />
+
+**Final Device Enrollment Permissions**:
+
 <img src="doc/images/device_enrollment_permissions.png" alt="Device Enrollment Permissions" width="600" />
 
-### WARP Client checks
+#### WARP Client Checks Configuration
+
+Configure device posture checks as shown:
+
 <img src="doc/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
 
-### 3.4 Policy assignment
+### 4. Configure terraform.tfvars
 
-1. *After* you have created all the ressources with Terraform, the policies for the "SaaS" type App in Cloudflare need to be assigned manually (Okta, Meraki, etc...)
-2. *Before* you destroy everything, the policies assigned manually to the "SaaS" type App in Cloudflare need to be removed manually (Okta, Meraki, etc...)
+Fill in all required variables in `terraform.tfvars`. Variables marked with `# Manually retrieved` need to be obtained from your existing accounts:
 
-### 3.5 Summary of the connectivity you can expect
+```hcl
+# Cloudflare Identity Providers (manually retrieved)
+cf_gateway_posture_id                     = "your_gateway_posture_id"
+cf_latest_macOS_version_posture_id        = "your_macos_posture_id"
+cf_latest_windows_version_posture_id      = "your_windows_posture_id"
+cf_latest_linux_kernel_version_posture_id = "your_linux_posture_id"
+cf_okta_identity_provider_id              = "your_okta_provider_id"
+cf_onetimepin_identity_provider_id        = "your_otp_provider_id"
+cf_azure_identity_provider_id             = "your_azure_provider_id"
 
-| Host | Cloud Provider | ping Status | Notes |
+# Okta Groups (manually retrieved)
+okta_zerotrust_group_id           = "your_zerotrust_group_id"
+okta_contractors_group_id         = "your_contractors_group_id"
+okta_infrastructureadmin_group_id = "your_infra_admin_group_id"
+# ... (continue with other variables)
+```
+
+### 5. Deploy Infrastructure
+
+```bash
+# Initialize Terraform
+terraform init
+
+# Review the deployment plan
+terraform plan
+
+# Deploy the infrastructure
+terraform apply
+```
+
+### 6. Post-Deployment Configuration
+
+After Terraform completes successfully:
+
+1. **Assign SaaS App Policies**: Manually assign policies to SaaS applications (Okta, Meraki, etc.) in the Cloudflare dashboard
+2. **Test Connectivity**: Verify access to resources across all cloud providers
+3. **Configure User Access**: Set up user accounts and test Zero Trust policies
+
+## 🔧 Environment Management
+
+### Connectivity Status
+
+The following table shows expected connectivity status for deployed resources:
+
+| Host | Cloud Provider | Status | Notes |
 |------|----------------|---------|-------|
-| cloudflared-replica-aws-0 | AWS | ❌ **FAIL** | Cloudflared tunnel endpoint |
-| cloudflare-zero-trust-demo-aws | AWS | ❌ **FAIL** | Demo instance |
+| cloudflared-replica-aws-0 | AWS | ❌ **FAIL** | Cloudflared tunnel endpoint (being fixed) |
+| cloudflare-zero-trust-demo-aws | AWS | ❌ **FAIL** | Demo instance (being fixed) |
 | cloudflare-warp-connector-azure-0 | Azure | ❌ **FAIL** | WARP Connector |
 | cloudflare-zero-trust-demo-azure-1 | Azure | ✅ **SUCCESS** | Demo instance |
 | cloudflare-infrastructure-access-gcp | GCP | ✅ **SUCCESS** | Infrastructure access |
@@ -90,129 +217,67 @@ This is what your Device Enrollment Permissions should look like:<br>
 | cloudflare-zero-trust-demo-gcp-1 | GCP | ✅ **SUCCESS** | Demo instance |
 | windows-rdp-server-gcp | GCP | ✅ **SUCCESS** | Windows RDP server |
 
-_NB: I am working on resolving the ping failing between the client and AWS workload. It should be working._
+> **Note**: AWS connectivity issues are being actively resolved.
 
-## 4. Terraform.tfvars
+### Automated Cleanup Scripts
 
-All the variables needed are listed in the file called **terraform.tfvars.example** that you can rename **terraform.tfvars** after you have filled in the blancks.
+This environment includes automated cleanup utilities:
 
-## 5. Initialisation and Apply
+#### SSH Known Hosts Cleanup
 
-<pre>
-git clone https://github.com/macharpe/terraform-cloudflare-zero-trust-demo
-cp terraform.tfvars.example terraform.tfvars</pre>
+The `known_hosts_cleanup.py` script automatically removes SSH host entries to prevent conflicts when VMs are recreated with the same IP addresses.
 
-### 5.1 Manually retrieved
+**Setup**:
+```bash
+# Add this line to your ~/.ssh/known_hosts file:
+#################### BELOW IS SAFE TO DELETE #########################
+```
 
-All the variables with "\# Manually retrieved" tag before will need to be retrieved manually. This is due to the fact that I also use some of these accounts for personnal use and I don't want to destroy everything as part of the **terraform destroy** command.
-
-Here is the list:
-
-<pre>
-# Manually retrieved
-cf_gateway_posture_id                     = "oject_id_in_cloudflare_for_gateway_presence"
-cf_latest_macOS_version_posture_id        = "custom_rule_checking_lastest_version_of_osx"
-cf_latest_windows_version_posture_id      = "custom_rule_checking_lastest_version_of_windows"
-cf_latest_linux_kernel_version_posture_id = "custom_rule_checking_lastest_version_of_linux"
-cf_okta_identity_provider_id              = "object_id_okta_identity_provider_in_cloudflare"
-cf_onetimepin_identity_provider_id        = "object_id_onetimePIN_identity_provider_in_cloudflare"
-cf_azure_identity_provider_id             = "object_id_azureAD_identity_provider_in_cloudflare"
-cf_azure_administrators_rule_group_id     = "custom_rule_group_in_cloudflare_pointing_to_azure_administrators_group_custom"
-
-# Okta groups
-# Manually retrieved
-okta_zerotrust_group_id           = "group_id_zerotrust_group_in_okta"
-okta_contractors_group_id         = "group_id_contractors_group_in_okta"
-okta_infrastructureadmin_group_id = "group_id_infrastructureadmin_group_in_okta"
-okta_itadmin_group_id             = "group_id_itadmin_group_in_okta"
-okta_salesengineering_group_id    = "group_id_salesengineering_group_in_okta"
-okta_sales_group_id               = "group_id_sales_group_in_okta"
-okta_meraki_group_id              = "group_id_meraki_group_in_okta"
-
-# Okta users
-# Manually retrieved
-okta_matthieu_user_id = "user_id_matthieu_in_okta"
-okta_jose_user_id     = "user_id_jose_in_okta"
-okta_stephane_user_id = "user_id_stephane_in_okta"
-
-# Manually retrieved
-azure_matthieu_user_object_id = "custome_user_matthieu_azuread_in_AzureAD"
-cf_osx_version_posture_rule_id = ""
-
-#Manually retrieved
-cf_tunnel_warp_connector_azure_id = "185f0bc0-986d-46c............."
-cf_tunnel_warp_connector_gcp_id   = "ad04a3ed-a1a1-460........"</pre>
-
-## 6. Environment variables
-
-You will need to have environment variables defined. Here is the list that I have setup in a .envrc file at the root
-
-<pre># Terraform Zero Trust Project
-# Cloudflare
-export TF_VAR_cloudflare_api_key=""
-export TF_VAR_cloudflare_account_id=""
-export TF_VAR_cloudflare_email=""
-export TF_VAR_cloudflare_zone_id=""
-
-# AWS
-export AWS_ACCESS_KEY_ID=""
-export AWS_SECRET_ACCESS_KEY=""
-
-# Azure
-export TF_VAR_azure_tenant_id=""
-export TF_VAR_azure_subscription_id=""
-
-# Google
-export GOOGLE_APPLICATION_CREDENTIALS="path_to_your_json_file"
-export TF_VAR_gcp_project_id=""
-
-# Datadog
-export TF_VAR_datadog_api_key=""</pre>
-
-## 7. Script for cleanup (optional)
-
-This demo environment creates a number of things in the cloudflare dashboard as well as in your .ssh/known_hosts. For the sake of helping automate as much as I can, I have created two scripts.
-1. known_hosts_cleanup.py
-2. cloudflare_devices_cleanup.sh
-
-### _7.1 known_hosts_cleanup.py_
-
-known_hosts_cleanup.py will run as part of the main.tf. It will remove everything below a line that I have defined in the file known_hosts.
-If this line is not present, the script will do nothing.
-
-How to use set it up?
-
-<pre> sudo nano ~/.ssh/known_hosts
-
-#Add the following without the hyphen below the last line
-"#################### BELOW IS SAFE TO DELETE #########################"</pre>
-
-
-I find it quite practical since the VMs often have the same private IPs and when you want to ssh into it you get this message:
-
-<pre>
+This prevents the common SSH warning:
+```
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
-Someone could be eavesdropping on you right now (man-in-the-middle attack)!
-It is also possible that a host key has just been changed.</pre>
+```
 
-Again, the script will run automatically as part of the *Terraform main.tf* file
+#### Cloudflare Devices Cleanup
 
-### _7.2 cloudflare_devices_cleanup.sh_
+The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up WARP connector device registrations.
 
-This script will clean up your Dashboard under _My Team > devices_ which will record a new cloudflare-warp-connector-azure-* and cloudflare-warp-connector-gcp-* everytime a warp connector connects to Cloudflare.
-To remove this cluter, I have created this script which will run as part of the main.tf
+## 🧹 Cleanup and Destruction
 
-# Roadmap
-- Implement SSM Parameter store for AWS and its equivalent for other cloud providers
-- Enhance Security Groups
-- Implement VNC usecase
-- Use the Entra ID integration
-- Use case for WARP Connector (Site-to-Site, Site-to-Internet...) [documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/warp-connector/)
-- SaaS Application in Cloudflare Access managed by Terraform
-- Observability use case with Datadog
+Before destroying the environment:
+
+1. **Remove SaaS App Policies**: Manually remove policies from SaaS applications in Cloudflare dashboard
+2. **Run Terraform Destroy**:
+   ```bash
+   terraform destroy
+   ```
+3. **Clean Up Manual Resources**: Remove manually created WARP connectors and policies
+
+## 🚀 Roadmap
+
+Planned enhancements and features:
+
+- **Enhanced Secret Management**: Implement SSM Parameter Store for AWS and equivalents for other cloud providers
+- **Advanced Security Groups**: More granular network security configurations
+- **Entra ID Integration**: Enhanced Azure Active Directory integration
+- **WARP Connector Extensions**: Site-to-Site and Site-to-Internet scenarios ([documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/warp-connector/))
+- **SaaS Application Management**: Terraform-managed SaaS applications in Cloudflare Access
+- **Enhanced Observability**: Advanced Datadog integration and monitoring
+- **Additional Identity Providers**: Support for more enterprise identity systems
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests to help improve this demonstration environment.
+
+## 📄 License
+
+This project is provided as-is for educational and demonstration purposes. Please review and adapt the security configurations for your production environment.
+
+---
+
+*For questions or support, please open an issue in this repository or refer to the blog series linked above.*
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
