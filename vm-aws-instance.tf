@@ -37,32 +37,32 @@ resource "aws_key_pair" "aws_ec2_vnc_key_pair" {
 
 
 
-#==========================================================
-# SSM Parameter Store for API Keys
-#==========================================================
-# Store the tunnel secret in SSM Parameter Store
-resource "aws_ssm_parameter" "aws_cloudflare_tunnel_secret" {
-  name  = "/myapp/cloudflare/aws-tunnel-secret"
-  type  = "SecureString"
-  value = module.cloudflare.aws_extracted_token
+# #==========================================================
+# # SSM Parameter Store for API Keys
+# #==========================================================
+# # Store the tunnel secret in SSM Parameter Store
+# resource "aws_ssm_parameter" "aws_cloudflare_tunnel_secret" {
+#   name  = "/myapp/cloudflare/aws-tunnel-secret"
+#   type  = "SecureString"
+#   value = module.cloudflare.aws_extracted_token
 
-  tags = {
-    Name        = "Cloudflare Tunnel Secret for AWS"
-    Environment = var.cf_aws_tag
-  }
-}
+#   tags = {
+#     Name        = "Cloudflare Tunnel Secret for AWS"
+#     Environment = var.cf_aws_tag
+#   }
+# }
 
-# Store the Datadog API key in SSM Parameter Store
-resource "aws_ssm_parameter" "datadog_api_key" {
-  name  = "/myapp/datadog/datadog-api-key"
-  type  = "SecureString"
-  value = var.datadog_api_key
+# # Store the Datadog API key in SSM Parameter Store
+# resource "aws_ssm_parameter" "datadog_api_key" {
+#   name  = "/myapp/datadog/datadog-api-key"
+#   type  = "SecureString"
+#   value = var.datadog_api_key
 
-  tags = {
-    Name        = "Datadog API Key"
-    Environment = var.cf_aws_tag
-  }
-}
+#   tags = {
+#     Name        = "Datadog API Key"
+#     Environment = var.cf_aws_tag
+#   }
+# }
 
 
 
