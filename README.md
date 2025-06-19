@@ -469,10 +469,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_aws_cloudflared_count"></a> [aws\_cloudflared\_count](#input\_aws\_cloudflared\_count) | number of cloudflared replicas | `number` | `1` | no |
 | <a name="input_aws_ec2_browser_ssh_name"></a> [aws\_ec2\_browser\_ssh\_name](#input\_aws\_ec2\_browser\_ssh\_name) | Name of the EC2 instance browser rendered SSH | `string` | n/a | yes |
 | <a name="input_aws_ec2_browser_vnc_name"></a> [aws\_ec2\_browser\_vnc\_name](#input\_aws\_ec2\_browser\_vnc\_name) | Name of the EC2 instance browser rendered VNC | `string` | n/a | yes |
 | <a name="input_aws_ec2_cloudflared_name"></a> [aws\_ec2\_cloudflared\_name](#input\_aws\_ec2\_cloudflared\_name) | name of cloudflared replica | `string` | n/a | yes |
-| <a name="input_aws_ec2_cloudflared_replica_count"></a> [aws\_ec2\_cloudflared\_replica\_count](#input\_aws\_ec2\_cloudflared\_replica\_count) | number of cloudflared replicas | `number` | `1` | no |
 | <a name="input_aws_ec2_instance_config_ami_id"></a> [aws\_ec2\_instance\_config\_ami\_id](#input\_aws\_ec2\_instance\_config\_ami\_id) | AMI ID representing the VM type and ID to be used | `string` | `"ami-086ecbd485d8bb032"` | no |
 | <a name="input_aws_ec2_instance_config_type"></a> [aws\_ec2\_instance\_config\_type](#input\_aws\_ec2\_instance\_config\_type) | type of EC2 instance | `string` | `"t3.micro"` | no |
 | <a name="input_aws_private_subnet_cidr"></a> [aws\_private\_subnet\_cidr](#input\_aws\_private\_subnet\_cidr) | AWS private subnet, subnet for VMs in AWS | `string` | n/a | yes |
@@ -501,27 +501,26 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_count"></a> [azure\_vm\_count](#input\_azure\_vm\_count) | number of Azure VM | `number` | `1` | no |
 | <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where WARP Connector is NOT installed | `string` | n/a | yes |
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
-| <a name="input_azure_warp_connector_vm_name"></a> [azure\_warp\_connector\_vm\_name](#input\_azure\_warp\_connector\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
-| <a name="input_cf_administration_web_app_name"></a> [cf\_administration\_web\_app\_name](#input\_cf\_administration\_web\_app\_name) | Name of the Administration web App in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_administration_web_app_port"></a> [cf\_administration\_web\_app\_port](#input\_cf\_administration\_web\_app\_port) | Name of the Sensitive web App in Cloudflare | `number` | n/a | yes |
+| <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
+| <a name="input_cf_admin_web_app_name"></a> [cf\_admin\_web\_app\_name](#input\_cf\_admin\_web\_app\_name) | Name of the Administration web App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_admin_web_app_port"></a> [cf\_admin\_web\_app\_port](#input\_cf\_admin\_web\_app\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to cloudflare application and aws environment | `string` | n/a | yes |
-| <a name="input_cf_azure_administrators_rule_group_id"></a> [cf\_azure\_administrators\_rule\_group\_id](#input\_cf\_azure\_administrators\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_azure_identity_provider_id"></a> [cf\_azure\_identity\_provider\_id](#input\_cf\_azure\_identity\_provider\_id) | Azure Entra ID identity provider ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_browser_rendering_ssh_app_name"></a> [cf\_browser\_rendering\_ssh\_app\_name](#input\_cf\_browser\_rendering\_ssh\_app\_name) | Name of the Browser Rendering SSH App in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_browser_rendering_vnc_app_name"></a> [cf\_browser\_rendering\_vnc\_app\_name](#input\_cf\_browser\_rendering\_vnc\_app\_name) | Name of the Browser Rendering VNC App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_browser_ssh_app_name"></a> [cf\_browser\_ssh\_app\_name](#input\_cf\_browser\_ssh\_app\_name) | Name of the Browser Rendering SSH App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_browser_vnc_app_name"></a> [cf\_browser\_vnc\_app\_name](#input\_cf\_browser\_vnc\_app\_name) | Name of the Browser Rendering VNC App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_custom_cgnat_routes"></a> [cf\_custom\_cgnat\_routes](#input\_cf\_custom\_cgnat\_routes) | List of custom CGNAT routes to add to the device profile | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_cf_default_cgnat_routes"></a> [cf\_default\_cgnat\_routes](#input\_cf\_default\_cgnat\_routes) | default cgnat routes | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "address": "100.64.0.0/10",<br/>    "description": "Default CGNAT Range"<br/>  }<br/>]</pre> | no |
 | <a name="input_cf_device_os"></a> [cf\_device\_os](#input\_cf\_device\_os) | This is the OS you are running on your own client machine | `string` | n/a | yes |
-| <a name="input_cf_domain_controller_rdp_port"></a> [cf\_domain\_controller\_rdp\_port](#input\_cf\_domain\_controller\_rdp\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
+| <a name="input_cf_domain_controller_rdp_port"></a> [cf\_domain\_controller\_rdp\_port](#input\_cf\_domain\_controller\_rdp\_port) | Port for the Domain Controller RDP in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_email_domain"></a> [cf\_email\_domain](#input\_cf\_email\_domain) | Email Domain used for email authentication in App policies | `string` | n/a | yes |
 | <a name="input_cf_gateway_posture_id"></a> [cf\_gateway\_posture\_id](#input\_cf\_gateway\_posture\_id) | Gateway posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_infra_app_name"></a> [cf\_infra\_app\_name](#input\_cf\_infra\_app\_name) | Name of the Infrastructure App in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_latest_linux_kernel_version_posture_id"></a> [cf\_latest\_linux\_kernel\_version\_posture\_id](#input\_cf\_latest\_linux\_kernel\_version\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_latest_macOS_version_posture_id"></a> [cf\_latest\_macOS\_version\_posture\_id](#input\_cf\_latest\_macOS\_version\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_latest_windows_version_posture_id"></a> [cf\_latest\_windows\_version\_posture\_id](#input\_cf\_latest\_windows\_version\_posture\_id) | Latest Windows version posture ID in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_okta_identity_provider_id"></a> [cf\_okta\_identity\_provider\_id](#input\_cf\_okta\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_onetimepin_identity_provider_id"></a> [cf\_onetimepin\_identity\_provider\_id](#input\_cf\_onetimepin\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_osx_version_posture_rule_id"></a> [cf\_osx\_version\_posture\_rule\_id](#input\_cf\_osx\_version\_posture\_rule\_id) | Rule ID for the posture check on latest version of macos | `string` | n/a | yes |
+| <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_sensitive_web_app_port"></a> [cf\_sensitive\_web\_app\_port](#input\_cf\_sensitive\_web\_app\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_subdomain_ssh"></a> [cf\_subdomain\_ssh](#input\_cf\_subdomain\_ssh) | Name of the subdomain for ssh public hostname of tunnel | `string` | n/a | yes |
@@ -532,18 +531,18 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_team_name"></a> [cf\_team\_name](#input\_cf\_team\_name) | Name of the Team in Cloudflare, essentially zero-trust org name | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_aws"></a> [cf\_tunnel\_name\_aws](#input\_cf\_tunnel\_name\_aws) | Name of the Cloudflare tunnel to AWS | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_gcp"></a> [cf\_tunnel\_name\_gcp](#input\_cf\_tunnel\_name\_gcp) | Name of the Cloudflare tunnel to GCP | `string` | n/a | yes |
-| <a name="input_cf_tunnel_warp_connector_azure_id"></a> [cf\_tunnel\_warp\_connector\_azure\_id](#input\_cf\_tunnel\_warp\_connector\_azure\_id) | ID of the WARP Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
-| <a name="input_cf_tunnel_warp_connector_gcp_id"></a> [cf\_tunnel\_warp\_connector\_gcp\_id](#input\_cf\_tunnel\_warp\_connector\_gcp\_id) | ID of the WARP Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
 | <a name="input_cf_warp_cgnat_cidr"></a> [cf\_warp\_cgnat\_cidr](#input\_cf\_warp\_cgnat\_cidr) | default ip range for WARP when overriding local interface IP | `string` | n/a | yes |
-| <a name="input_cf_windows_rdp_tunnel_name_gcp"></a> [cf\_windows\_rdp\_tunnel\_name\_gcp](#input\_cf\_windows\_rdp\_tunnel\_name\_gcp) | Name of the Cloudflared tunnel for Windows RDP Server GCP | `string` | n/a | yes |
+| <a name="input_cf_warp_tunnel_azure_id"></a> [cf\_warp\_tunnel\_azure\_id](#input\_cf\_warp\_tunnel\_azure\_id) | ID of the WARP Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
+| <a name="input_cf_warp_tunnel_gcp_id"></a> [cf\_warp\_tunnel\_gcp\_id](#input\_cf\_warp\_tunnel\_gcp\_id) | ID of the WARP Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
+| <a name="input_cf_windows_posture_id"></a> [cf\_windows\_posture\_id](#input\_cf\_windows\_posture\_id) | Latest Windows version posture ID in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_windows_rdp_tunnel_name"></a> [cf\_windows\_rdp\_tunnel\_name](#input\_cf\_windows\_rdp\_tunnel\_name) | Name of the Cloudflared tunnel for Windows RDP Server GCP | `string` | n/a | yes |
 | <a name="input_cloudflare_account_id"></a> [cloudflare\_account\_id](#input\_cloudflare\_account\_id) | Cloudflare account ID | `string` | n/a | yes |
 | <a name="input_cloudflare_api_key"></a> [cloudflare\_api\_key](#input\_cloudflare\_api\_key) | Cloudflare API key | `string` | n/a | yes |
 | <a name="input_cloudflare_email"></a> [cloudflare\_email](#input\_cloudflare\_email) | Cloudflare login email | `string` | n/a | yes |
 | <a name="input_cloudflare_zone_id"></a> [cloudflare\_zone\_id](#input\_cloudflare\_zone\_id) | Cloudflare zone ID | `string` | n/a | yes |
 | <a name="input_datadog_api_key"></a> [datadog\_api\_key](#input\_datadog\_api\_key) | Datadog API Key from https://app.datadoghq.com/organization-settings/api-keys | `string` | n/a | yes |
 | <a name="input_datadog_region"></a> [datadog\_region](#input\_datadog\_region) | location of the datadog region | `string` | `"datadoghq.eu"` | no |
-| <a name="input_gcp_cloudflared_instance_name"></a> [gcp\_cloudflared\_instance\_name](#input\_gcp\_cloudflared\_instance\_name) | Name for the VM instance running cloudflared for infrastructure access demo | `string` | n/a | yes |
-| <a name="input_gcp_cloudflared_windows_rdp_name"></a> [gcp\_cloudflared\_windows\_rdp\_name](#input\_gcp\_cloudflared\_windows\_rdp\_name) | Name for the VM instance running cloudflared and Windows RDP Server on GCP | `string` | n/a | yes |
+| <a name="input_gcp_cloudflared_vm_name"></a> [gcp\_cloudflared\_vm\_name](#input\_gcp\_cloudflared\_vm\_name) | Name for the VM instance running cloudflared for infrastructure access demo | `string` | n/a | yes |
 | <a name="input_gcp_enable_oslogin"></a> [gcp\_enable\_oslogin](#input\_gcp\_enable\_oslogin) | Whether to enable OS Login | `bool` | `true` | no |
 | <a name="input_gcp_ip_cidr_infra"></a> [gcp\_ip\_cidr\_infra](#input\_gcp\_ip\_cidr\_infra) | CIDR Range for GCP VMs running cloudflared | `string` | n/a | yes |
 | <a name="input_gcp_ip_cidr_warp"></a> [gcp\_ip\_cidr\_warp](#input\_gcp\_ip\_cidr\_warp) | CIDR Range for GCP VMs running warp | `string` | n/a | yes |
@@ -559,13 +558,14 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_warp_connector_vm_name"></a> [gcp\_warp\_connector\_vm\_name](#input\_gcp\_warp\_connector\_vm\_name) | Name of the GCP VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_windows_admin_password"></a> [gcp\_windows\_admin\_password](#input\_gcp\_windows\_admin\_password) | Password for Windows Server admin user in GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_machine_size"></a> [gcp\_windows\_machine\_size](#input\_gcp\_windows\_machine\_size) | size of the compute engine instance for Windows specifically | `string` | `"e2-medium"` | no |
+| <a name="input_gcp_windows_rdp_vm_name"></a> [gcp\_windows\_rdp\_vm\_name](#input\_gcp\_windows\_rdp\_vm\_name) | Name for the VM instance running cloudflared and Windows RDP Server on GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_user_name"></a> [gcp\_windows\_user\_name](#input\_gcp\_windows\_user\_name) | vm user name for GCP Windows VM | `string` | n/a | yes |
 | <a name="input_okta_bob_user_linux_password"></a> [okta\_bob\_user\_linux\_password](#input\_okta\_bob\_user\_linux\_password) | Linux password for user bob in EC2 instance | `string` | n/a | yes |
 | <a name="input_okta_bob_user_login"></a> [okta\_bob\_user\_login](#input\_okta\_bob\_user\_login) | User login for bob, in an email format | `string` | n/a | yes |
 | <a name="input_okta_contractors_group_id"></a> [okta\_contractors\_group\_id](#input\_okta\_contractors\_group\_id) | ID for Contractors group in Okta | `string` | n/a | yes |
 | <a name="input_okta_contractors_saml_group_name"></a> [okta\_contractors\_saml\_group\_name](#input\_okta\_contractors\_saml\_group\_name) | SAML Group name for Contractors group | `string` | n/a | yes |
-| <a name="input_okta_infrastructureadmin_group_id"></a> [okta\_infrastructureadmin\_group\_id](#input\_okta\_infrastructureadmin\_group\_id) | ID for InfrastructureAdmin group in Okta | `string` | n/a | yes |
-| <a name="input_okta_infrastructureadmin_saml_group_name"></a> [okta\_infrastructureadmin\_saml\_group\_name](#input\_okta\_infrastructureadmin\_saml\_group\_name) | SAML Group name for InfrastructureAdmin group | `string` | n/a | yes |
+| <a name="input_okta_infra_admin_group_id"></a> [okta\_infra\_admin\_group\_id](#input\_okta\_infra\_admin\_group\_id) | ID for InfrastructureAdmin group in Okta | `string` | n/a | yes |
+| <a name="input_okta_infra_admin_saml_group_name"></a> [okta\_infra\_admin\_saml\_group\_name](#input\_okta\_infra\_admin\_saml\_group\_name) | SAML Group name for InfrastructureAdmin group | `string` | n/a | yes |
 | <a name="input_okta_itadmin_group_id"></a> [okta\_itadmin\_group\_id](#input\_okta\_itadmin\_group\_id) | ID for ITAdmin group in Okta | `string` | n/a | yes |
 | <a name="input_okta_itadmin_saml_group_name"></a> [okta\_itadmin\_saml\_group\_name](#input\_okta\_itadmin\_saml\_group\_name) | SAML Group name for ITAdmin group | `string` | n/a | yes |
 | <a name="input_okta_jose_user_id"></a> [okta\_jose\_user\_id](#input\_okta\_jose\_user\_id) | ID for Jose user in Okta | `string` | n/a | yes |
@@ -573,10 +573,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_okta_matthieu_user_id"></a> [okta\_matthieu\_user\_id](#input\_okta\_matthieu\_user\_id) | ID for Matthieu user in Okta | `string` | n/a | yes |
 | <a name="input_okta_matthieu_user_login"></a> [okta\_matthieu\_user\_login](#input\_okta\_matthieu\_user\_login) | User login for stephane, in an email format | `string` | n/a | yes |
 | <a name="input_okta_meraki_group_id"></a> [okta\_meraki\_group\_id](#input\_okta\_meraki\_group\_id) | ID for Meraki group in Okta | `string` | n/a | yes |
+| <a name="input_okta_sales_eng_group_id"></a> [okta\_sales\_eng\_group\_id](#input\_okta\_sales\_eng\_group\_id) | ID for SalesEngineering group in Okta | `string` | n/a | yes |
+| <a name="input_okta_sales_eng_saml_group_name"></a> [okta\_sales\_eng\_saml\_group\_name](#input\_okta\_sales\_eng\_saml\_group\_name) | SAML Group name for SalesEngineering group | `string` | n/a | yes |
 | <a name="input_okta_sales_group_id"></a> [okta\_sales\_group\_id](#input\_okta\_sales\_group\_id) | ID for Sales group in Okta | `string` | n/a | yes |
 | <a name="input_okta_sales_saml_group_name"></a> [okta\_sales\_saml\_group\_name](#input\_okta\_sales\_saml\_group\_name) | SAML Group name for Sales group | `string` | n/a | yes |
-| <a name="input_okta_salesengineering_group_id"></a> [okta\_salesengineering\_group\_id](#input\_okta\_salesengineering\_group\_id) | ID for SalesEngineering group in Okta | `string` | n/a | yes |
-| <a name="input_okta_salesengineering_saml_group_name"></a> [okta\_salesengineering\_saml\_group\_name](#input\_okta\_salesengineering\_saml\_group\_name) | SAML Group name for SalesEngineering group | `string` | n/a | yes |
 | <a name="input_okta_stephane_user_id"></a> [okta\_stephane\_user\_id](#input\_okta\_stephane\_user\_id) | ID for Stephane user in Okta | `string` | n/a | yes |
 | <a name="input_okta_stephane_user_login"></a> [okta\_stephane\_user\_login](#input\_okta\_stephane\_user\_login) | User login for stephane, in an email format | `string` | n/a | yes |
 | <a name="input_okta_zerotrust_group_id"></a> [okta\_zerotrust\_group\_id](#input\_okta\_zerotrust\_group\_id) | ID for ZeroTrust group in Okta | `string` | n/a | yes |
