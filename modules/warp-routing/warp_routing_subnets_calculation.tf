@@ -1,3 +1,7 @@
+#=========================================================================
+#         SUBNET CALCULATION FOR WARP ROUTING Azure VMs
+#=========================================================================
+
 resource "null_resource" "python_script_azure_infrastructure" {
   provisioner "local-exec" {
     command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.azure_address_prefixes} azure"
@@ -15,13 +19,15 @@ data "local_file" "azure_subnet_output" {
   depends_on = [null_resource.python_script_azure_infrastructure]
 }
 
+
+
 #=========================================================================
 #         SUBNET CALCULATION FOR WARP ROUTING GCP VMs
 #=========================================================================
 
 resource "null_resource" "python_script_gcp_infrastructure_warp" {
   provisioner "local-exec" {
-    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets_gcp.py ${var.gcp_ip_cidr_infra} ${var.gcp_ip_cidr_warp} ${var.gcp_ip_cidr_windows_rdp} gcp"
+    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.gcp_ip_cidr_infra} ${var.gcp_ip_cidr_warp} ${var.gcp_ip_cidr_windows_rdp} gcp"
   }
 
   triggers = {
@@ -35,6 +41,8 @@ data "local_file" "gcp_subnet_output" {
 
   depends_on = [null_resource.python_script_gcp_infrastructure_warp]
 }
+
+
 
 #=========================================================================
 #         SUBNET CALCULATION FOR WARP ROUTING AWS VMs

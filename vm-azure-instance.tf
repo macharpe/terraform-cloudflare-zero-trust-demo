@@ -116,16 +116,13 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
     public_key = module.ssh_keys.azure_ssh_public_key[count.index]
   }
 
-  # Only the second VM gets the startup script
-  custom_data = count.index == 0 ? base64encode(templatefile("${path.module}/scripts/azure-warpconnector-init.tftpl", {
-    hostname                 = "${var.azure_warp_connector_vm_name}-${count.index}" # Dynamic hostname
+  # VM index 0 = warp_connector, others = basic
+  custom_data = base64encode(templatefile("${path.module}/scripts/azure-init.tftpl", {
+    role                     = count.index == 0 ? "warp_connector" : "basic"
+    hostname                 = count.index == 0 ? "${var.azure_warp_connector_vm_name}-${count.index}" : "${var.azure_vm_name}-${count.index}"
     warp_tunnel_secret_azure = module.cloudflare.azure_extracted_warp_token
     datadog_api_key          = var.datadog_api_key
     datadog_region           = var.datadog_region
-    })) : base64encode(templatefile("${path.module}/scripts/azure-vm-init.tftpl", {
-    hostname        = "${var.azure_vm_name}-${count.index}" # Dynamic hostname
-    datadog_api_key = var.datadog_api_key
-    datadog_region  = var.datadog_region
   }))
 
   os_disk {

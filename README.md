@@ -41,21 +41,21 @@ _Last Updated: 12th of June 2025_
 ### 📝 **Core Code Files**
 | File Type | Count | Lines of Code | Purpose |
 |-----------|-------|---------------|---------|
-| **Terraform (.tf)** | 29 | 4,584 | Infrastructure as Code |
-| **Python (.py)** | 3 | 446 | Automation & subnet calculation |
-| **Shell Scripts (.sh)** | 2 | 294 | Cleanup & maintenance |
-| **Markdown (.md)** | 4 | 811 | Core documentation |
-| **Total Core Code** | 38 | **6,135** | **Production-ready codebase** |
+| **Terraform (.tf)** | 29 | 4,611 | Infrastructure as Code |
+| **Templates (.tftpl, .tpl)** | 3 | 437 | Cloud-init & startup scripts |
+| **Python (.py)** | 2 | 364 | Subnet calculation & automation |
+| **Shell Scripts (.sh)** | 2 | 161 | Cleanup & maintenance |
+| **Batch Scripts (.cmd)** | 1 | 127 | Windows initialization |
+| **Total Core Code** | 37 | **5,700** | **Streamlined codebase** |
 
 <table>
 <tr>
 <td>
 
 **📁 Infrastructure Resources**
-- **137** total resources
-- **14** data sources
+- **313** total resources, modules & data sources
 - **4** custom modules
-- **188** configurable variables
+- **188** configurable variables  
 - **29** Terraform files
 
 </td>
@@ -84,11 +84,11 @@ _Last Updated: 12th of June 2025_
 <td>
 
 **🚀 Automation & Quality**
+- **Consolidated scripts** (reduced from 7 to 4)
+- **Role-based infrastructure** deployment
 - **Modular design** with 4 reusable modules
-- **1:1.37** resource-to-variable ratio
-- **98.5%** size reduction (core vs total)
 - **100%** Infrastructure as Code coverage
-- **Production-grade** variable management
+- **Streamlined codebase** (-7% lines, -1 file)
 
 </td>
 </tr>

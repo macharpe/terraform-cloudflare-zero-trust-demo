@@ -126,16 +126,15 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
 
     enable-oslogin = var.gcp_enable_oslogin
 
-    user-data = templatefile("${path.module}/scripts/gcp-cloudflared-init.tpl", {
-      tunnel_name            = var.cf_tunnel_name_gcp
-      account_id             = var.cloudflare_account_id
-      cloudflare_domain      = var.cf_subdomain_ssh
+    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", {
+      role                   = "cloudflared"
       tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
       gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
       datadog_api_key        = var.datadog_api_key
       datadog_region         = var.datadog_region
       admin_web_app_port     = var.cf_administration_web_app_port
       sensitive_web_app_port = var.cf_sensitive_web_app_port
+      warp_token             = module.cloudflare.gcp_extracted_warp_token
     })
   }
 }
@@ -184,6 +183,8 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
       user_name                 = var.gcp_windows_user_name
       admin_password            = var.gcp_windows_admin_password
       tunnel_secret_windows_gcp = module.cloudflare.gcp_windows_extracted_token
+      admin_web_app_port        = var.cf_administration_web_app_port
+      sensitive_web_app_port    = var.cf_sensitive_web_app_port
     })
   }
 }
@@ -226,10 +227,14 @@ resource "google_compute_instance" "gcp_vm_instance" {
     ROLE = count.index == 0 ? "warp_connector" : "default"
 
     user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", {
-      role            = count.index == 0 ? "warp_connector" : "default"
-      warp_token      = module.cloudflare.gcp_extracted_warp_token
-      datadog_api_key = var.datadog_api_key
-      datadog_region  = var.datadog_region
+      role                   = count.index == 0 ? "warp_connector" : "default"
+      warp_token             = module.cloudflare.gcp_extracted_warp_token
+      datadog_api_key        = var.datadog_api_key
+      datadog_region         = var.datadog_region
+      tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
+      gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
+      admin_web_app_port     = var.cf_administration_web_app_port
+      sensitive_web_app_port = var.cf_sensitive_web_app_port
     })
   }
 }

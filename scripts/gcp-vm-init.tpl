@@ -67,6 +67,49 @@ if [[ "$ROLE" == "warp_connector" ]]; then
         warp-cli status
     fi
 
+elif [[ "$ROLE" == "cloudflared" ]]; then
+    echo "Configuring Cloudflared tunnel..."
+
+    # Install cloudflared
+    wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+    dpkg -i cloudflared-linux-amd64.deb
+    cloudflared service install ${tunnel_secret_gcp}
+    systemctl restart cloudflared.service
+
+    # Create /etc/ssh/ca_cloudflare.pub and paste the gateway_ca_certificate
+    echo "${gateway_ca_certificate}" | tee /etc/ssh/ca_cloudflare.pub
+    chmod 600 /etc/ssh/ca_cloudflare.pub
+
+    # Allowing One-time PIN contractor to login
+    adduser --force-badname oktauser2.bcey3
+    echo "oktauser2.bcey3:bob" | chpasswd
+    usermod -aG sudo oktauser2.bcey3
+
+    # Modify /etc/ssh/sshd_config
+    sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+    sed -i '/PubkeyAuthentication yes/a TrustedUserCAKeys \/etc\/ssh\/ca_cloudflare.pub' /etc/ssh/sshd_config
+
+    # Create directory for Web Servers
+    cd /home/
+    mkdir webserver1
+    mkdir webserver2
+
+    # very basic webserver 1
+    cd /home/webserver1/
+    echo '<html><body><h1>Hello from GCP! This is my Administration Application</h1></body></html>' > /home/webserver1/index.html
+    python3 -m http.server ${admin_web_app_port} &
+
+    # very basic webserver 2
+    cd /home/webserver2/
+    echo '<html><body><h1>Hello from GCP! This the Sensitive Competition App</h1></body></html>' > /home/webserver2/index.html
+    python3 -m http.server ${sensitive_web_app_port} &
+
+    # Restart SSH service
+    service ssh restart
+
+    # Wait for 60 seconds
+    sleep 60
+
 else
     echo "Default VM setup, no special role"
 fi

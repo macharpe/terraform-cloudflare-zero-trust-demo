@@ -263,11 +263,18 @@ resource "aws_instance" "cloudflared_aws" {
 
   #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = templatefile("${path.module}/scripts/aws-cloudflared-init.yaml", {
+  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", {
+    role              = "cloudflared"
     hostname          = "${var.aws_ec2_cloudflared_name}-${count.index}"
     tunnel_secret_aws = module.cloudflare.aws_extracted_token
+    users             = var.aws_users
+    vnc_password      = var.aws_vnc_password
     datadog_api_key   = var.datadog_api_key
     datadog_region    = var.datadog_region
+    # Linux user for contractor
+    okta_contractor_username = split("@", var.okta_bob_user_login)[0]
+    okta_contractor_password = var.okta_bob_user_linux_password
+    ca_cloudflare_browser    = module.cloudflare.pubkey_short_lived_certificate
   })
 
   tags = {
@@ -298,7 +305,8 @@ resource "aws_instance" "aws_ec2_service_instance" {
 
   #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = templatefile("${path.module}/scripts/aws-browser-ssh-init.tftpl", {
+  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", {
+    role                  = "browser_ssh"
     hostname              = "${var.aws_ec2_browser_ssh_name}"
     ca_cloudflare_browser = module.cloudflare.pubkey_short_lived_certificate
     users                 = var.aws_users
@@ -307,6 +315,8 @@ resource "aws_instance" "aws_ec2_service_instance" {
     # Linux user for contractor
     okta_contractor_username = split("@", var.okta_bob_user_login)[0]
     okta_contractor_password = var.okta_bob_user_linux_password
+    vnc_password             = var.aws_vnc_password
+    tunnel_secret_aws        = module.cloudflare.aws_extracted_token
   })
 
   tags = {
@@ -335,11 +345,18 @@ resource "aws_instance" "aws_ec2_vnc_instance" {
 
   #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = templatefile("${path.module}/scripts/aws-browser-vnc-init.tftpl", {
+  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", {
+    role            = "vnc"
     hostname        = var.aws_ec2_browser_vnc_name
+    users           = var.aws_users
     vnc_password    = var.aws_vnc_password
     datadog_api_key = var.datadog_api_key
     datadog_region  = var.datadog_region
+    # Linux user for contractor
+    okta_contractor_username = split("@", var.okta_bob_user_login)[0]
+    okta_contractor_password = var.okta_bob_user_linux_password
+    tunnel_secret_aws        = module.cloudflare.aws_extracted_token
+    ca_cloudflare_browser    = module.cloudflare.pubkey_short_lived_certificate
   })
 
   tags = {

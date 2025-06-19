@@ -1,13 +1,36 @@
 #cloud-config
-
 hostname: ${hostname}
-
 package_update: true
 package_upgrade: true
 
 packages:
+  - wget
+  - curl
+  - traceroute
+  - build-essential
+  - hping3
   - net-tools
+  - unzip
 
+users:
+  - default
+%{ if role == "browser_ssh" ~}
+%{ for user in users ~}
+  - name: ${user}
+    passwd: ${user}
+    groups: sudo
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+%{ endfor ~}
+  - name: ${okta_contractor_username}
+    passwd: ${okta_contractor_password}
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+%{ endif ~}
+
+%{ if role == "vnc" ~}
 write_files:
   - path: /tmp/setup-vnc-complete.sh
     content: |
@@ -162,17 +185,36 @@ write_files:
 
       echo "=== VNC Setup Complete ===" >> /tmp/vnc-setup.log
     permissions: "0755"
+%{ endif ~}
 
 runcmd:
   # Set hostname
   - hostnamectl set-hostname ${hostname}
+  
+  # Set timezone
+  - timedatectl set-timezone Europe/Paris
 
-  # Install Datadog Agent
-  - DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)" > /tmp/dd_install.log 2>&1
+%{ if role == "browser_ssh" ~}
+  # Configure SSH for browser access
+  - echo "${ca_cloudflare_browser}" > /etc/ssh/ca_cloudflare_browser.pub
+  - chmod 600 /etc/ssh/ca_cloudflare_browser.pub
+  - sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+  - sed -i '/PubkeyAuthentication yes/a TrustedUserCAKeys /etc/ssh/ca_cloudflare_browser.pub' /etc/ssh/sshd_config
+%{ endif ~}
 
+%{ if role == "cloudflared" ~}
+  # Install cloudflared
+  - sudo mkdir -p --mode=0755 /usr/share/keyrings
+  - curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+  - echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+  - sudo apt-get update && sudo apt-get install cloudflared
+  - sudo cloudflared service install ${tunnel_secret_aws}
+%{ endif ~}
+
+%{ if role == "vnc" ~}
   # Run the complete VNC setup
   - /tmp/setup-vnc-complete.sh
-
+  
   # Create info file
   - |
     cat > /home/ubuntu/VNC_INFO.txt << 'INFOEND'
@@ -194,8 +236,17 @@ runcmd:
     INFOEND
 
     chown ubuntu:ubuntu /home/ubuntu/VNC_INFO.txt
+%{ endif ~}
 
+  # Datadog Agent installation
+  - 'DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)" > /tmp/dd_install.log 2>&1'
+
+%{ if role == "vnc" ~}
 final_message: |
   VNC setup complete on ${hostname}!
   VNC should be accessible on port 5901.
   Check logs: cat /tmp/vnc-setup.log
+%{ else ~}
+final_message: |
+  AWS ${role} setup complete on ${hostname}!
+%{ endif ~}

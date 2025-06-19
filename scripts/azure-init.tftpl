@@ -15,16 +15,31 @@ packages:
   - unzip
 
 runcmd:
+  # Set hostname
+  - hostnamectl set-hostname ${hostname}
+  
+  # Set timezone
+  - timedatectl set-timezone Europe/Paris
+
+%{ if role == "warp_connector" ~}
+  # Install WARP Connector
   - |
     curl https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
   - |
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
   - sudo apt-get update && sudo apt-get install -y cloudflare-warp
+  
+  # Enable IP forwarding for WARP
   - sudo sysctl -w net.ipv4.ip_forward=1
   - echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-ip-forward.conf
-  - sudo timedatectl set-timezone Europe/Paris
+  
+  # Configure WARP Connector
   - sudo warp-cli --accept-tos connector new ${warp_tunnel_secret_azure}
   - sudo warp-cli --accept-tos connect
+%{ endif ~}
 
-    # Datadog Agent installation
+  # Datadog Agent installation
   - 'DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)" > /tmp/dd_install.log 2>&1'
+
+final_message: |
+  Azure ${role} setup complete on ${hostname}!
