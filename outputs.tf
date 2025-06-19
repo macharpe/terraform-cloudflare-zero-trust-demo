@@ -82,10 +82,10 @@ output "AZURE_VMS" {
   description = "Azure instance details"
   value = {
     for idx in toset(range(var.azure_vm_count)) :
-    "${tonumber(idx) == 0 ? var.azure_warp_connector_vm_name : var.azure_vm_name}-${idx}" => {
+    "${tonumber(idx) == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${idx}" => {
       internal_ip = azurerm_network_interface.nic[idx].private_ip_address
       public_ip   = azurerm_public_ip.nat_gateway_public_ip.ip_address
-      public_dns  = "${tonumber(idx) == 0 ? var.azure_warp_connector_vm_name : var.azure_vm_name}-${idx}.${var.azure_public_dns_domain}"
+      public_dns  = "${tonumber(idx) == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${idx}.${var.azure_public_dns_domain}"
       ssh         = "ssh ${var.azure_vm_admin_username}@${tonumber(idx) == 0 ? "warp_ip" : azurerm_network_interface.nic[idx].private_ip_address} -i ${module.ssh_keys.azure_key_paths[idx]}"
     }
   }

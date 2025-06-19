@@ -28,19 +28,19 @@ variable "cf_gateway_posture_id" {
   sensitive   = true
 }
 
-variable "cf_latest_macOS_version_posture_id" {
+variable "cf_macos_posture_id" {
   description = "Latest macOS version posture ID in Cloudflare"
   type        = string
   sensitive   = true
 }
 
-variable "cf_latest_windows_version_posture_id" {
+variable "cf_windows_posture_id" {
   description = "Latest Windows version posture ID in Cloudflare"
   type        = string
   sensitive   = true
 }
 
-variable "cf_latest_linux_kernel_version_posture_id" {
+variable "cf_linux_posture_id" {
   description = "Latest Linux Kernel version posture ID in Cloudflare"
   type        = string
   sensitive   = true
@@ -52,7 +52,7 @@ variable "cf_okta_identity_provider_id" {
   sensitive   = true
 }
 
-variable "cf_onetimepin_identity_provider_id" {
+variable "cf_otp_identity_provider_id" {
   description = "OneTime PIN identity provider ID in Cloudflare"
   type        = string
   sensitive   = true
@@ -64,7 +64,7 @@ variable "cf_azure_identity_provider_id" {
   sensitive   = true
 }
 
-variable "cf_azure_administrators_rule_group_id" {
+variable "cf_azure_admin_rule_group_id" {
   description = "Azure Administrators Rule Group ID in Cloudflare"
   type        = string
   sensitive   = true
@@ -155,12 +155,12 @@ variable "cf_infra_app_name" {
   type        = string
 }
 
-variable "cf_browser_rendering_ssh_app_name" {
+variable "cf_browser_ssh_app_name" {
   description = "Name of the Browser Rendering SSH App in Cloudflare"
   type        = string
 }
 
-variable "cf_browser_rendering_vnc_app_name" {
+variable "cf_browser_vnc_app_name" {
   description = "Name of the Browser Rendering VNC App in Cloudflare"
   type        = string
 }
@@ -170,12 +170,12 @@ variable "cf_sensitive_web_app_name" {
   type        = string
 }
 
-variable "cf_administration_web_app_name" {
+variable "cf_admin_web_app_name" {
   description = "Name of the Administration web app in Cloudflare"
   type        = string
 }
 
-variable "cf_administration_web_app_port" {
+variable "cf_admin_web_app_port" {
   description = "Name of the Sensitive web App in Cloudflare"
   type        = number
 }
@@ -194,7 +194,7 @@ variable "cf_domain_controller_rdp_port" {
 #==========================================
 # Okta
 #==========================================
-variable "okta_infrastructureadmin_saml_group_name" {
+variable "okta_infra_admin_saml_group_name" {
   description = "SAML Group name for InfrastructureAdmin group"
   type        = string
 }
@@ -204,7 +204,7 @@ variable "okta_contractors_saml_group_name" {
   type        = string
 }
 
-variable "okta_salesengineering_saml_group_name" {
+variable "okta_sales_eng_saml_group_name" {
   description = "SAML Group name for SalesEngineering group"
   type        = string
 }

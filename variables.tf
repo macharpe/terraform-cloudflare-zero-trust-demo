@@ -51,12 +51,12 @@ variable "gcp_vm_count" {
 
 
 ## VM names
-variable "gcp_cloudflared_instance_name" {
+variable "gcp_cloudflared_vm_name" {
   description = "Name for the VM instance running cloudflared for infrastructure access demo"
   type        = string
 }
 
-variable "gcp_cloudflared_windows_rdp_name" {
+variable "gcp_windows_rdp_vm_name" {
   description = "Name for the VM instance running cloudflared and Windows RDP Server on GCP"
   type        = string
 }
@@ -159,17 +159,17 @@ variable "cf_tunnel_name_aws" {
   type        = string
 }
 
-variable "cf_windows_rdp_tunnel_name_gcp" {
+variable "cf_windows_rdp_tunnel_name" {
   description = "Name of the Cloudflared tunnel for Windows RDP Server GCP"
   type        = string
 }
 
-variable "cf_tunnel_warp_connector_azure_id" {
+variable "cf_warp_tunnel_azure_id" {
   description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
   type        = string
 }
 
-variable "cf_tunnel_warp_connector_gcp_id" {
+variable "cf_warp_tunnel_gcp_id" {
   description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
   type        = string
 }
@@ -195,12 +195,12 @@ variable "cf_subdomain_web_sensitive" {
   type        = string
 }
 
-variable "cf_browser_rendering_ssh_app_name" {
+variable "cf_browser_ssh_app_name" {
   description = "Name of the Browser Rendering SSH App in Cloudflare"
   type        = string
 }
 
-variable "cf_browser_rendering_vnc_app_name" {
+variable "cf_browser_vnc_app_name" {
   description = "Name of the Browser Rendering VNC App in Cloudflare"
   type        = string
 }
@@ -215,13 +215,13 @@ variable "cf_sensitive_web_app_name" {
   type        = string
 }
 
-variable "cf_administration_web_app_name" {
+variable "cf_admin_web_app_name" {
   description = "Name of the Administration web App in Cloudflare"
   type        = string
 }
 
-variable "cf_administration_web_app_port" {
-  description = "Name of the Sensitive web App in Cloudflare"
+variable "cf_admin_web_app_port" {
+  description = "Port for the Administration web App in Cloudflare"
   type        = number
 }
 
@@ -231,7 +231,7 @@ variable "cf_sensitive_web_app_port" {
 }
 
 variable "cf_domain_controller_rdp_port" {
-  description = "Port for the Administration web App in Cloudflare"
+  description = "Port for the Domain Controller RDP in Cloudflare"
   type        = number
 }
 
@@ -247,19 +247,19 @@ variable "cf_gateway_posture_id" {
   sensitive   = true
 }
 
-variable "cf_latest_macOS_version_posture_id" {
+variable "cf_macos_posture_id" {
   description = "Latest macOS version posture ID in Cloudflare"
   type        = string
   sensitive   = true
 }
 
-variable "cf_latest_windows_version_posture_id" {
+variable "cf_windows_posture_id" {
   description = "Latest Windows version posture ID in Cloudflare"
   type        = string
   sensitive   = true
 }
 
-variable "cf_latest_linux_kernel_version_posture_id" {
+variable "cf_linux_posture_id" {
   description = "Latest Linux Kernel version posture ID in Cloudflare"
   type        = string
   sensitive   = true
@@ -271,7 +271,7 @@ variable "cf_okta_identity_provider_id" {
   sensitive   = true
 }
 
-variable "cf_onetimepin_identity_provider_id" {
+variable "cf_otp_identity_provider_id" {
   description = "OneTime PIN identity provider ID in Cloudflare"
   type        = string
   sensitive   = true
@@ -283,7 +283,7 @@ variable "cf_azure_identity_provider_id" {
   sensitive   = true
 }
 
-variable "cf_azure_administrators_rule_group_id" {
+variable "cf_azure_admin_rule_group_id" {
   description = "Azure Administrators Rule Group ID in Cloudflare"
   type        = string
   sensitive   = true
@@ -350,7 +350,7 @@ variable "okta_contractors_group_id" {
   sensitive   = true
 }
 
-variable "okta_infrastructureadmin_group_id" {
+variable "okta_infra_admin_group_id" {
   description = "ID for InfrastructureAdmin group in Okta"
   type        = string
   sensitive   = true
@@ -362,7 +362,7 @@ variable "okta_itadmin_group_id" {
   sensitive   = true
 }
 
-variable "okta_salesengineering_group_id" {
+variable "okta_sales_eng_group_id" {
   description = "ID for SalesEngineering group in Okta"
   type        = string
   sensitive   = true
@@ -380,7 +380,7 @@ variable "okta_meraki_group_id" {
   sensitive   = true
 }
 
-variable "okta_infrastructureadmin_saml_group_name" {
+variable "okta_infra_admin_saml_group_name" {
   description = "SAML Group name for InfrastructureAdmin group"
   type        = string
 }
@@ -390,7 +390,7 @@ variable "okta_contractors_saml_group_name" {
   type        = string
 }
 
-variable "okta_salesengineering_saml_group_name" {
+variable "okta_sales_eng_saml_group_name" {
   description = "SAML Group name for SalesEngineering group"
   type        = string
 }
@@ -484,7 +484,7 @@ variable "aws_ec2_browser_vnc_name" {
   type        = string
 }
 
-variable "aws_ec2_cloudflared_replica_count" {
+variable "aws_cloudflared_count" {
   description = "number of cloudflared replicas"
   type        = number
   default     = 1
@@ -600,7 +600,7 @@ variable "azure_vm_admin_password" {
   sensitive   = true
 }
 
-variable "azure_warp_connector_vm_name" {
+variable "azure_warp_vm_name" {
   description = "Name of the Azure VM where WARP Connector is installed"
   type        = string
 }

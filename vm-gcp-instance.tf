@@ -92,51 +92,84 @@ resource "google_compute_router_nat" "cloud_nat" {
 
 
 #==========================================================
+# Local Values for GCP Instance Configuration
+#==========================================================
+locals {
+  # Common GCP instance configuration
+  common_gcp_config = {
+    zone    = "${var.gcp_region}-a"
+    network = google_compute_network.gcp_custom_vpc.id
+  }
+
+  # Common Linux boot disk configuration
+  common_linux_boot_disk = {
+    image = "ubuntu-os-cloud/ubuntu-2204-lts"
+  }
+
+  # Common metadata variables
+  common_metadata_vars = {
+    enable-oslogin = var.gcp_enable_oslogin
+  }
+
+  # Common user-data template variables for GCP
+  gcp_common_user_data_vars = merge(local.global_monitoring, local.global_cloudflare, {
+    tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
+    gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
+    warp_token             = module.cloudflare.gcp_extracted_warp_token
+  })
+
+  # Common scheduling for preemptible instances
+  preemptible_scheduling = {
+    preemptible       = true
+    automatic_restart = false
+  }
+
+  # Common scheduling for standard instances
+  standard_scheduling = {
+    preemptible         = false
+    automatic_restart   = true
+    on_host_maintenance = "MIGRATE"
+    provisioning_model  = "STANDARD"
+  }
+}
+
+#==========================================================
 # GCP INSTANCE RUNNING CLOUDFLARED: Infrastructure Access
 #==========================================================
 resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
-  name         = var.gcp_cloudflared_instance_name
+  name         = var.gcp_cloudflared_vm_name
   machine_type = var.gcp_machine_size
-  zone         = "${var.gcp_region}-a"
+  zone         = local.common_gcp_config.zone
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+      image = local.common_linux_boot_disk.image
     }
   }
 
   network_interface {
-    network    = google_compute_network.gcp_custom_vpc.id
+    network    = local.common_gcp_config.network
     subnetwork = google_compute_subnetwork.gcp_cloudflared_subnet.id
   }
 
   // Optional config to make instance ephemeral 
   scheduling {
-    preemptible       = true
-    automatic_restart = false
+    preemptible       = local.preemptible_scheduling.preemptible
+    automatic_restart = local.preemptible_scheduling.automatic_restart
   }
 
   tags = ["infrastructure-access-instances"]
 
-  metadata = {
+  metadata = merge(local.common_metadata_vars, {
     ssh-keys = join("\n", [
       for username in var.gcp_users :
       "${username}:${module.ssh_keys.gcp_public_keys[username]}"
     ])
 
-    enable-oslogin = var.gcp_enable_oslogin
-
-    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", {
-      role                   = "cloudflared"
-      tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
-      gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
-      datadog_api_key        = var.datadog_api_key
-      datadog_region         = var.datadog_region
-      admin_web_app_port     = var.cf_administration_web_app_port
-      sensitive_web_app_port = var.cf_sensitive_web_app_port
-      warp_token             = module.cloudflare.gcp_extracted_warp_token
-    })
-  }
+    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", merge(local.gcp_common_user_data_vars, {
+      role = "cloudflared"
+    }))
+  })
 }
 
 
@@ -144,9 +177,9 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
 # GCP INSTANCE RUNNING CLOUDFLARED: Windows RDP Server
 #==========================================================
 resource "google_compute_instance" "gcp_windows_rdp_server" {
-  name         = var.gcp_cloudflared_windows_rdp_name
+  name         = var.gcp_windows_rdp_vm_name
   machine_type = var.gcp_windows_machine_size
-  zone         = "${var.gcp_region}-a"
+  zone         = local.common_gcp_config.zone
 
   boot_disk {
     initialize_params {
@@ -157,15 +190,15 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
   }
 
   network_interface {
-    network    = google_compute_network.gcp_custom_vpc.id
+    network    = local.common_gcp_config.network
     subnetwork = google_compute_subnetwork.gcp_cloudflared_windows_rdp_subnet.id
   }
 
   scheduling {
-    preemptible         = false
-    automatic_restart   = true
-    on_host_maintenance = "MIGRATE"
-    provisioning_model  = "STANDARD"
+    preemptible         = local.standard_scheduling.preemptible
+    automatic_restart   = local.standard_scheduling.automatic_restart
+    on_host_maintenance = local.standard_scheduling.on_host_maintenance
+    provisioning_model  = local.standard_scheduling.provisioning_model
   }
 
   service_account {
@@ -183,7 +216,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
       user_name                 = var.gcp_windows_user_name
       admin_password            = var.gcp_windows_admin_password
       tunnel_secret_windows_gcp = module.cloudflare.gcp_windows_extracted_token
-      admin_web_app_port        = var.cf_administration_web_app_port
+      admin_web_app_port        = var.cf_admin_web_app_port
       sensitive_web_app_port    = var.cf_sensitive_web_app_port
     })
   }
@@ -196,16 +229,16 @@ resource "google_compute_instance" "gcp_vm_instance" {
   count        = var.gcp_vm_count
   name         = count.index == 0 ? "${var.gcp_warp_connector_vm_name}-${count.index}" : "${var.gcp_vm_name}-${count.index}"
   machine_type = var.gcp_machine_size
-  zone         = "${var.gcp_region}-a"
+  zone         = local.common_gcp_config.zone
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+      image = local.common_linux_boot_disk.image
     }
   }
 
   network_interface {
-    network    = google_compute_network.gcp_custom_vpc.id
+    network    = local.common_gcp_config.network
     subnetwork = google_compute_subnetwork.gcp_warp_subnet.id
     #    access_config {}
   }
@@ -213,30 +246,20 @@ resource "google_compute_instance" "gcp_vm_instance" {
   can_ip_forward = count.index == 0 ? true : false
 
   scheduling {
-    preemptible       = true
-    automatic_restart = false
+    preemptible       = local.preemptible_scheduling.preemptible
+    automatic_restart = local.preemptible_scheduling.automatic_restart
   }
 
   tags = ["warp-instances"]
 
-  metadata = {
+  metadata = merge(local.common_metadata_vars, {
     ssh-keys = "${var.gcp_vm_default_user}:${module.ssh_keys.gcp_vm_key[count.index]}"
+    ROLE     = count.index == 0 ? "warp_connector" : "default"
 
-    enable-oslogin = var.gcp_enable_oslogin
-
-    ROLE = count.index == 0 ? "warp_connector" : "default"
-
-    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", {
-      role                   = count.index == 0 ? "warp_connector" : "default"
-      warp_token             = module.cloudflare.gcp_extracted_warp_token
-      datadog_api_key        = var.datadog_api_key
-      datadog_region         = var.datadog_region
-      tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
-      gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
-      admin_web_app_port     = var.cf_administration_web_app_port
-      sensitive_web_app_port = var.cf_sensitive_web_app_port
-    })
-  }
+    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", merge(local.gcp_common_user_data_vars, {
+      role = count.index == 0 ? "warp_connector" : "default"
+    }))
+  })
 }
 
 

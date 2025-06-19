@@ -42,7 +42,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
         saml = {
           identity_provider_id = var.cf_okta_identity_provider_id
           attribute_name       = "groups"
-          attribute_value      = var.okta_infrastructureadmin_saml_group_name
+          attribute_value      = var.okta_infra_admin_saml_group_name
         }
       },
       {
@@ -98,7 +98,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
 resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" {
   account_id           = var.cloudflare_account_id
   type                 = "ssh"
-  name                 = var.cf_browser_rendering_ssh_app_name
+  name                 = var.cf_browser_ssh_app_name
   app_launcher_visible = true
   logo_url             = "https://cdn.iconscout.com/icon/free/png-256/free-database-icon-download-in-svg-png-gif-file-formats--ui-elements-pack-user-interface-icons-444649.png"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
@@ -109,18 +109,18 @@ resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" 
     uri  = var.cf_subdomain_ssh
   }]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_onetimepin_identity_provider_id]
+  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_otp_identity_provider_id]
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
   policies = [
     {
       decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.employees_browser_rendering_policy.id
+      id       = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
     },
     {
       decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.contractors_browser_rendering_policy.id
+      id       = cloudflare_zero_trust_access_policy.policies["contractors_browser_rendering"].id
     },
   ]
 }
@@ -132,7 +132,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" 
 resource "cloudflare_zero_trust_access_application" "vnc_aws_browser_rendering" {
   account_id           = var.cloudflare_account_id
   type                 = "vnc"
-  name                 = var.cf_browser_rendering_vnc_app_name
+  name                 = var.cf_browser_vnc_app_name
   app_launcher_visible = true
   logo_url             = "https://blog.zwindler.fr/2015/07/vnc.png"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
@@ -143,18 +143,18 @@ resource "cloudflare_zero_trust_access_application" "vnc_aws_browser_rendering" 
     uri  = var.cf_subdomain_vnc
   }]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_onetimepin_identity_provider_id]
+  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_otp_identity_provider_id]
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
   policies = [
     {
       decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.employees_browser_rendering_policy.id
+      id       = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
     },
     {
       decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.contractors_browser_rendering_policy.id
+      id       = cloudflare_zero_trust_access_policy.policies["contractors_browser_rendering"].id
     },
   ]
 }
@@ -185,7 +185,7 @@ resource "cloudflare_zero_trust_access_application" "sensitive_web_server" {
 
   policies = [{
     decision = "allow"
-    id       = cloudflare_zero_trust_access_policy.sensitive_web_server_policy.id
+    id       = cloudflare_zero_trust_access_policy.policies["sensitive_web_server"].id
   }]
 }
 
@@ -199,7 +199,7 @@ resource "cloudflare_zero_trust_access_application" "sensitive_web_server" {
 resource "cloudflare_zero_trust_access_application" "administration_web_app" {
   account_id           = var.cloudflare_account_id
   type                 = "self_hosted"
-  name                 = var.cf_administration_web_app_name
+  name                 = var.cf_admin_web_app_name
   app_launcher_visible = true
   logo_url             = "https://raw.githubusercontent.com/uditkumar489/Icon-pack/master/Entrepreneur/digital-marketing/svg/computer-1.svg"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
@@ -216,6 +216,6 @@ resource "cloudflare_zero_trust_access_application" "administration_web_app" {
 
   policies = [{
     decision = "allow"
-    id       = cloudflare_zero_trust_access_policy.web_app_policy.id
+    id       = cloudflare_zero_trust_access_policy.policies["web_app"].id
   }]
 }

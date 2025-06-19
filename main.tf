@@ -36,11 +36,11 @@ data "http" "my_ip" {
 }
 
 module "ssh_keys" {
-  source                            = "./modules/keys"
-  gcp_users                         = toset(var.gcp_users)
-  aws_ec2_cloudflared_replica_count = var.aws_ec2_cloudflared_replica_count
-  azure_vm_count                    = var.azure_vm_count
-  gcp_vm_count                      = var.gcp_vm_count
+  source                = "./modules/keys"
+  gcp_users             = toset(var.gcp_users)
+  aws_cloudflared_count = var.aws_cloudflared_count
+  azure_vm_count        = var.azure_vm_count
+  gcp_vm_count          = var.gcp_vm_count
 }
 
 module "cloudflare" {
@@ -54,10 +54,10 @@ module "cloudflare" {
   # Tunnel
   cf_tunnel_name_gcp             = var.cf_tunnel_name_gcp
   cf_tunnel_name_aws             = var.cf_tunnel_name_aws
-  cf_windows_rdp_tunnel_name_gcp = var.cf_windows_rdp_tunnel_name_gcp
+  cf_windows_rdp_tunnel_name_gcp = var.cf_windows_rdp_tunnel_name
 
-  cf_tunnel_warp_connector_azure_id = var.cf_tunnel_warp_connector_azure_id
-  cf_tunnel_warp_connector_gcp_id   = var.cf_tunnel_warp_connector_gcp_id
+  cf_tunnel_warp_connector_azure_id = var.cf_warp_tunnel_azure_id
+  cf_tunnel_warp_connector_gcp_id   = var.cf_warp_tunnel_gcp_id
 
   gcp_vm_internal_ip          = google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip
   gcp_windows_vm_internal_ip  = google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip
@@ -74,26 +74,26 @@ module "cloudflare" {
   cf_target_name             = var.cf_target_name
 
   # SAML OKTA
-  okta_infrastructureadmin_saml_group_name = var.okta_infrastructureadmin_saml_group_name
-  okta_contractors_saml_group_name         = var.okta_contractors_saml_group_name
-  okta_salesengineering_saml_group_name    = var.okta_salesengineering_saml_group_name
-  okta_itadmin_saml_group_name             = var.okta_itadmin_saml_group_name
-  okta_sales_saml_group_name               = var.okta_sales_saml_group_name
+  okta_infra_admin_saml_group_name = var.okta_infra_admin_saml_group_name
+  okta_contractors_saml_group_name = var.okta_contractors_saml_group_name
+  okta_sales_eng_saml_group_name   = var.okta_sales_eng_saml_group_name
+  okta_itadmin_saml_group_name     = var.okta_itadmin_saml_group_name
+  okta_sales_saml_group_name       = var.okta_sales_saml_group_name
 
   okta_bob_user_login = var.okta_bob_user_login
 
   cf_email_domain = var.cf_email_domain
 
   # App names and ports
-  cf_browser_rendering_ssh_app_name = var.cf_browser_rendering_ssh_app_name
-  cf_browser_rendering_vnc_app_name = var.cf_browser_rendering_vnc_app_name
-  cf_infra_app_name                 = var.cf_infra_app_name
-  cf_sensitive_web_app_name         = var.cf_sensitive_web_app_name
-  cf_administration_web_app_name    = var.cf_administration_web_app_name
-  cf_team_name                      = var.cf_team_name
-  cf_administration_web_app_port    = var.cf_administration_web_app_port
-  cf_sensitive_web_app_port         = var.cf_sensitive_web_app_port
-  cf_domain_controller_rdp_port     = var.cf_domain_controller_rdp_port
+  cf_browser_ssh_app_name       = var.cf_browser_ssh_app_name
+  cf_browser_vnc_app_name       = var.cf_browser_vnc_app_name
+  cf_infra_app_name             = var.cf_infra_app_name
+  cf_sensitive_web_app_name     = var.cf_sensitive_web_app_name
+  cf_admin_web_app_name         = var.cf_admin_web_app_name
+  cf_team_name                  = var.cf_team_name
+  cf_admin_web_app_port         = var.cf_admin_web_app_port
+  cf_sensitive_web_app_port     = var.cf_sensitive_web_app_port
+  cf_domain_controller_rdp_port = var.cf_domain_controller_rdp_port
 
   # AWS
   aws_ec2_ssh_service_private_ip = aws_instance.aws_ec2_service_instance.private_ip
@@ -107,14 +107,14 @@ module "cloudflare" {
   azure_address_prefixes     = var.azure_address_prefixes
 
   # Static definition
-  cf_gateway_posture_id                     = var.cf_gateway_posture_id
-  cf_latest_macOS_version_posture_id        = var.cf_latest_macOS_version_posture_id
-  cf_latest_windows_version_posture_id      = var.cf_latest_windows_version_posture_id
-  cf_latest_linux_kernel_version_posture_id = var.cf_latest_linux_kernel_version_posture_id
-  cf_okta_identity_provider_id              = var.cf_okta_identity_provider_id
-  cf_onetimepin_identity_provider_id        = var.cf_onetimepin_identity_provider_id
-  cf_azure_identity_provider_id             = var.cf_azure_identity_provider_id
-  cf_azure_administrators_rule_group_id     = var.cf_azure_administrators_rule_group_id
+  cf_gateway_posture_id         = var.cf_gateway_posture_id
+  cf_macos_posture_id           = var.cf_macos_posture_id
+  cf_windows_posture_id         = var.cf_windows_posture_id
+  cf_linux_posture_id           = var.cf_linux_posture_id
+  cf_okta_identity_provider_id  = var.cf_okta_identity_provider_id
+  cf_otp_identity_provider_id   = var.cf_otp_identity_provider_id
+  cf_azure_identity_provider_id = var.cf_azure_identity_provider_id
+  cf_azure_admin_rule_group_id  = var.cf_azure_admin_rule_group_id
 
   # Device Profile
   cf_device_os                   = var.cf_device_os

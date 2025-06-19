@@ -1,53 +1,139 @@
-#======================================================
-# Short lived Certificate CA for Infrastructure Access
-#======================================================
+#==========================================================
+# Local Variables
+#==========================================================
 locals {
+  # Certificate data
   gateway_ca_certificate = jsondecode(data.http.short_lived_cloudflare_ssh_ca.response_body)
-}
 
-data "http" "short_lived_cloudflare_ssh_ca" {
-  url = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/access/gateway_ca"
+  # WARP connector tokens
+  azure_warp_connector_token = jsondecode(data.http.cloudflare_warp_connector_token_azure.response_body).result
+  gcp_warp_connector_token   = jsondecode(data.http.cloudflare_warp_connector_token_gcp.response_body).result
 
-  request_headers = {
+  # Tunnel configurations
+  tunnels = {
+    gcp_infrastructure = {
+      name = var.cf_tunnel_name_gcp
+      routes = [
+        {
+          comment = "This is a route making GCP subnet available in the Cloudflare network"
+          network = var.gcp_ip_cidr_infra
+        }
+      ]
+      public_hostnames = [
+        {
+          hostname = var.cf_subdomain_web
+          service  = "http://localhost:${var.cf_admin_web_app_port}"
+          aud_tag  = "administration_web_app"
+        },
+        {
+          hostname = var.cf_subdomain_web_sensitive
+          service  = "http://localhost:${var.cf_sensitive_web_app_port}"
+          aud_tag  = "sensitive_web_server"
+        }
+      ]
+    }
+    gcp_windows_rdp = {
+      name = var.cf_windows_rdp_tunnel_name_gcp
+      routes = [
+        {
+          comment = "This is a route making GCP Windows RDP subnet available in the Cloudflare network"
+          network = var.gcp_ip_cidr_windows_rdp
+        }
+      ]
+    }
+    aws_browser_rendering = {
+      name = var.cf_tunnel_name_aws
+      routes = [
+        {
+          comment = "This is a route making AWS private subnet available in the Cloudflare network"
+          network = var.aws_private_subnet_cidr
+        }
+      ]
+    }
+  }
+
+  # HTTP request headers for API calls
+  cloudflare_api_headers = {
     "X-Auth-Email" = var.cloudflare_email
     "X-Auth-Key"   = var.cloudflare_api_key
     "Content-Type" = "application/json"
   }
 }
 
-#=====================================
-# GCP Tunnel: Access for Infrastruture
-#=====================================
-resource "cloudflare_zero_trust_tunnel_cloudflared" "gcp_cloudflared_tunnel" {
+#==========================================================
+# Data Sources
+#==========================================================
+data "http" "short_lived_cloudflare_ssh_ca" {
+  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/access/gateway_ca"
+  request_headers = local.cloudflare_api_headers
+}
+
+data "http" "cloudflare_warp_connector_token_azure" {
+  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_azure_id}/token"
+  request_headers = local.cloudflare_api_headers
+}
+
+data "http" "cloudflare_warp_connector_token_gcp" {
+  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_gcp_id}/token"
+  request_headers = local.cloudflare_api_headers
+}
+
+#==========================================================
+# Cloudflare Tunnels
+#==========================================================
+resource "cloudflare_zero_trust_tunnel_cloudflared" "tunnels" {
+  for_each = local.tunnels
+
   account_id = var.cloudflare_account_id
-  name       = var.cf_tunnel_name_gcp
+  name       = each.value.name
   config_src = "cloudflare"
 }
 
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "gcp_tunnel_cloudflared_token" {
+#==========================================================
+# Tunnel Tokens
+#==========================================================
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_tokens" {
+  for_each = local.tunnels
+
   account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.gcp_cloudflared_tunnel.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnels[each.key].id
 }
 
-# Private Network Tab configuration
-resource "cloudflare_zero_trust_tunnel_cloudflared_route" "gcp_private_network" {
+#==========================================================
+# Private Network Routes
+#==========================================================
+resource "cloudflare_zero_trust_tunnel_cloudflared_route" "routes" {
+  for_each = {
+    for route_key, route in flatten([
+      for tunnel_key, tunnel in local.tunnels : [
+        for route_idx, route in tunnel.routes : {
+          key     = "${tunnel_key}_${route_idx}"
+          tunnel  = tunnel_key
+          comment = route.comment
+          network = route.network
+        }
+      ]
+    ]) : route.key => route
+  }
+
   account_id = var.cloudflare_account_id
-  comment    = "This is a route making GCP subnet available in the Cloudflare network"
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.gcp_cloudflared_tunnel.id
-  network    = var.gcp_ip_cidr_infra
+  comment    = each.value.comment
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnels[each.value.tunnel].id
+  network    = each.value.network
 }
 
-
-# Public Hostname Tab configuration for GCP Tunnel
+#==========================================================
+# Public Hostname Configurations - GCP Only (no AWS IPs dependency)
+#==========================================================
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname" {
   account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.gcp_cloudflared_tunnel.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_infrastructure"].id
 
   config = {
     ingress = [
       {
         hostname = var.cf_subdomain_web
-        service  = "http://localhost:${var.cf_administration_web_app_port}"
+        service  = "http://localhost:${var.cf_admin_web_app_port}"
         origin_request = {
           access = {
             aud_tag   = [cloudflare_zero_trust_access_application.administration_web_app.aud]
@@ -74,70 +160,25 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
   }
 }
 
-
-#===========================================
-# GCP Tunnel: Cloudflared Windows RDP Server
-#===========================================
-resource "cloudflare_zero_trust_tunnel_cloudflared" "gcp_cloudflared_windows_rdp_tunnel" {
-  account_id = var.cloudflare_account_id
-  name       = var.cf_windows_rdp_tunnel_name_gcp
-  config_src = "cloudflare"
-}
-
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "gcp_tunnel_cloudflared_windows_rdp_token" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.gcp_cloudflared_windows_rdp_tunnel.id
-}
-
-# Private Network Tab configuration
-resource "cloudflare_zero_trust_tunnel_cloudflared_route" "gcp_private_network_windows_rdp" {
-  account_id = var.cloudflare_account_id
-  comment    = "This is a route making GCP Windows RDP subnet available in the Cloudflare network"
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.gcp_cloudflared_windows_rdp_tunnel.id
-  network    = var.gcp_ip_cidr_windows_rdp
-}
-
-
-
-
-#=====================================
-# AWS Tunnel: SSH browser rendered
-#=====================================
-resource "cloudflare_zero_trust_tunnel_cloudflared" "aws_cloudflared_tunnel" {
-  account_id = var.cloudflare_account_id
-  name       = var.cf_tunnel_name_aws
-  config_src = "cloudflare"
-}
-
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "aws_tunnel_cloudflared_token" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.aws_cloudflared_tunnel.id
-}
-
-# Private Network Tab configuration (Private Network AWS)
-resource "cloudflare_zero_trust_tunnel_cloudflared_route" "aws_private_network" {
-  account_id = var.cloudflare_account_id
-  comment    = "This is a route making AWS private subnet available in the Cloudflare network"
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.aws_cloudflared_tunnel.id
-  network    = var.aws_private_subnet_cidr
-}
-
-# Public Hostname Tab configuration for AWS Tunnel
+#==========================================================
+# AWS Public Hostname Configuration (requires AWS instances)
+#==========================================================
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname" {
   account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.aws_cloudflared_tunnel.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].id
 
   config = {
-    ingress = [{
-      hostname = var.cf_subdomain_ssh
-      service  = "ssh://${var.aws_ec2_ssh_service_private_ip}:22"
-      origin_request = {
-        access = {
-          aud_tag   = [cloudflare_zero_trust_access_application.ssh_aws_browser_rendering.aud]
-          required  = true
-          team_name = var.cf_team_name
+    ingress = [
+      {
+        hostname = var.cf_subdomain_ssh
+        service  = "ssh://${var.aws_ec2_ssh_service_private_ip}:22"
+        origin_request = {
+          access = {
+            aud_tag   = [cloudflare_zero_trust_access_application.ssh_aws_browser_rendering.aud]
+            required  = true
+            team_name = var.cf_team_name
+          }
         }
-      }
       },
       {
         hostname = var.cf_subdomain_vnc
@@ -154,43 +195,5 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
         service = "http_status:404"
       }
     ]
-  }
-}
-
-
-
-
-#=====================================
-# Azure Tunnel: WARP Connector
-#=====================================
-locals {
-  azure_warp_connector_token = jsondecode(data.http.cloudflare_warp_connector_token_azure.response_body).result
-}
-
-data "http" "cloudflare_warp_connector_token_azure" {
-  url = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_azure_id}/token"
-  request_headers = {
-    "X-Auth-Email" = "${var.cloudflare_email}"
-    "X-Auth-Key"   = "${var.cloudflare_api_key}"
-    "Content-Type" = "application/json"
-  }
-}
-
-
-
-
-#=====================================
-# GCP Tunnel: WARP Connector
-#=====================================
-locals {
-  gcp_warp_connector_token = jsondecode(data.http.cloudflare_warp_connector_token_gcp.response_body).result
-}
-
-data "http" "cloudflare_warp_connector_token_gcp" {
-  url = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_gcp_id}/token"
-  request_headers = {
-    "X-Auth-Email" = "${var.cloudflare_email}"
-    "X-Auth-Key"   = "${var.cloudflare_api_key}"
-    "Content-Type" = "application/json"
   }
 }

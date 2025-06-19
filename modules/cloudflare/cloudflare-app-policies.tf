@@ -1,310 +1,145 @@
-#======================================================
-# POLICY For Web app
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "web_app_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "Administration Web App Policy"
-  session_duration = "0s"
-
-  include = [{
-    group = {
-      id = cloudflare_zero_trust_access_group.it_admin_rule_group.id
+#==========================================================
+# Local Variables
+#==========================================================
+locals {
+  # Common access policy configurations
+  access_policies = {
+    web_app = {
+      name                  = "Administration Web App Policy"
+      include_groups        = ["it_admin"]
+      require_posture       = true
+      require_mfa           = false
+      purpose_justification = false
     }
-  }]
-  require = [{
-    device_posture = {
-      integration_uid = var.cf_gateway_posture_id
+    sensitive_web_server = {
+      name                            = "Competition App Policy"
+      include_groups                  = ["sales", "sales_engineering"]
+      require_posture                 = true
+      require_mfa                     = true
+      purpose_justification           = true
+      purpose_justification_prompt    = "Please enter a justification for entering this protected domain."
+      lifecycle_create_before_destroy = true
     }
-  }]
-}
-
-
-#======================================================
-# POLICY For Sensitive web app
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "sensitive_web_server_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "Competition App Policy"
-  session_duration = "0s"
-
-  purpose_justification_prompt   = "Please enter a justification for entering this protected domain."
-  purpose_justification_required = true
-
-  include = [
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.sales_rule_group.id
-      }
-    },
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.sales_engineering_rule_group.id
-      }
+    employees_browser_rendering = {
+      name                         = "Employees AWS Database Policy"
+      include_groups               = ["infrastructure_admin"]
+      require_posture              = true
+      require_mfa                  = false
+      purpose_justification        = true
+      purpose_justification_prompt = "Please enter a justification as this is a production Application."
+      require_login_method         = true
     }
-  ]
-
-  require = [
-    {
-      device_posture = {
-        integration_uid = var.cf_gateway_posture_id
-      }
-    },
-    {
-      auth_method = {
-        auth_method = "mfa"
-      }
+    contractors_browser_rendering = {
+      name                         = "Contractors AWS Database Policy"
+      include_groups               = ["contractors"]
+      require_posture              = true
+      require_mfa                  = false
+      purpose_justification        = true
+      purpose_justification_prompt = "Please enter a justification as this is a production Application."
+      include_email_domain         = true
     }
-  ]
-
-  exclude = [{
-    auth_method = {
-      auth_method = "sms"
+    aws = {
+      name            = "AWS Cloud Policy"
+      include_groups  = ["sales_engineering"]
+      require_posture = true
+      require_mfa     = true
     }
-  }]
-
-  lifecycle {
-    create_before_destroy = true
+    salesforce = {
+      name               = "Salesforce Policy"
+      include_groups     = ["sales", "sales_engineering"]
+      require_posture    = true
+      require_mfa        = true
+      require_country    = true
+      require_os_version = true
+    }
+    okta = {
+      name            = "Okta Policy"
+      include_groups  = ["it_admin"]
+      require_posture = true
+      require_mfa     = true
+    }
+    meraki = {
+      name            = "Meraki Policy"
+      include_groups  = ["it_admin"]
+      require_posture = true
+      require_mfa     = true
+    }
   }
 }
 
+#==========================================================
+# Access Policies
+#==========================================================
+resource "cloudflare_zero_trust_access_policy" "policies" {
+  for_each = local.access_policies
 
-
-#======================================================
-# POLICY for Employees AWS Browser Rendering
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "employees_browser_rendering_policy" {
   account_id       = var.cloudflare_account_id
   decision         = "allow"
-  name             = "Employees AWS Database Policy"
+  name             = each.value.name
   session_duration = "0s"
 
-  purpose_justification_prompt   = "Please enter a justification as this is a production Application."
-  purpose_justification_required = true
+  # Purpose justification
+  purpose_justification_prompt   = try(each.value.purpose_justification_prompt, null)
+  purpose_justification_required = try(each.value.purpose_justification, false)
 
-  include = [
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.infrastructure_admin_rule_group.id
+  # Include groups
+  include = concat(
+    # SAML groups
+    [
+      for group in each.value.include_groups : {
+        group = {
+          id = cloudflare_zero_trust_access_group.saml_groups[group].id
+        }
       }
-    }
-  ]
-
-  require = [
-    {
-      device_posture = {
-        integration_uid = var.cf_gateway_posture_id
-      }
-    },
-    {
-      login_method = {
-        id = var.cf_okta_identity_provider_id
-      }
-    }
-  ]
-}
-
-
-
-#======================================================
-# POLICY for Contractors AWS Browser SSH database
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "contractors_browser_rendering_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "Contractors AWS Database Policy"
-  session_duration = "0s"
-
-  purpose_justification_prompt   = "Please enter a justification as this is a production Application."
-  purpose_justification_required = true
-
-  include = [
-    {
+    ],
+    # Email domain (for contractors)
+    try(each.value.include_email_domain, false) ? [{
       email_domain = {
         domain = var.cf_email_domain
       }
-    },
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.contractors_rule_group.id
-      }
-    }
-  ]
+    }] : []
+  )
 
-  require = [
-    {
+  # Require conditions
+  require = concat(
+    # Device posture (always required if specified)
+    try(each.value.require_posture, false) ? [{
       device_posture = {
         integration_uid = var.cf_gateway_posture_id
       }
-    },
-  ]
-}
-
-
-#======================================================
-# POLICY for AWS Cloud
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "aws_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "AWS Cloud Policy"
-  session_duration = "0s"
-
-  include = [
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.sales_engineering_rule_group.id
-      }
-    }
-  ]
-
-  require = [
-    {
-      device_posture = {
-        integration_uid = var.cf_gateway_posture_id
-      }
-    },
-    {
+    }] : [],
+    # MFA requirement
+    try(each.value.require_mfa, false) ? [{
       auth_method = {
         auth_method = "mfa"
       }
-    }
-  ]
-
-  exclude = [{
-    auth_method = {
-      auth_method = "sms"
-    }
-  }]
-}
-
-
-
-#======================================================
-# POLICY for Salesforce
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "salesforce_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "Salesforce Policy"
-  session_duration = "0s"
-
-  include = [
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.sales_rule_group.id
+    }] : [],
+    # Login method (for specific policies)
+    try(each.value.require_login_method, false) ? [{
+      login_method = {
+        id = var.cf_okta_identity_provider_id
       }
-    },
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.sales_engineering_rule_group.id
-      }
-    }
-  ]
-
-  require = [
-    {
-      device_posture = {
-        integration_uid = var.cf_gateway_posture_id
-      }
-    },
-    {
+    }] : [],
+    # Country requirements
+    try(each.value.require_country, false) ? [{
       group = {
         id = cloudflare_zero_trust_access_group.country_requirements_rule_group.id
       }
-    },
-    {
+    }] : [],
+    # OS version requirements
+    try(each.value.require_os_version, false) ? [{
       group = {
         id = cloudflare_zero_trust_access_group.latest_os_version_requirements_rule_group.id
       }
-    },
-    {
-      auth_method = {
-        auth_method = "mfa"
-      }
-    }
-  ]
+    }] : []
+  )
 
-  exclude = [{
+  # Exclude SMS (for MFA policies)
+  exclude = try(each.value.require_mfa, false) ? [{
     auth_method = {
       auth_method = "sms"
     }
-  }]
-}
+  }] : []
 
-
-#======================================================
-# POLICY for Okta
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "okta_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "Okta Policy"
-  session_duration = "0s"
-
-  include = [
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.it_admin_rule_group.id
-      }
-    }
-  ]
-
-  require = [
-    {
-      device_posture = {
-        integration_uid = var.cf_gateway_posture_id
-      }
-    },
-    {
-      auth_method = {
-        auth_method = "mfa"
-      }
-    }
-  ]
-
-  exclude = [{
-    auth_method = {
-      auth_method = "sms"
-    }
-  }]
-}
-
-
-#======================================================
-# POLICY for Meraki
-#======================================================
-resource "cloudflare_zero_trust_access_policy" "meraki_policy" {
-  account_id       = var.cloudflare_account_id
-  decision         = "allow"
-  name             = "Meraki Policy"
-  session_duration = "0s"
-
-  include = [
-    {
-      group = {
-        id = cloudflare_zero_trust_access_group.it_admin_rule_group.id
-      }
-    }
-  ]
-
-  require = [
-    {
-      device_posture = {
-        integration_uid = var.cf_gateway_posture_id
-      }
-    },
-    {
-      auth_method = {
-        auth_method = "mfa"
-      }
-    }
-  ]
-
-  exclude = [{
-    auth_method = {
-      auth_method = "sms"
-    }
-  }]
+  # Note: lifecycle blocks cannot be conditional in for_each resources
 }

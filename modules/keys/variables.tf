@@ -3,7 +3,7 @@ variable "gcp_users" {
   type = set(string)
 }
 
-variable "aws_ec2_cloudflared_replica_count" {
+variable "aws_cloudflared_count" {
   description = "number of AWS EC2 Instances"
   type        = number
 }
@@ -15,5 +15,5 @@ variable "azure_vm_count" {
 
 variable "gcp_vm_count" {
   description = "number of vm not running cloudflared"
-  type        = string
+  type        = number
 }

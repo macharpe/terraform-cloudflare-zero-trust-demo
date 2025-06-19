@@ -109,135 +109,99 @@ locals {
 }
 
 
-#============================================================================
-# Define fixed precedence values that ensure Terraform profiles always have priority
-#============================================================================
+#==========================================================
+# Device Profile Configurations
+#==========================================================
 locals {
-  laptop_precedence         = 10 # Highest priority - specific OS match
-  vm_precedence             = 20 # Medium priority - group-based match  
-  warp_connector_precedence = 30 # Lower priority - service account match
+  # Device precedence values
+  device_precedence = {
+    laptop         = 10 # Highest priority - specific OS match
+    vm             = 20 # Medium priority - group-based match  
+    warp_connector = 30 # Lower priority - service account match
+  }
+
+  # Common profile settings
+  common_profile_settings = {
+    allow_mode_switch     = false
+    tunnel_protocol       = "masque"
+    switch_locked         = false
+    allowed_to_leave      = true
+    allow_updates         = true
+    auto_connect          = 0
+    disable_auto_fallback = false
+    lan_allow_minutes     = 30
+    lan_allow_subnet_size = 16
+    exclude_office_ips    = true
+    captive_portal        = 180
+  }
+
+  # Device profiles configuration
+  device_profiles = {
+    laptop = {
+      name        = "Zero-Trust demo local laptop (mac)"
+      description = "This profile is for the local laptop (running macos) for my zero-trust demo"
+      precedence  = local.device_precedence.laptop
+      match       = "os.name == \"${var.cf_device_os}\""
+      support_url = "Zero-TrustDemo-LaptopProfile"
+    }
+    vm = {
+      name        = "Zero-Trust demo VMs (Ubuntu and Windows 11)"
+      description = "This profile is for my VMs for my zero-trust demo"
+      precedence  = local.device_precedence.vm
+      match       = "any(identity.saml_attributes[*] in {\"groups=${var.okta_infra_admin_saml_group_name}\"}) or any(identity.saml_attributes[*] in {\"groups=${var.okta_contractors_saml_group_name}\"}) or identity.email matches \"${var.cf_email_domain}\""
+      support_url = "Zero-TrustDemo-VMProfile"
+    }
+    warp_connector = {
+      name        = "Zero-Trust demo WarpConnector"
+      description = "This profile is dedicated for WARP Connector"
+      precedence  = local.device_precedence.warp_connector
+      match       = "identity.email == \"warp_connector@${var.cf_team_name}.cloudflareaccess.com\""
+      support_url = "WARPConnectorProfile"
+    }
+  }
 }
-
-
 
 #==========================================================
-# Customized profile for demo to be used on local laptop
+# Device Custom Profiles
 #==========================================================
-resource "cloudflare_zero_trust_device_custom_profile" "client_custom_route_profile" {
+resource "cloudflare_zero_trust_device_custom_profile" "profiles" {
+  for_each = local.device_profiles
+
   account_id = var.cloudflare_account_id
   enabled    = true
 
-  name                  = "Zero-Trust demo local laptop (mac)"
-  description           = "This profile is for the local laptop (running macos) for my zero-trust demo"
-  precedence            = local.laptop_precedence # Fixed value: 10
-  match                 = "os.name == \"${var.cf_device_os}\""
-  allow_mode_switch     = false
-  tunnel_protocol       = "masque"
-  switch_locked         = false
-  allowed_to_leave      = true
-  allow_updates         = true
-  auto_connect          = 0
-  disable_auto_fallback = false
-  support_url           = "Zero-TrustDemo-LaptopProfile"
-  service_mode_v2 = {
-    mode = "warp"
-  }
+  name        = each.value.name
+  description = each.value.description
+  precedence  = each.value.precedence
+  match       = each.value.match
+  support_url = each.value.support_url
 
-  # Exclude routes configuration
-  exclude = [for route in values(local.final_exclude_routes) : {
-    address     = route.address
-    description = route.description
-  }]
+  # Common settings
+  allow_mode_switch     = local.common_profile_settings.allow_mode_switch
+  tunnel_protocol       = local.common_profile_settings.tunnel_protocol
+  switch_locked         = local.common_profile_settings.switch_locked
+  allowed_to_leave      = local.common_profile_settings.allowed_to_leave
+  allow_updates         = local.common_profile_settings.allow_updates
+  auto_connect          = local.common_profile_settings.auto_connect
+  disable_auto_fallback = local.common_profile_settings.disable_auto_fallback
+  lan_allow_minutes     = local.common_profile_settings.lan_allow_minutes
+  lan_allow_subnet_size = local.common_profile_settings.lan_allow_subnet_size
+  exclude_office_ips    = local.common_profile_settings.exclude_office_ips
+  captive_portal        = local.common_profile_settings.captive_portal
 
-  lan_allow_minutes     = 30
-  lan_allow_subnet_size = 16
-  exclude_office_ips    = true
-  captive_portal        = 180
-
-  # it will get applied once and will be ignored any subsequent terraform apply
-  lifecycle {
-    ignore_changes = all
-  }
-}
-
-#=======================================================
-# Customized profile for demo to be used in local VMs
-#========================================================
-resource "cloudflare_zero_trust_device_custom_profile" "vms_custom_route_profile" {
-  account_id = var.cloudflare_account_id
-  enabled    = true
-
-  name                  = "Zero-Trust demo VMs (Ubuntu and Windows 11)"
-  description           = "This profile is for my VMs for my zero-trust demo"
-  precedence            = local.vm_precedence # Fixed value: 20
-  match                 = "any(identity.saml_attributes[*] in {\"groups=${var.okta_infrastructureadmin_saml_group_name}\"}) or any(identity.saml_attributes[*] in {\"groups=${var.okta_contractors_saml_group_name}\"}) or identity.email matches \"${var.cf_email_domain}\""
-  allow_mode_switch     = false
-  tunnel_protocol       = "masque"
-  switch_locked         = false
-  allowed_to_leave      = true
-  allow_updates         = true
-  auto_connect          = 0
-  disable_auto_fallback = false
-  support_url           = "Zero-TrustDemo-VMProfile"
-
-  service_mode_v2 = {
-    mode = "warp"
-  }
-
-  # Exclude routes configuration
-  exclude = [for route in values(local.final_exclude_routes) : {
-    address     = route.address
-    description = route.description
-  }]
-
-  lan_allow_minutes     = 30
-  lan_allow_subnet_size = 16
-  exclude_office_ips    = true
-  captive_portal        = 180
-
-  # it will get applied once and will be ignored any subsequent terraform apply
-  lifecycle {
-    ignore_changes = all
-  }
-}
-
-#===============================================================
-# Customized profile for demo to be used in WARP Connector
-#===============================================================
-resource "cloudflare_zero_trust_device_custom_profile" "warpconnector_custom_route_profile" {
-  account_id = var.cloudflare_account_id
-  enabled    = true
-
-  name                  = "Zero-Trust demo WarpConnector"
-  description           = "This profile is dedicated for WARP Connector"
-  precedence            = local.warp_connector_precedence # Fixed value: 30
-  match                 = "identity.email == \"warp_connector@${var.cf_team_name}.cloudflareaccess.com\""
-  allow_mode_switch     = false
-  tunnel_protocol       = "masque"
-  switch_locked         = false
-  allowed_to_leave      = true
-  allow_updates         = true
-  auto_connect          = 0
-  disable_auto_fallback = false
-  support_url           = "WARPConnectorProfile"
   service_mode_v2 = {
     mode = "warp"
   }
 
   # Exclude routes configuration
   exclude = [
-    for route in local.final_exclude_routes : {
+    for route in values(local.final_exclude_routes) : {
       address     = route.address
       description = route.description
     }
   ]
 
-  lan_allow_minutes     = 30
-  lan_allow_subnet_size = 16
-  exclude_office_ips    = true
-  captive_portal        = 180
-
-  # it will get applied once and will be ignored any subsequent terraform apply
+  # Apply once and ignore subsequent changes
   lifecycle {
     ignore_changes = all
   }

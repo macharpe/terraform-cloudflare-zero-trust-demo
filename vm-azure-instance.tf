@@ -5,7 +5,7 @@ resource "azurerm_resource_group" "cloudflare_rg" {
   name     = var.azure_resource_group_name
   location = var.azure_resource_group_location
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 
@@ -15,10 +15,10 @@ resource "azurerm_resource_group" "cloudflare_rg" {
 resource "azurerm_virtual_network" "cloudflare_vnet" {
   name                = "cloudflare-vnet"
   address_space       = [var.azure_address_vnet]
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 resource "azurerm_subnet" "cloudflare_subnet" {
@@ -31,12 +31,12 @@ resource "azurerm_subnet" "cloudflare_subnet" {
 resource "azurerm_public_ip" "public_ip" {
   count               = var.azure_vm_count
   name                = "public-ip-main-${count.index}"
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
   allocation_method   = "Static"
-  domain_name_label   = "${count.index == 0 ? var.azure_warp_connector_vm_name : var.azure_vm_name}-${count.index}"
+  domain_name_label   = "${count.index == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${count.index}"
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 
@@ -44,8 +44,8 @@ resource "azurerm_public_ip" "public_ip" {
 resource "azurerm_network_interface" "nic" {
   count               = var.azure_vm_count
   name                = "nic-main-${count.index}"
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
 
   # To enable routing on vm count 0
   ip_forwarding_enabled = count.index == 0 ? true : false
@@ -56,7 +56,7 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address_allocation = "Dynamic"
   }
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 #==========================================================
@@ -64,21 +64,21 @@ resource "azurerm_network_interface" "nic" {
 #==========================================================
 resource "azurerm_public_ip" "nat_gateway_public_ip" {
   name                = "nat-gateway-public-ip"
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 resource "azurerm_nat_gateway" "cloudflare_natgw" {
   name                = "cloudflare-natgw"
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
   sku_name            = "Standard"
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 resource "azurerm_nat_gateway_public_ip_association" "natgw_ip" {
@@ -95,13 +95,54 @@ resource "azurerm_subnet_nat_gateway_association" "cloudflare_natgw_association"
 
 
 #==========================================================
+# Local Values for Azure Configuration
+#==========================================================
+locals {
+  # Common Azure configuration
+  azure_common_config = {
+    location            = azurerm_resource_group.cloudflare_rg.location
+    resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  }
+
+  # Common user data template variables for Azure
+  azure_common_user_data_vars = merge(local.global_monitoring, {
+    warp_tunnel_secret_azure = module.cloudflare.azure_extracted_warp_token
+  })
+
+  # Common tags
+  azure_common_tags = var.azure_default_tags
+
+  # Common OS disk configuration
+  azure_common_os_disk = {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+    disk_size_gb         = 32
+  }
+
+  # Common source image configuration
+  azure_common_source_image = {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  # Common timeouts
+  azure_common_timeouts = {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
+}
+
+#==========================================================
 # Azure Virtual Machine
 #==========================================================
 resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
   count               = var.azure_vm_count
-  name                = "${count.index == 0 ? var.azure_warp_connector_vm_name : var.azure_vm_name}-${count.index}"
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
-  location            = azurerm_resource_group.cloudflare_rg.location
+  name                = "${count.index == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${count.index}"
+  resource_group_name = local.azure_common_config.resource_group_name
+  location            = local.azure_common_config.location
   size                = var.azure_vm_size
   admin_username      = var.azure_vm_admin_username
   #  admin_password                  = var.azure_vm_admin_password
@@ -117,33 +158,30 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
   }
 
   # VM index 0 = warp_connector, others = basic
-  custom_data = base64encode(templatefile("${path.module}/scripts/azure-init.tftpl", {
-    role                     = count.index == 0 ? "warp_connector" : "basic"
-    hostname                 = count.index == 0 ? "${var.azure_warp_connector_vm_name}-${count.index}" : "${var.azure_vm_name}-${count.index}"
-    warp_tunnel_secret_azure = module.cloudflare.azure_extracted_warp_token
-    datadog_api_key          = var.datadog_api_key
-    datadog_region           = var.datadog_region
-  }))
+  custom_data = base64encode(templatefile("${path.module}/scripts/azure-init.tftpl", merge(local.azure_common_user_data_vars, {
+    role     = count.index == 0 ? "warp_connector" : "basic"
+    hostname = count.index == 0 ? "${var.azure_warp_vm_name}-${count.index}" : "${var.azure_vm_name}-${count.index}"
+  })))
 
   os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-    disk_size_gb         = 32
+    caching              = local.azure_common_os_disk.caching
+    storage_account_type = local.azure_common_os_disk.storage_account_type
+    disk_size_gb         = local.azure_common_os_disk.disk_size_gb
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
+    publisher = local.azure_common_source_image.publisher
+    offer     = local.azure_common_source_image.offer
+    sku       = local.azure_common_source_image.sku
+    version   = local.azure_common_source_image.version
   }
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.azure_common_timeouts.create
+    update = local.azure_common_timeouts.update
+    delete = local.azure_common_timeouts.delete
   }
 }
 
@@ -153,8 +191,8 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
 #==========================================================
 resource "azurerm_route_table" "cloudflare_route_table_warp" {
   name                = "cloudflare-route-table-to-WARP"
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
 
   route {
     name                   = "route-to-warp-subnet"
@@ -177,7 +215,7 @@ resource "azurerm_route_table" "cloudflare_route_table_warp" {
     next_hop_in_ip_address = azurerm_network_interface.nic[0].private_ip_address
   }
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }
 
 resource "azurerm_subnet_route_table_association" "cloudflare_subnet_route_association" {
@@ -208,8 +246,8 @@ resource "azurerm_network_interface_security_group_association" "main" {
 #==========================================================
 resource "azurerm_network_security_group" "nsg" {
   name                = "nsg-ssh-and-icmp-from-myIP-allowed"
-  location            = azurerm_resource_group.cloudflare_rg.location
-  resource_group_name = azurerm_resource_group.cloudflare_rg.name
+  location            = local.azure_common_config.location
+  resource_group_name = local.azure_common_config.resource_group_name
 
   security_rule {
     name                       = "AllowSSH"
@@ -266,5 +304,5 @@ resource "azurerm_network_security_group" "nsg" {
     azurerm_subnet_route_table_association.cloudflare_subnet_route_association,
   ]
 
-  tags = var.azure_default_tags
+  tags = local.azure_common_tags
 }

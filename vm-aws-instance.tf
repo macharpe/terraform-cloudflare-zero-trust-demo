@@ -14,7 +14,7 @@ resource "aws_key_pair" "aws_ec2_service_key_pair" {
 
 # AWS Key Pair for Cloudflared
 resource "aws_key_pair" "aws_ec2_cloudflared_key_pair" {
-  count      = var.aws_ec2_cloudflared_replica_count
+  count      = var.aws_cloudflared_count
   key_name   = "aws_ssh_cloudflared_${count.index}"
   public_key = module.ssh_keys.aws_ssh_public_key[count.index]
 
@@ -34,92 +34,6 @@ resource "aws_key_pair" "aws_ec2_vnc_key_pair" {
     Environment = var.cf_aws_tag
   }
 }
-
-
-
-# #==========================================================
-# # SSM Parameter Store for API Keys
-# #==========================================================
-# # Store the tunnel secret in SSM Parameter Store
-# resource "aws_ssm_parameter" "aws_cloudflare_tunnel_secret" {
-#   name  = "/myapp/cloudflare/aws-tunnel-secret"
-#   type  = "SecureString"
-#   value = module.cloudflare.aws_extracted_token
-
-#   tags = {
-#     Name        = "Cloudflare Tunnel Secret for AWS"
-#     Environment = var.cf_aws_tag
-#   }
-# }
-
-# # Store the Datadog API key in SSM Parameter Store
-# resource "aws_ssm_parameter" "datadog_api_key" {
-#   name  = "/myapp/datadog/datadog-api-key"
-#   type  = "SecureString"
-#   value = var.datadog_api_key
-
-#   tags = {
-#     Name        = "Datadog API Key"
-#     Environment = var.cf_aws_tag
-#   }
-# }
-
-
-
-# #==========================================================
-# # IAM Role for EC2 Instances to access SSM Parameter Store
-# #==========================================================
-# # IAM role for EC2 instances to access SSM parameters
-# resource "aws_iam_role" "ec2_ssm_role" {
-#   name = "ec2-ssm-access-role"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "ec2.amazonaws.com"
-#         }
-#       }
-#     ]
-#   })
-
-#   tags = {
-#     Name        = "EC2 SSM Access Role"
-#     Environment = var.cf_aws_tag
-#   }
-# }
-
-# # IAM policy for accessing SSM parameters
-# resource "aws_iam_role_policy" "ec2_ssm_policy" {
-#   name = "ec2-ssm-parameter-policy"
-#   role = aws_iam_role.ec2_ssm_role.id
-
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Action = [
-#           "ssm:GetParameter",
-#           "ssm:GetParameters"
-#         ]
-#         Resource = [
-#           "arn:aws:ssm:${var.aws_region}:*:parameter/myapp/*"
-#         ]
-#       }
-#     ]
-#   })
-# }
-
-# # Instance profile for EC2
-# resource "aws_iam_instance_profile" "ec2_profile" {
-#   name = "ec2-ssm-profile"
-#   role = aws_iam_role.ec2_ssm_role.name
-# }
-
 
 
 
@@ -244,43 +158,48 @@ resource "aws_route_table_association" "public" {
 
 
 #==========================================================
+# Local Values for Instance Configuration
+#==========================================================
+locals {
+  # Common instance configuration
+  aws_common_instance_config = {
+    ami           = var.aws_ec2_instance_config_ami_id
+    instance_type = var.aws_ec2_instance_config_type
+    subnet_id     = aws_subnet.aws_private_subnet.id
+  }
+
+  # Common user data template variables
+  aws_common_user_data_vars = merge(local.global_monitoring, local.global_okta, local.global_security, {
+    users                 = local.global_users.aws_users
+    tunnel_secret_aws     = module.cloudflare.aws_extracted_token
+    ca_cloudflare_browser = module.cloudflare.pubkey_short_lived_certificate
+  })
+
+  # Common tags
+  aws_common_tags = {
+    Environment = var.cf_aws_tag
+  }
+}
+
+#==========================================================
 # EC2 Instances: Cloudflared EC2 Instances
 #==========================================================
 resource "aws_instance" "cloudflared_aws" {
-  count         = var.aws_ec2_cloudflared_replica_count
-  ami           = var.aws_ec2_instance_config_ami_id
-  instance_type = var.aws_ec2_instance_config_type
-
-  subnet_id = aws_subnet.aws_private_subnet.id
-
-  # Troubleshoot (remove after)
-  # subnet_id                   = aws_subnet.aws_public_subnet.id
-  # associate_public_ip_address = true
-
+  count                  = var.aws_cloudflared_count
+  ami                    = local.aws_common_instance_config.ami
+  instance_type          = local.aws_common_instance_config.instance_type
+  subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_cloudflared_sg.id]
+  key_name               = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
 
-  key_name = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
+  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
+    role     = "cloudflared"
+    hostname = "${var.aws_ec2_cloudflared_name}-${count.index}"
+  }))
 
-  #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-
-  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", {
-    role              = "cloudflared"
-    hostname          = "${var.aws_ec2_cloudflared_name}-${count.index}"
-    tunnel_secret_aws = module.cloudflare.aws_extracted_token
-    users             = var.aws_users
-    vnc_password      = var.aws_vnc_password
-    datadog_api_key   = var.datadog_api_key
-    datadog_region    = var.datadog_region
-    # Linux user for contractor
-    okta_contractor_username = split("@", var.okta_bob_user_login)[0]
-    okta_contractor_password = var.okta_bob_user_linux_password
-    ca_cloudflare_browser    = module.cloudflare.pubkey_short_lived_certificate
+  tags = merge(local.aws_common_tags, {
+    Name = "${var.aws_ec2_cloudflared_name}-${count.index}"
   })
-
-  tags = {
-    Name        = "${var.aws_ec2_cloudflared_name}-${count.index}"
-    Environment = var.cf_aws_tag
-  }
 }
 
 
@@ -289,40 +208,20 @@ resource "aws_instance" "cloudflared_aws" {
 # EC2 Instances: SERVICE Browser SSH EC2 Instances
 #==========================================================
 resource "aws_instance" "aws_ec2_service_instance" {
-  #  count         = 1
-  ami           = var.aws_ec2_instance_config_ami_id
-  instance_type = var.aws_ec2_instance_config_type
-
-  subnet_id = aws_subnet.aws_private_subnet.id
-
-  # Troubleshoot (remove after)
-  # subnet_id                   = aws_subnet.aws_public_subnet.id
-  # associate_public_ip_address = true
-
+  ami                    = local.aws_common_instance_config.ami
+  instance_type          = local.aws_common_instance_config.instance_type
+  subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_ssh_server_sg.id]
+  key_name               = aws_key_pair.aws_ec2_service_key_pair.key_name
 
-  key_name = aws_key_pair.aws_ec2_service_key_pair.key_name
+  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
+    role     = "browser_ssh"
+    hostname = var.aws_ec2_browser_ssh_name
+  }))
 
-  #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-
-  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", {
-    role                  = "browser_ssh"
-    hostname              = "${var.aws_ec2_browser_ssh_name}"
-    ca_cloudflare_browser = module.cloudflare.pubkey_short_lived_certificate
-    users                 = var.aws_users
-    datadog_api_key       = var.datadog_api_key
-    datadog_region        = var.datadog_region
-    # Linux user for contractor
-    okta_contractor_username = split("@", var.okta_bob_user_login)[0]
-    okta_contractor_password = var.okta_bob_user_linux_password
-    vnc_password             = var.aws_vnc_password
-    tunnel_secret_aws        = module.cloudflare.aws_extracted_token
+  tags = merge(local.aws_common_tags, {
+    Name = var.aws_ec2_browser_ssh_name
   })
-
-  tags = {
-    Name        = "${var.aws_ec2_browser_ssh_name}"
-    Environment = var.cf_aws_tag
-  }
 }
 
 
@@ -330,39 +229,20 @@ resource "aws_instance" "aws_ec2_service_instance" {
 # EC2 Instance: VNC Browser Service
 #==========================================================
 resource "aws_instance" "aws_ec2_vnc_instance" {
-  ami           = var.aws_ec2_instance_config_ami_id
-  instance_type = var.aws_ec2_instance_config_type
-
-  subnet_id = aws_subnet.aws_private_subnet.id
-
-  # Troubleshoot (remove after)
-  # subnet_id                   = aws_subnet.aws_public_subnet.id
-  # associate_public_ip_address = true
-
+  ami                    = local.aws_common_instance_config.ami
+  instance_type          = local.aws_common_instance_config.instance_type
+  subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_vnc_server_sg.id]
+  key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name
 
-  key_name = aws_key_pair.aws_ec2_vnc_key_pair.key_name
+  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
+    role     = "vnc"
+    hostname = var.aws_ec2_browser_vnc_name
+  }))
 
-  #iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-
-  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", {
-    role            = "vnc"
-    hostname        = var.aws_ec2_browser_vnc_name
-    users           = var.aws_users
-    vnc_password    = var.aws_vnc_password
-    datadog_api_key = var.datadog_api_key
-    datadog_region  = var.datadog_region
-    # Linux user for contractor
-    okta_contractor_username = split("@", var.okta_bob_user_login)[0]
-    okta_contractor_password = var.okta_bob_user_linux_password
-    tunnel_secret_aws        = module.cloudflare.aws_extracted_token
-    ca_cloudflare_browser    = module.cloudflare.pubkey_short_lived_certificate
+  tags = merge(local.aws_common_tags, {
+    Name = var.aws_ec2_browser_vnc_name
   })
-
-  tags = {
-    Name        = var.aws_ec2_browser_vnc_name
-    Environment = var.cf_aws_tag
-  }
 }
 
 
