@@ -34,19 +34,19 @@ _Last Updated: 12th of June 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Core Project Size**: 19 MB *(excluding documentation, configs, and build artifacts)*
-- **Core Files**: 354 files *(focused on infrastructure and automation)*
-- **Core Directories**: 196 directories *(well-organized modular structure)*
+- **Core Project Size**: 18.3 MB *(excluding .claude, .github, .terraform, 0-documentation, 1-workspace-conf folders)*
+- **Core Files**: 69 files *(focused on infrastructure and automation)*
+- **Core Directories**: 14 directories *(well-organized modular structure)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Before | After | Change | Purpose |
 |-----------|-------|--------|-------|--------|---------|
-| **Terraform (.tf)** | 30 | 4,597 | 4,114 | **-10.5%** | Infrastructure as Code |
+| **Terraform (.tf)** | 30 | 4,597 | 4,214 | **-8.3%** | Infrastructure as Code |
 | **Templates (.tftpl, .tpl)** | 3 | 414 | 414 | 0% | Cloud-init & startup scripts |
 | **Python (.py)** | 2 | 255 | 255 | 0% | Subnet calculation & automation |
 | **Shell Scripts (.sh)** | 2 | 294 | 294 | 0% | Cleanup & maintenance |
 | **Batch Scripts (.cmd)** | 1 | 126 | 126 | 0% | Windows initialization |
-| **Total Core Code** | 38 | **5,686** | **5,203** | **-8.5%** | **Refactored codebase** |
+| **Total Core Code** | 38 | **5,686** | **5,303** | **-6.7%** | **Refactored codebase** |
 
 <table>
 <tr>
@@ -56,7 +56,7 @@ _Last Updated: 12th of June 2025_
 - **313** total resources, modules & data sources
 - **4** custom modules
 - **188** configurable variables  
-- **29** Terraform files
+- **30** Terraform files
 
 </td>
 <td>
@@ -224,8 +224,8 @@ This includes:
 
 3. **Retrieve Tunnel IDs**: Copy the tunnel IDs and add them to your `terraform.tfvars`:
    ```hcl
-   cf_tunnel_warp_connector_azure_id = "185f0bc0-986d-46c............."
-   cf_tunnel_warp_connector_gcp_id   = "ad04a3ed-a1a1-460........"
+   cf_warp_tunnel_azure_id = "185f0bc0-986d-46c............."
+   cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-460........"
    ```
 
 #### Device Enrollment Policies
@@ -259,11 +259,11 @@ Fill in all required variables in `terraform.tfvars`. Variables marked with `# M
 ```hcl
 # Cloudflare Identity Providers (manually retrieved)
 cf_gateway_posture_id                     = "your_gateway_posture_id"
-cf_latest_macOS_version_posture_id        = "your_macos_posture_id"
-cf_latest_windows_version_posture_id      = "your_windows_posture_id"
-cf_latest_linux_kernel_version_posture_id = "your_linux_posture_id"
+cf_macos_posture_id                       = "your_macos_posture_id"
+cf_windows_posture_id                     = "your_windows_posture_id"
+cf_linux_posture_id                       = "your_linux_posture_id"
 cf_okta_identity_provider_id              = "your_okta_provider_id"
-cf_onetimepin_identity_provider_id        = "your_otp_provider_id"
+cf_otp_identity_provider_id               = "your_otp_provider_id"
 cf_azure_identity_provider_id             = "your_azure_provider_id"
 
 # Okta Groups (manually retrieved)

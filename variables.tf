@@ -552,17 +552,17 @@ variable "azure_developer1_name" {
 }
 
 variable "azure_developer2_name" {
-  description = "User 1 in Azure AD"
+  description = "User 2 in Azure AD"
   type        = string
 }
 
 variable "azure_sales1_name" {
-  description = "User 1 in Azure AD"
+  description = "User 3 in Azure AD"
   type        = string
 }
 
 variable "azure_sales2_name" {
-  description = "User 1 in Azure AD"
+  description = "User 4 in Azure AD"
   type        = string
 }
 
