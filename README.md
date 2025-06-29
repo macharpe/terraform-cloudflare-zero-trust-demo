@@ -34,7 +34,7 @@ _Last Updated: 12th of June 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Core Project Size**: 18.3 MB *(excluding .claude, .github, .terraform, 0-documentation, 1-workspace-conf folders)*
+- **Core Project Size**: 18.3 MB
 - **Core Files**: 69 files *(focused on infrastructure and automation)*
 - **Core Directories**: 14 directories *(well-organized modular structure)*
 
