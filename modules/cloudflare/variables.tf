@@ -141,10 +141,27 @@ variable "cf_subdomain_web_sensitive" {
   type        = string
 }
 
-variable "cf_target_name" {
+variable "cf_subdomain_rdp" {
+  description = "Name of the subdomain for rdp browser rendered public hostname"
+  type        = string
+}
+
+
+
+
+#==========================================
+# Target names
+#==========================================
+variable "cf_target_ssh_name" {
   description = "Friendly name for the Target hostname in Infrastructure App"
   type        = string
 }
+
+variable "cf_target_rdp_name" {
+  description = "Friendly name for the Target hostname in RDP windows browser rendered App"
+  type        = string
+}
+
 
 
 #==========================================
@@ -174,6 +191,12 @@ variable "cf_admin_web_app_name" {
   description = "Name of the Administration web app in Cloudflare"
   type        = string
 }
+
+variable "cf_browser_rdp_app_name" {
+  description = "Name of the RDP windows browser rendered App in Cloudflare"
+  type        = string
+}
+
 
 variable "cf_admin_web_app_port" {
   description = "Name of the Sensitive web App in Cloudflare"

@@ -39,26 +39,26 @@ _Last Updated: 12th of June 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Core Project Size**: 18.3 MB
-- **Core Files**: 69 files *(focused on infrastructure and automation)*
-- **Core Directories**: 14 directories *(well-organized modular structure)*
+- **Core Project Size**: 18.0 MB
+- **Core Files**: 59 files *(focused on infrastructure and automation)*
+- **Core Directories**: 15 directories *(well-organized modular structure)*
 
 ### 📝 **Core Code Files**
-| File Type | Count | Before | After | Change | Purpose |
-|-----------|-------|--------|-------|--------|---------|
-| **Terraform (.tf)** | 30 | 4,597 | 4,214 | **-8.3%** | Infrastructure as Code |
-| **Templates (.tftpl, .tpl)** | 3 | 414 | 414 | 0% | Cloud-init & startup scripts |
-| **Python (.py)** | 2 | 255 | 255 | 0% | Subnet calculation & automation |
-| **Shell Scripts (.sh)** | 2 | 294 | 294 | 0% | Cleanup & maintenance |
-| **Batch Scripts (.cmd)** | 1 | 126 | 126 | 0% | Windows initialization |
-| **Total Core Code** | 38 | **5,686** | **5,303** | **-6.7%** | **Refactored codebase** |
+| File Type | Count | Lines | Purpose |
+|-----------|-------|-------|---------|
+| **Terraform (.tf)** | 30 | 4,309 | Infrastructure as Code |
+| **Templates (.tftpl, .tpl)** | 3 | 427 | Cloud-init & startup scripts |
+| **Python (.py)** | 2 | 255 | Subnet calculation & automation |
+| **Shell Scripts (.sh)** | 2 | 294 | Cleanup & maintenance |
+| **Batch Scripts (.cmd)** | 1 | 148 | Windows initialization |
+| **Total Core Code** | 38 | **5,433** | **Enhanced codebase** |
 
 <table>
 <tr>
 <td>
 
 **📁 Infrastructure Resources**
-- **313** total resources, modules & data sources
+- **157** total resources, modules & data sources
 - **4** custom modules
 - **188** configurable variables  
 - **30** Terraform files
@@ -83,7 +83,7 @@ _Last Updated: 12th of June 2025_
 - **Zero Trust** security model
 - **Identity integration** (Okta, Azure AD)
 - **WARP Connector** cross-cloud routing
-- **Browser-rendered** services
+- **Browser-rendered** services (SSH, VNC and RDP)
 
 </td>
 <td>

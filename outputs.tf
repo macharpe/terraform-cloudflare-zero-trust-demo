@@ -37,6 +37,7 @@ output "GCP_COMPUTE_INSTANCES" {
         gcp_windows_username = var.gcp_windows_user_name
         internal_ip          = google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip
         public_ip            = google_compute_address.cloud_nat_ip.address
+        ssh                  = "ssh -o PubkeyAuthentication=no ${var.gcp_windows_user_name}@${google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip}"
         tunnel = {
           cf_tunnel_id      = module.cloudflare.gcp_windows_rdp_tunnel_id
           cf_tunnel_status  = module.cloudflare.gcp_windows_rdp_tunnel_status

@@ -4,7 +4,7 @@
 # Creating the Target
 resource "cloudflare_zero_trust_access_infrastructure_target" "ssh_gcp_instance" {
   account_id = var.cloudflare_account_id
-  hostname   = var.cf_target_name
+  hostname   = var.cf_target_ssh_name
   ip = {
     ipv4 = {
       ip_addr = var.gcp_vm_internal_ip
@@ -25,7 +25,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
     port     = "22",
     protocol = "SSH"
     target_attributes = {
-      hostname = [var.cf_target_name]
+      hostname = [var.cf_target_ssh_name]
     },
   }]
 
@@ -219,3 +219,51 @@ resource "cloudflare_zero_trust_access_application" "administration_web_app" {
     id       = cloudflare_zero_trust_access_policy.policies["web_app"].id
   }]
 }
+
+
+#======================================================
+# SELF-HOSTED App: RDP Browser Rendered
+#======================================================
+# Creating the Target
+resource "cloudflare_zero_trust_access_infrastructure_target" "rdp_gcp_instance" {
+  account_id = var.cloudflare_account_id
+  hostname   = var.cf_target_rdp_name
+  ip = {
+    ipv4 = {
+      ip_addr = var.gcp_windows_vm_internal_ip
+    }
+  }
+}
+
+# # Creating the Self-hosted Application for RDP Browser Rendered
+# resource "cloudflare_zero_trust_access_application" "rdp_gcp_browser_rendering" {
+#   account_id           = var.cloudflare_account_id
+#   type                 = "self_hosted"
+#   name                 = var.cf_browser_rdp_app_name
+#   app_launcher_visible = true
+#   logo_url             = "https://www.strongdm.com/hubfs/21126185/Technology%20Images/5f2b5a6d97b360a016392d7f_Windows-RDP.png"
+#   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+#   session_duration     = "0s"
+
+#   target_criteria = [{
+#     port     = "3389",
+#     protocol = "rdp"
+#     target_attributes = {
+#       hostname = [var.cf_target_rdp_name]
+#     },
+#   }]
+
+#   destinations = [{
+#     type = "public"
+#     uri  = var.cf_subdomain_rdp
+#   }]
+
+#   allowed_idps                = [var.cf_okta_identity_provider_id]
+#   auto_redirect_to_identity   = true
+#   allow_authenticate_via_warp = false
+
+#   policies = [{
+#     decision = "allow"
+#     id       = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
+#   }]
+# }

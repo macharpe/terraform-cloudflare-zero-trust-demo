@@ -71,7 +71,11 @@ module "cloudflare" {
   cf_subdomain_vnc           = var.cf_subdomain_vnc
   cf_subdomain_web           = var.cf_subdomain_web
   cf_subdomain_web_sensitive = var.cf_subdomain_web_sensitive
-  cf_target_name             = var.cf_target_name
+  cf_subdomain_rdp           = var.cf_subdomain_rdp
+
+  # Targets
+  cf_target_ssh_name = var.cf_target_ssh_name
+  cf_target_rdp_name = var.cf_target_rdp_name
 
   # SAML OKTA
   okta_infra_admin_saml_group_name = var.okta_infra_admin_saml_group_name
@@ -90,6 +94,7 @@ module "cloudflare" {
   cf_infra_app_name             = var.cf_infra_app_name
   cf_sensitive_web_app_name     = var.cf_sensitive_web_app_name
   cf_admin_web_app_name         = var.cf_admin_web_app_name
+  cf_browser_rdp_app_name       = var.cf_browser_rdp_app_name
   cf_team_name                  = var.cf_team_name
   cf_admin_web_app_port         = var.cf_admin_web_app_port
   cf_sensitive_web_app_port     = var.cf_sensitive_web_app_port

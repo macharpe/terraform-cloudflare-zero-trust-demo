@@ -15,7 +15,7 @@ locals {
       name = var.cf_tunnel_name_gcp
       routes = [
         {
-          comment = "This is a route making GCP subnet available in the Cloudflare network"
+          comment = "Route making GCP subnet available in the Cloudflare network"
           network = var.gcp_ip_cidr_infra
         }
       ]
@@ -36,7 +36,7 @@ locals {
       name = var.cf_windows_rdp_tunnel_name_gcp
       routes = [
         {
-          comment = "This is a route making GCP Windows RDP subnet available in the Cloudflare network"
+          comment = "Route making GCP Windows RDP subnet available in the Cloudflare network"
           network = var.gcp_ip_cidr_windows_rdp
         }
       ]
@@ -45,7 +45,7 @@ locals {
       name = var.cf_tunnel_name_aws
       routes = [
         {
-          comment = "This is a route making AWS private subnet available in the Cloudflare network"
+          comment = "Route making AWS private subnet available in the Cloudflare network"
           network = var.aws_private_subnet_cidr
         }
       ]

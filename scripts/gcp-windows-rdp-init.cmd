@@ -28,6 +28,28 @@ echo Restart-Service TermService -Force >> C:\setup.ps1
 echo Start-Sleep -Seconds 10 >> C:\setup.ps1
 echo Write-Output "RDP configuration completed" >> C:\setup.ps1
 
+REM Enable OpenSSH Server
+echo # Enable OpenSSH Server >> C:\setup.ps1
+echo try { >> C:\setup.ps1
+echo   Write-Output "Enabling OpenSSH Server..." >> C:\setup.ps1
+echo   Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0 >> C:\setup.ps1
+echo   Start-Service sshd >> C:\setup.ps1
+echo   Set-Service -Name sshd -StartupType 'Automatic' >> C:\setup.ps1
+echo   Write-Output "OpenSSH Server enabled and started" >> C:\setup.ps1
+echo } catch { >> C:\setup.ps1
+echo   Write-Output "Error enabling OpenSSH Server: $_" >> C:\setup.ps1
+echo } >> C:\setup.ps1
+
+REM Set timezone to Paris, France
+echo # Set timezone to Paris, France >> C:\setup.ps1
+echo try { >> C:\setup.ps1
+echo   Write-Output "Setting timezone to Paris, France..." >> C:\setup.ps1
+echo   Set-TimeZone -Id "Romance Standard Time" >> C:\setup.ps1
+echo   Write-Output "Timezone set to Paris, France successfully" >> C:\setup.ps1
+echo } catch { >> C:\setup.ps1
+echo   Write-Output "Error setting timezone: $_" >> C:\setup.ps1
+echo } >> C:\setup.ps1
+
 REM Add cloudflared installation
 echo # Install cloudflared >> C:\setup.ps1
 echo try { >> C:\setup.ps1
@@ -115,7 +137,7 @@ schtasks /create /tn "SetupRDP" /tr "powershell.exe -ExecutionPolicy Bypass -Fil
 REM Enable RDP via registry directly as backup
 echo Enabling RDP via registry...
 reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
-reg add "HKLM\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
+reg add "HKLM\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 1 /f
 
 REM Enable RDP firewall rule via netsh as backup
 echo Enabling RDP firewall rule...

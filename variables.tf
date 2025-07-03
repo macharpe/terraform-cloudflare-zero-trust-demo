@@ -195,6 +195,11 @@ variable "cf_subdomain_web_sensitive" {
   type        = string
 }
 
+variable "cf_subdomain_rdp" {
+  description = "Name of the subdomain for rdp browser rendered public hostname"
+  type        = string
+}
+
 variable "cf_browser_ssh_app_name" {
   description = "Name of the Browser Rendering SSH App in Cloudflare"
   type        = string
@@ -220,6 +225,11 @@ variable "cf_admin_web_app_name" {
   type        = string
 }
 
+variable "cf_browser_rdp_app_name" {
+  description = "Name of the RDP windows browser rendered App in Cloudflare"
+  type        = string
+}
+
 variable "cf_admin_web_app_port" {
   description = "Port for the Administration web App in Cloudflare"
   type        = number
@@ -236,10 +246,20 @@ variable "cf_domain_controller_rdp_port" {
 }
 
 
-variable "cf_target_name" {
+
+###
+variable "cf_target_ssh_name" {
   description = "Friendly name for the Target hostname in Infrastructure App"
   type        = string
 }
+
+variable "cf_target_rdp_name" {
+  description = "Friendly name for the Target hostname in RDP windows browser rendered App"
+  type        = string
+}
+
+
+
 
 variable "cf_gateway_posture_id" {
   description = "Gateway posture ID in Cloudflare"

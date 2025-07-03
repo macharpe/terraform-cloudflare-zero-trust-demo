@@ -19,6 +19,10 @@ locals {
       subdomain = var.cf_subdomain_vnc
       tunnel_id = cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].id
     }
+    rdp = {
+      subdomain = var.cf_subdomain_rdp
+      tunnel_id = cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_windows_rdp"].id
+    }
   }
 }
 

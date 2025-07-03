@@ -183,7 +183,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
 
   boot_disk {
     initialize_params {
-      image = "windows-server-2016-dc-v20250516"
+      image = "windows-server-2025-dc-v20250612"
       size  = 50
       type  = "pd-standard"
     }
@@ -206,7 +206,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
     scopes = ["cloud-platform"]
   }
 
-  tags = ["rdp-server", "infrastructure-access-instances"]
+  tags = ["infrastructure-access-instances"]
 
   metadata = {
     enable-osconfig    = "TRUE"
@@ -221,6 +221,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
     })
   }
 }
+
 
 #==========================================================
 # GCP INSTANCES NOT RUNNING CLOUDFLARED
@@ -390,22 +391,4 @@ resource "google_compute_firewall" "allow_egress" {
 
   destination_ranges = ["0.0.0.0/0"]
   target_tags        = ["infrastructure-access-instances", "warp-instances"]
-}
-
-# Firewall Rule for RDP Access
-resource "google_compute_firewall" "allow_rdp_from_my-ip" {
-  name    = "allow-rdp-from-my-ip"
-  network = google_compute_network.gcp_custom_vpc.name
-
-  direction = "INGRESS"
-  priority  = 900
-
-  allow {
-    protocol = "tcp"
-    ports    = ["3389"]
-  }
-
-  # Allow from any IP - change to specific IPs for better security
-  source_ranges = [var.cf_warp_cgnat_cidr]
-  target_tags   = ["rdp-server"]
 }

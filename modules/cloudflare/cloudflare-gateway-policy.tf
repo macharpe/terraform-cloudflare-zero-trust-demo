@@ -4,13 +4,14 @@
 locals {
   # Precedence values
   precedence = {
-    rdp_admin_allow  = 10
-    pdf_block        = 170
-    sfdc_setup_block = 252
-    ai_tools_block   = 335
-    gambling_block   = 502
-    ip_access_block  = 669
-    rdp_default_deny = 29000
+    access_infra_target = 5
+    rdp_admin_allow     = 10
+    pdf_block           = 170
+    sfdc_setup_block    = 252
+    ai_tools_block      = 335
+    gambling_block      = 502
+    ip_access_block     = 669
+    rdp_default_deny    = 29000
   }
 
   # Common rule settings for block policies
@@ -23,6 +24,16 @@ locals {
 
   # Gateway policies configuration
   gateway_policies = {
+    access_infra_target = {
+      name                 = "Access Infra Target Policy"
+      description          = "Evaluate Access applications before or after specific Gateway policies"
+      enabled              = true
+      action               = "allow"
+      precedence           = local.precedence.access_infra_target
+      filters              = ["l4"]
+      traffic              = "access.target"
+      notification_enabled = false
+    }
     rdp_admin_access = {
       name                 = "Zero-Trust demo RDP - IT Admin Access Policy"
       description          = "Allow RDP access for IT administrators"
