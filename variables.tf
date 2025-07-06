@@ -97,17 +97,17 @@ variable "gcp_windows_machine_size" {
 
 
 # Networking
-variable "gcp_ip_cidr_infra" {
+variable "gcp_infra_cidr" {
   description = "CIDR Range for GCP VMs running cloudflared"
   type        = string
 }
 
-variable "gcp_ip_cidr_warp" {
+variable "gcp_warp_cidr" {
   description = "CIDR Range for GCP VMs running warp"
   type        = string
 }
 
-variable "gcp_ip_cidr_windows_rdp" {
+variable "gcp_windows_rdp_cidr" {
   description = "CIDR Range for GCP VMs running cloudflared, Windows and RDP Server"
   type        = string
 }
@@ -525,12 +525,12 @@ variable "aws_vpc_cidr" {
   type        = string
 }
 
-variable "aws_private_subnet_cidr" {
+variable "aws_private_cidr" {
   description = "AWS private subnet, subnet for VMs in AWS"
   type        = string
 }
 
-variable "aws_public_subnet_cidr" {
+variable "aws_public_cidr" {
   description = "AWS public subnet"
   type        = string
 }
@@ -641,12 +641,12 @@ variable "azure_vm_count" {
   default     = 1
 }
 
-variable "azure_address_prefixes" {
+variable "azure_subnet_cidr" {
   description = "Azure address prefix, subnet for VM in Azure"
   type        = string
 }
 
-variable "azure_address_vnet" {
+variable "azure_vnet_cidr" {
   description = "Azure address vnet, subnet for vnet in Azure"
   type        = string
 }

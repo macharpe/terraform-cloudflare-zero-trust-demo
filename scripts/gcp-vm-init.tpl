@@ -112,6 +112,16 @@ elif [[ "$ROLE" == "cloudflared" ]]; then
 
 else
     echo "Default VM setup, no special role"
+    
+    # Configure SSH daemon for better compatibility
+    echo "Configuring SSH daemon for compatibility..."
+    
+    # Add compatible KexAlgorithms to SSH config
+    echo "KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256" >> /etc/ssh/sshd_config
+    
+    # Restart SSH service to apply changes
+    systemctl restart ssh
+    
 fi
 
 # Datadog Agent installation

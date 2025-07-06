@@ -62,9 +62,9 @@ module "cloudflare" {
   gcp_vm_internal_ip          = google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip
   gcp_windows_vm_internal_ip  = google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip
   gcp_cloudflared_vm_instance = google_compute_instance.gcp_cloudflared_vm_instance
-  gcp_ip_cidr_infra           = var.gcp_ip_cidr_infra
-  gcp_ip_cidr_warp            = var.gcp_ip_cidr_warp
-  gcp_ip_cidr_windows_rdp     = var.gcp_ip_cidr_windows_rdp
+  gcp_infra_cidr              = var.gcp_infra_cidr
+  gcp_warp_cidr               = var.gcp_warp_cidr
+  gcp_windows_rdp_cidr        = var.gcp_windows_rdp_cidr
 
   # Domain
   cf_subdomain_ssh           = var.cf_subdomain_ssh
@@ -84,7 +84,8 @@ module "cloudflare" {
   okta_itadmin_saml_group_name     = var.okta_itadmin_saml_group_name
   okta_sales_saml_group_name       = var.okta_sales_saml_group_name
 
-  okta_bob_user_login = var.okta_bob_user_login
+  okta_bob_user_login      = var.okta_bob_user_login
+  okta_matthieu_user_login = var.okta_matthieu_user_login
 
   cf_email_domain = var.cf_email_domain
 
@@ -103,13 +104,13 @@ module "cloudflare" {
   # AWS
   aws_ec2_ssh_service_private_ip = aws_instance.aws_ec2_service_instance.private_ip
   aws_ec2_vnc_service_private_ip = aws_instance.aws_ec2_vnc_instance.private_ip
-  aws_private_subnet_cidr        = var.aws_private_subnet_cidr
-  aws_public_subnet_cidr         = var.aws_public_subnet_cidr
+  aws_private_cidr               = var.aws_private_cidr
+  aws_public_cidr                = var.aws_public_cidr
 
   # Azure
   azure_engineering_group_id = module.azure-ad.azure_engineering_group_id
   azure_sales_group_id       = module.azure-ad.azure_sales_group_id
-  azure_address_prefixes     = var.azure_address_prefixes
+  azure_subnet_cidr          = var.azure_subnet_cidr
 
   # Static definition
   cf_gateway_posture_id         = var.cf_gateway_posture_id
@@ -126,6 +127,7 @@ module "cloudflare" {
   cf_osx_version_posture_rule_id = var.cf_osx_version_posture_rule_id
   cf_default_cgnat_routes        = var.cf_default_cgnat_routes
   cf_custom_cgnat_routes         = var.cf_custom_cgnat_routes
+  cf_warp_cgnat_cidr             = var.cf_warp_cgnat_cidr
 
   # Subnet generation
   cf_azure_json_subnet_generation = module.warp-routing.cf_azure_json_subnet_generation
@@ -155,9 +157,9 @@ module "warp-routing" {
   gcp_cloudflared_vm_instance = google_compute_instance.gcp_cloudflared_vm_instance
   gcp_vm_instance             = [google_compute_instance.gcp_vm_instance[0]]
 
-  azure_address_prefixes  = var.azure_address_prefixes
-  gcp_ip_cidr_infra       = var.gcp_ip_cidr_infra
-  gcp_ip_cidr_warp        = var.gcp_ip_cidr_warp
-  aws_private_subnet_cidr = var.aws_private_subnet_cidr
-  gcp_ip_cidr_windows_rdp = var.gcp_ip_cidr_windows_rdp
+  azure_subnet_cidr    = var.azure_subnet_cidr
+  gcp_infra_cidr       = var.gcp_infra_cidr
+  gcp_warp_cidr        = var.gcp_warp_cidr
+  aws_private_cidr     = var.aws_private_cidr
+  gcp_windows_rdp_cidr = var.gcp_windows_rdp_cidr
 }

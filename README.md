@@ -39,39 +39,40 @@ _Last Updated: 12th of June 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Core Project Size**: 18.0 MB
-- **Core Files**: 59 files *(focused on infrastructure and automation)*
+- **Core Project Size**: 20.7 MB
+- **Core Files**: 51 files *(focused on infrastructure and automation)*
 - **Core Directories**: 15 directories *(well-organized modular structure)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 30 | 4,309 | Infrastructure as Code |
-| **Templates (.tftpl, .tpl)** | 3 | 427 | Cloud-init & startup scripts |
+| **Terraform (.tf)** | 30 | 4,382 | Infrastructure as Code |
+| **Templates (.tftpl, .tpl)** | 3 | 424 | Cloud-init & startup scripts |
 | **Python (.py)** | 2 | 255 | Subnet calculation & automation |
 | **Shell Scripts (.sh)** | 2 | 294 | Cleanup & maintenance |
 | **Batch Scripts (.cmd)** | 1 | 148 | Windows initialization |
-| **Total Core Code** | 38 | **5,433** | **Enhanced codebase** |
+| **Total Core Code** | 38 | **5,503** | **Enhanced codebase** |
 
 <table>
 <tr>
 <td>
 
 **📁 Infrastructure Resources**
-- **157** total resources, modules & data sources
+- **161** total resources to be created
+- **9** data sources  
 - **4** custom modules
-- **188** configurable variables  
+- **196** configurable variables  
 - **30** Terraform files
 
 </td>
 <td>
 
 **☁️ Cloud Distribution**
-- **49** Cloudflare resources (35.8%)
-- **20** Google Cloud resources (14.6%)
-- **19** AWS resources (13.9%)
-- **14** Azure resources (10.2%)
-- **35** supporting resources (25.5%)
+- **30** Cloudflare resources (30.0%)
+- **24** AWS resources (24.0%)
+- **19** Google Cloud resources (19.0%)
+- **14** Azure resources (14.0%)
+- **13** supporting resources (13.0%)
 
 </td>
 </tr>
@@ -99,33 +100,6 @@ _Last Updated: 12th of June 2025_
 </tr>
 </table>
 
-## 🔧 **Recent Refactoring Achievements** *(June 2025)*
-
-This project underwent a comprehensive refactoring of the Cloudflare module, demonstrating best practices in Infrastructure as Code optimization:
-
-### **📊 Refactoring Impact Summary**
-| Component | Before | After | Reduction | Key Improvements |
-|-----------|--------|-------|-----------|------------------|
-| **DNS Records** | 47 lines | 25 lines | **-47%** | Single `for_each` loop replacing 4 duplicate resources |
-| **SAML Rule Groups** | 198 lines | 120 lines | **-40%** | Consolidated group management with dynamic loops |
-| **Access Policies** | 311 lines | 152 lines | **-51%** | One dynamic resource replacing 8 policy resources |
-| **Gateway Policies** | 211 lines | 139 lines | **-34%** | Centralized policy configuration with locals |
-| **Device Profiles** | 245 lines | 209 lines | **-15%** | Unified profile management system |
-| **Keys Module** | 143 lines | 99 lines | **-31%** | Unified SSH key generation with single for_each pattern |
-| **Overall Impact** | **2,113 lines** | **999 lines** | **-38%** | **Dramatically improved maintainability** |
-
-### **🎯 Key Refactoring Benefits**
-- **Maintainability**: Adding new policies, groups, or DNS records now requires only updating `locals` blocks
-- **Consistency**: Standardized patterns across all Cloudflare resources using `for_each` loops
-- **DRY Principles**: Eliminated code duplication while maintaining full functionality
-- **Scalability**: Infrastructure scales easily with minimal configuration changes
-- **Best Practices**: Demonstrates advanced Terraform patterns and modern IaC approaches
-
-### **✅ Quality Assurance**
-- All refactored code validates successfully with `terraform validate`
-- Comprehensive dependency management (resolved circular dependencies)
-- Maintained backward compatibility with existing variable structures
-- Zero functional regression - all original capabilities preserved
 
 ## 📚 Background Reading
 

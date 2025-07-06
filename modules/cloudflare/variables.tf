@@ -247,6 +247,11 @@ variable "okta_bob_user_login" {
   type        = string
 }
 
+variable "okta_matthieu_user_login" {
+  description = "User login for stephane, in an email format"
+  type        = string
+}
+
 
 #==========================================
 # GCP
@@ -265,17 +270,17 @@ variable "gcp_cloudflared_vm_instance" {
   type = any
 }
 
-variable "gcp_ip_cidr_infra" {
+variable "gcp_infra_cidr" {
   description = "CIDR Range for GCP VMs"
   type        = string
 }
 
-variable "gcp_ip_cidr_warp" {
+variable "gcp_warp_cidr" {
   description = "CIDR Range for GCP VMs running warp"
   type        = string
 }
 
-variable "gcp_ip_cidr_windows_rdp" {
+variable "gcp_windows_rdp_cidr" {
   description = "CIDR Range for GCP VMs running cloudflared, Windows and RDP Server"
   type        = string
 }
@@ -295,12 +300,12 @@ variable "aws_ec2_vnc_service_private_ip" {
 }
 
 
-variable "aws_private_subnet_cidr" {
+variable "aws_private_cidr" {
   description = "AWS private subnet, subnet for VMs in AWS"
   type        = string
 }
 
-variable "aws_public_subnet_cidr" {
+variable "aws_public_cidr" {
   description = "AWS public subnet"
   type        = string
 }
@@ -319,7 +324,7 @@ variable "azure_sales_group_id" {
   description = "Object ID of Azure_Sales group from Azure AD"
 }
 
-variable "azure_address_prefixes" {
+variable "azure_subnet_cidr" {
   description = "Azure address prefix, subnet for VM in Azure"
   type        = string
 }
@@ -354,6 +359,11 @@ variable "cf_custom_cgnat_routes" {
     address     = string
     description = string
   }))
+}
+
+variable "cf_warp_cgnat_cidr" {
+  description = "default ip range for WARP when overriding local interface IP"
+  type        = string
 }
 
 variable "cf_azure_json_subnet_generation" {

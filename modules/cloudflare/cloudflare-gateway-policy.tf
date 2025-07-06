@@ -4,15 +4,21 @@
 locals {
   # Precedence values
   precedence = {
-    access_infra_target = 5
-    rdp_admin_allow     = 10
-    pdf_block           = 170
-    sfdc_setup_block    = 252
-    ai_tools_block      = 335
-    gambling_block      = 502
-    ip_access_block     = 669
-    rdp_default_deny    = 29000
+    access_infra_target    = 5
+    rdp_admin_allow        = 10
+    block_lateral_ssh      = 15
+    block_lateral_rdp      = 20
+    block_lateral_smb      = 25
+    block_lateral_winrm    = 30
+    block_lateral_database = 35
+    pdf_block              = 170
+    sfdc_setup_block       = 252
+    ai_tools_block         = 335
+    gambling_block         = 502
+    ip_access_block        = 669
+    rdp_default_deny       = 29000
   }
+
 
   # Common rule settings for block policies
   default_block_settings = {
@@ -45,6 +51,61 @@ locals {
       identity             = "any(identity.saml_attributes[*] == \"groups=${var.okta_itadmin_saml_group_name}\") or any(identity.saml_attributes[*] == \"groups=${var.okta_infra_admin_saml_group_name}\")"
       device_posture       = "any(device_posture.checks.passed[*] == \"${var.cf_macos_posture_id}\") or any(device_posture.checks.passed[*] == \"${var.cf_windows_posture_id}\") or any(device_posture.checks.passed[*] == \"${var.cf_linux_posture_id}\")"
       notification_enabled = false
+    }
+    block_lateral_ssh = {
+      name                 = "Zero-Trust demo Block SSH Lateral Movement"
+      description          = "Block SSH connections between internal VMs for lateral movement prevention, while allowing direct SSH from WARP clients"
+      enabled              = true
+      action               = "block"
+      precedence           = local.precedence.block_lateral_ssh
+      filters              = ["l4"]
+      traffic              = "net.dst.port == 22 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      block_reason         = "SSH lateral movement blocked - use authorized access methods or ensure device compliance"
+      notification_enabled = true
+    }
+    block_lateral_rdp = {
+      name                 = "Zero-Trust demo Block RDP Lateral Movement"
+      description          = "Block unauthorized RDP connections between internal VMs"
+      enabled              = true
+      action               = "block"
+      precedence           = local.precedence.block_lateral_rdp
+      filters              = ["l4"]
+      traffic              = "net.dst.port == 3389 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.dst.ip == ${var.gcp_windows_vm_internal_ip})"
+      block_reason         = "RDP lateral movement blocked - use authorized access methods"
+      notification_enabled = true
+    }
+    block_lateral_smb = {
+      name                 = "Zero-Trust demo Block SMB Lateral Movement"
+      description          = "Block SMB/CIFS connections between internal VMs for lateral movement prevention"
+      enabled              = true
+      action               = "block"
+      precedence           = local.precedence.block_lateral_smb
+      filters              = ["l4"]
+      traffic              = "(net.dst.port == 445 or net.dst.port == 139) and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}})"
+      block_reason         = "SMB lateral movement blocked - use authorized file sharing methods"
+      notification_enabled = true
+    }
+    block_lateral_winrm = {
+      name                 = "Zero-Trust demo Block WinRM Lateral Movement"
+      description          = "Block WinRM connections between internal VMs for lateral movement prevention"
+      enabled              = true
+      action               = "block"
+      precedence           = local.precedence.block_lateral_winrm
+      filters              = ["l4"]
+      traffic              = "(net.dst.port == 5985 or net.dst.port == 5986) and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}})"
+      block_reason         = "WinRM lateral movement blocked - use authorized remote management methods"
+      notification_enabled = true
+    }
+    block_lateral_database = {
+      name                 = "Zero-Trust demo Block Database Lateral Movement"
+      description          = "Block database connections between internal VMs for lateral movement prevention"
+      enabled              = true
+      action               = "block"
+      precedence           = local.precedence.block_lateral_database
+      filters              = ["l4"]
+      traffic              = "(net.dst.port == 3306 or net.dst.port == 5432 or net.dst.port == 1433 or net.dst.port == 1521 or net.dst.port == 27017) and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}})"
+      block_reason         = "Database lateral movement blocked - use authorized database access methods"
+      notification_enabled = true
     }
     block_pdf_download = {
       name                 = "Zero-Trust demo Block PDF Files download"

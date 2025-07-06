@@ -141,7 +141,7 @@ locals {
       name        = "Zero-Trust demo local laptop (mac)"
       description = "This profile is for the local laptop (running macos) for my zero-trust demo"
       precedence  = local.device_precedence.laptop
-      match       = "os.name == \"${var.cf_device_os}\""
+      match       = "os.name == \"${var.cf_device_os}\" and identity.email == \"${var.okta_matthieu_user_login}\"",
       support_url = "Zero-TrustDemo-LaptopProfile"
     }
     vm = {

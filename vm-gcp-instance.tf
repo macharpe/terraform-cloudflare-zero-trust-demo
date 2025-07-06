@@ -8,21 +8,21 @@ resource "google_compute_network" "gcp_custom_vpc" {
 
 resource "google_compute_subnetwork" "gcp_cloudflared_subnet" {
   name          = "zero-trust-cloudflared-subnet"
-  ip_cidr_range = var.gcp_ip_cidr_infra
+  ip_cidr_range = var.gcp_infra_cidr
   region        = var.gcp_region
   network       = google_compute_network.gcp_custom_vpc.id
 }
 
 resource "google_compute_subnetwork" "gcp_warp_subnet" {
   name          = "zero-trust-warp-subnet"
-  ip_cidr_range = var.gcp_ip_cidr_warp
+  ip_cidr_range = var.gcp_warp_cidr
   region        = var.gcp_region
   network       = google_compute_network.gcp_custom_vpc.id
 }
 
 resource "google_compute_subnetwork" "gcp_cloudflared_windows_rdp_subnet" {
   name          = "zero-trust-cloudflared-windows-rdp-subnet"
-  ip_cidr_range = var.gcp_ip_cidr_windows_rdp
+  ip_cidr_range = var.gcp_windows_rdp_cidr
   region        = var.gcp_region
   network       = google_compute_network.gcp_custom_vpc.id
 }
@@ -283,7 +283,7 @@ resource "google_compute_route" "route_to_warp_subnet" {
 resource "google_compute_route" "route_to_azure_subnet" {
   name       = "route-to-azure-subnet"
   network    = google_compute_network.gcp_custom_vpc.name
-  dest_range = var.azure_address_prefixes
+  dest_range = var.azure_subnet_cidr
 
   next_hop_instance      = google_compute_instance.gcp_vm_instance[0].self_link
   next_hop_instance_zone = google_compute_instance.gcp_vm_instance[0].zone
@@ -294,7 +294,7 @@ resource "google_compute_route" "route_to_azure_subnet" {
 resource "google_compute_route" "route_to_aws_subnet" {
   name       = "route-to-aws-subnet"
   network    = google_compute_network.gcp_custom_vpc.name
-  dest_range = var.aws_private_subnet_cidr
+  dest_range = var.aws_private_cidr
 
   next_hop_instance      = google_compute_instance.gcp_vm_instance[0].self_link
   next_hop_instance_zone = google_compute_instance.gcp_vm_instance[0].zone
@@ -337,7 +337,7 @@ resource "google_compute_firewall" "allow_icmp_from_any" {
     protocol = "icmp"
   }
 
-  source_ranges = [var.cf_warp_cgnat_cidr, var.azure_address_prefixes]
+  source_ranges = [var.cf_warp_cgnat_cidr, var.azure_subnet_cidr]
   target_tags   = ["infrastructure-access-instances", "warp-instances"]
 }
 

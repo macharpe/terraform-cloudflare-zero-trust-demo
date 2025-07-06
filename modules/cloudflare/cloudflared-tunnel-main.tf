@@ -16,7 +16,7 @@ locals {
       routes = [
         {
           comment = "Route making GCP subnet available in the Cloudflare network"
-          network = var.gcp_ip_cidr_infra
+          network = var.gcp_infra_cidr
         }
       ]
       public_hostnames = [
@@ -37,7 +37,7 @@ locals {
       routes = [
         {
           comment = "Route making GCP Windows RDP subnet available in the Cloudflare network"
-          network = var.gcp_ip_cidr_windows_rdp
+          network = var.gcp_windows_rdp_cidr
         }
       ]
     }
@@ -46,7 +46,7 @@ locals {
       routes = [
         {
           comment = "Route making AWS private subnet available in the Cloudflare network"
-          network = var.aws_private_subnet_cidr
+          network = var.aws_private_cidr
         }
       ]
     }

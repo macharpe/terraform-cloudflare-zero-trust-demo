@@ -14,7 +14,7 @@ resource "azurerm_resource_group" "cloudflare_rg" {
 #==========================================================
 resource "azurerm_virtual_network" "cloudflare_vnet" {
   name                = "cloudflare-vnet"
-  address_space       = [var.azure_address_vnet]
+  address_space       = [var.azure_vnet_cidr]
   location            = local.azure_common_config.location
   resource_group_name = local.azure_common_config.resource_group_name
 
@@ -25,7 +25,7 @@ resource "azurerm_subnet" "cloudflare_subnet" {
   name                 = "cloudflare-subnet"
   resource_group_name  = azurerm_resource_group.cloudflare_rg.name
   virtual_network_name = azurerm_virtual_network.cloudflare_vnet.name
-  address_prefixes     = [var.azure_address_prefixes]
+  address_prefixes     = [var.azure_subnet_cidr]
 }
 
 resource "azurerm_public_ip" "public_ip" {
@@ -203,14 +203,14 @@ resource "azurerm_route_table" "cloudflare_route_table_warp" {
 
   route {
     name                   = "route-to-gcp-subnet"
-    address_prefix         = var.gcp_ip_cidr_warp # GCP subnet CIDR for WARP VM
+    address_prefix         = var.gcp_warp_cidr # GCP subnet CIDR for WARP VM
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = azurerm_network_interface.nic[0].private_ip_address
   }
 
   route {
     name                   = "route-to-aws-subnet"
-    address_prefix         = var.aws_private_subnet_cidr # AWS subnet CIDR
+    address_prefix         = var.aws_private_cidr # AWS subnet CIDR
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = azurerm_network_interface.nic[0].private_ip_address
   }
@@ -283,7 +283,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Icmp"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = var.gcp_ip_cidr_warp
+    source_address_prefix      = var.gcp_warp_cidr
     destination_address_prefix = "*"
   }
 

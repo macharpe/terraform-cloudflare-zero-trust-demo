@@ -20,9 +20,9 @@ gcp_machine_size               = "e2-micro"
 gcp_windows_machine_size       = "e2-medium"
 
 # Networking
-gcp_ip_cidr_infra              = "10.156.70.0/24"
-gcp_ip_cidr_warp               = "10.156.85.0/24"
-gcp_ip_cidr_windows_rdp        = "10.156.90.0/24"
+gcp_infra_cidr              = "10.156.70.0/24"
+gcp_warp_cidr               = "10.156.85.0/24"
+gcp_windows_rdp_cidr        = "10.156.90.0/24"
 
 
 #=====================================
@@ -36,7 +36,7 @@ cf_subdomain_web_sensitive     = "competition-app****"
 cf_subdomain_rdp               = "rdp.*********"
 
 cf_target_ssh_name             = "GCP-database"
-cf_target_rdp_name             = "GCP-windows-rdp"
+cf_target_rdp_name             = "GCP-Browser-RDP"
 
 cf_tunnel_name_gcp             = "Tunnel GCP (Access For Infrastructure)"
 cf_tunnel_name_aws             = "Tunnel AWS (SSH Browser Rendered)"
@@ -146,8 +146,8 @@ aws_vnc_password               = "vnc"
 
 # networking
 aws_vpc_cidr                   = "172.16.0.0/16"
-aws_private_subnet_cidr        = "172.16.69.0/24"
-aws_public_subnet_cidr         = "172.16.84.0/24"
+aws_private_cidr        = "172.16.69.0/24"
+aws_public_cidr         = "172.16.84.0/24"
 
 
 #=====================================
@@ -173,8 +173,8 @@ azure_warp_vm_name             = "cloudflare-warp-connector-azure"
 azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
 
 # networking
-azure_address_prefixes         = "192.168.71.0/24"
-azure_address_vnet             = "192.168.0.0/16"
+azure_subnet_cidr         = "192.168.71.0/24"
+azure_vnet_cidr             = "192.168.0.0/16"
 azure_public_dns_domain        = "westeurope.cloudapp.azure.com"
 
 # Manually retrieved

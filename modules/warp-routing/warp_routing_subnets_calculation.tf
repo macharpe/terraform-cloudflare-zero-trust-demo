@@ -4,12 +4,12 @@
 
 resource "null_resource" "python_script_azure_infrastructure" {
   provisioner "local-exec" {
-    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.azure_address_prefixes} azure"
+    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.azure_subnet_cidr} azure"
   }
 
   triggers = {
     script_hash = filesha256("${path.module}/scripts/generate_subnets.py")
-    input_cidr  = var.azure_address_prefixes
+    input_cidr  = var.azure_subnet_cidr
   }
 }
 
@@ -27,12 +27,12 @@ data "local_file" "azure_subnet_output" {
 
 resource "null_resource" "python_script_gcp_infrastructure_warp" {
   provisioner "local-exec" {
-    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.gcp_ip_cidr_infra} ${var.gcp_ip_cidr_warp} ${var.gcp_ip_cidr_windows_rdp} gcp"
+    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.gcp_infra_cidr} ${var.gcp_warp_cidr} ${var.gcp_windows_rdp_cidr} gcp"
   }
 
   triggers = {
     script_hash = filesha256("${path.module}/scripts/generate_subnets.py")
-    input_cidr  = var.gcp_ip_cidr_infra
+    input_cidr  = var.gcp_infra_cidr
   }
 }
 
@@ -50,12 +50,12 @@ data "local_file" "gcp_subnet_output" {
 
 resource "null_resource" "python_script_aws_infrastructure" {
   provisioner "local-exec" {
-    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.aws_private_subnet_cidr} aws"
+    command = "python3 ${path.root}/modules/warp-routing/scripts/generate_subnets.py ${var.aws_private_cidr} aws"
   }
 
   triggers = {
     script_hash = filesha256("${path.module}/scripts/generate_subnets.py")
-    input_cidr  = var.aws_private_subnet_cidr
+    input_cidr  = var.aws_private_cidr
   }
 }
 
