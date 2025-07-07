@@ -65,46 +65,46 @@ locals {
     }
     block_lateral_rdp = {
       name                 = "Zero-Trust demo Block RDP Lateral Movement"
-      description          = "Block unauthorized RDP connections between internal VMs"
+      description          = "Block RDP connections between internal VMs for lateral movement prevention, while allowing direct RDP from WARP clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_rdp
       filters              = ["l4"]
-      traffic              = "net.dst.port == 3389 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.dst.ip == ${var.gcp_windows_vm_internal_ip})"
-      block_reason         = "RDP lateral movement blocked - use authorized access methods"
+      traffic              = "net.dst.port == 3389 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      block_reason         = "RDP lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_lateral_smb = {
       name                 = "Zero-Trust demo Block SMB Lateral Movement"
-      description          = "Block SMB/CIFS connections between internal VMs for lateral movement prevention"
+      description          = "Block SMB/CIFS connections between internal VMs for lateral movement prevention, while allowing direct SMB from WARP clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_smb
       filters              = ["l4"]
-      traffic              = "(net.dst.port == 445 or net.dst.port == 139) and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}})"
-      block_reason         = "SMB lateral movement blocked - use authorized file sharing methods"
+      traffic              = "net.dst.port in {445 139} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      block_reason         = "SMB lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_lateral_winrm = {
       name                 = "Zero-Trust demo Block WinRM Lateral Movement"
-      description          = "Block WinRM connections between internal VMs for lateral movement prevention"
+      description          = "Block WinRM connections between internal VMs for lateral movement prevention, while allowing direct WinRM from WARP clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_winrm
       filters              = ["l4"]
-      traffic              = "(net.dst.port == 5985 or net.dst.port == 5986) and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}})"
-      block_reason         = "WinRM lateral movement blocked - use authorized remote management methods"
+      traffic              = "net.dst.port in {5985 5986} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      block_reason         = "WinRM lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_lateral_database = {
       name                 = "Zero-Trust demo Block Database Lateral Movement"
-      description          = "Block database connections between internal VMs for lateral movement prevention"
+      description          = "Block database connections between internal VMs for lateral movement prevention, while allowing direct database access from WARP clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_database
       filters              = ["l4"]
-      traffic              = "(net.dst.port == 3306 or net.dst.port == 5432 or net.dst.port == 1433 or net.dst.port == 1521 or net.dst.port == 27017) and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}})"
-      block_reason         = "Database lateral movement blocked - use authorized database access methods"
+      traffic              = "net.dst.port in {3306 5432 1433 1521 27017} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      block_reason         = "Database lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_pdf_download = {

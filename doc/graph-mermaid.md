@@ -168,12 +168,13 @@ flowchart TB
       cf_app_ssh_gcp["App: GCP Infrastructure SSH"]
       cf_app_ssh_aws["App: AWS Browser SSH"]
       cf_app_vnc_aws["App: AWS Browser VNC"]
+      cf_app_rdp_gcp["App: GCP RDP Target<br/>(Infrastructure)"]
     end
     
     subgraph CFPolicies ["Access Policies & Groups"]
       cf_rule_groups["Rule Groups<br/>• Contractors<br/>• Infrastructure Admins<br/>• Sales Engineering<br/>• Sales<br/>• IT Admins"]
       cf_access_policies["Access Policies<br/>• Group-based access<br/>• Device posture<br/>• MFA requirements<br/>• Purpose justification"]
-      cf_gateway_policies["Gateway Policies<br/>• RDP Admin Access<br/>• Content Filtering<br/>• IP Restrictions"]
+      cf_gateway_policies["Gateway Policies<br/>• RDP Admin Access<br/>• Lateral Movement Prevention<br/>• Content Filtering<br/>• IP Restrictions"]
     end
     
     subgraph CFDevice ["Device Management"]
@@ -184,6 +185,15 @@ flowchart TB
     subgraph CFAuth ["Authentication"]
       cf_short_certs["Short-Lived Certificates<br/>SSH CA for Infrastructure"]
       cf_access_tags["Access Tags<br/>zero_trust_demo_tag"]
+    end
+    
+    subgraph CFSecurity ["Lateral Movement Prevention"]
+      cf_lateral_ssh["Block SSH Lateral Movement<br/>Port 22 - Internal VMs"]
+      cf_lateral_rdp["Block RDP Lateral Movement<br/>Port 3389 - Internal VMs"]
+      cf_lateral_smb["Block SMB Lateral Movement<br/>Ports 445/139 - File Sharing"]
+      cf_lateral_winrm["Block WinRM Lateral Movement<br/>Ports 5985/5986 - Remote Mgmt"]
+      cf_lateral_db["Block Database Lateral Movement<br/>Common DB Ports"]
+      cf_rdp_admin["Allow RDP Admin Access<br/>IT/Infra Admins Only"]
     end
   end
 
@@ -246,7 +256,17 @@ flowchart TB
   cf_access_policies --> cf_app_ssh_gcp
   cf_access_policies --> cf_app_ssh_aws
   cf_access_policies --> cf_app_vnc_aws
+  cf_access_policies --> cf_app_rdp_gcp
   cf_rule_groups --> cf_access_policies
+  
+  %% Lateral Movement Prevention Flow
+  cf_gateway_policies --> CFSecurity
+  CFSecurity --> cf_lateral_ssh
+  CFSecurity --> cf_lateral_rdp
+  CFSecurity --> cf_lateral_smb
+  CFSecurity --> cf_lateral_winrm
+  CFSecurity --> cf_lateral_db
+  CFSecurity --> cf_rdp_admin
   
   %% WARP Connector Cross-Cloud Routing
   azure_vms -.-> gcp_warp_vms
@@ -271,7 +291,7 @@ flowchart TB
   class AWS,AWSNetwork,AWSCompute,AWSSecurity awsStyle
   class GCP,GCPNetwork,GCPCompute,GCPSecurity,GCPRouting gcpStyle
   class Azure,AzureNetwork,AzureCompute,AzureRouting azureStyle
-  class Cloudflare,CFTunnels,CFDNS,CFApps,CFPolicies,CFDevice,CFAuth cloudflareStyle
+  class Cloudflare,CFTunnels,CFDNS,CFApps,CFPolicies,CFDevice,CFAuth,CFSecurity cloudflareStyle
   class External,AzureAD,Utilities externalStyle
   class KeyMgmt,WARPRouting moduleStyle
 ```
@@ -289,6 +309,7 @@ This comprehensive diagram represents a multi-cloud Zero Trust architecture usin
 - **Identity Integration**: Okta SAML and Azure AD integration
 - **Access Control**: Group-based policies with device posture and MFA
 - **Network Security**: Cloudflare Tunnels for secure private network access
+- **Lateral Movement Prevention**: Gateway policies blocking SSH, RDP, SMB, WinRM, and database lateral movement
 - **Content Filtering**: Gateway policies for web filtering and IP restrictions
 
 ### **Cross-Cloud Connectivity**
@@ -301,3 +322,11 @@ This comprehensive diagram represents a multi-cloud Zero Trust architecture usin
 - **Certificate Authority**: Short-lived SSH certificates for infrastructure access
 - **Automated Cleanup**: Scripts for maintaining SSH known_hosts and device registrations
 - **Posture Checking**: macOS version compliance for device access
+
+### **Lateral Movement Prevention**
+- **SSH Blocking**: Prevents unauthorized SSH connections between internal VMs (port 22)
+- **RDP Controls**: Blocks lateral RDP movement except for authorized IT/Infrastructure admins
+- **SMB/CIFS Protection**: Secures file sharing protocols (ports 445/139)
+- **WinRM Security**: Prevents unauthorized Windows remote management (ports 5985/5986)
+- **Database Security**: Blocks lateral database access (MySQL, PostgreSQL, SQL Server, Oracle, MongoDB)
+- **WARP Exception**: Allows legitimate access from WARP clients while blocking VM-to-VM communication
