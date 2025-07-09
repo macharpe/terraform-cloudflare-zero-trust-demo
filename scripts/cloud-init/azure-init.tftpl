@@ -1,0 +1,141 @@
+#cloud-config
+hostname: ${hostname}
+package_update: true
+package_upgrade: true
+
+packages:
+  - wget
+  - curl
+  - net-tools
+  - iproute2
+  - nmap
+  - traceroute
+  - build-essential
+  - hping3
+  - unzip
+
+runcmd:
+  # Wait briefly for network to be ready
+  - sleep 10
+
+  # Set hostname
+  - hostnamectl set-hostname ${hostname}
+  
+  # Set timezone
+  - timedatectl set-timezone Europe/Paris
+
+%{ if role == "warp_connector" ~}
+  # Install WARP Connector
+  - |
+    echo "Installing WARP Connector..."
+    
+    # Download and install GPG key
+    curl https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+    
+    # Add repository (hardcode jammy for Ubuntu 22.04)
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+    
+    # Update and install WARP
+    sudo apt-get update
+    sudo apt-get install -y cloudflare-warp
+    
+    # Enable IP forwarding for WARP
+    sudo sysctl -w net.ipv4.ip_forward=1
+    echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-ip-forward.conf
+    
+    # Ensure warp service is enabled and running (following GCP pattern)
+    echo "Starting WARP service..."
+    systemctl enable warp-svc
+    systemctl start warp-svc
+    
+    # Wait for service to be ready
+    sleep 10
+    
+    # Check service status
+    if systemctl is-active --quiet warp-svc; then
+        echo "WARP service is running successfully"
+        systemctl status warp-svc --no-pager
+    else
+        echo "WARNING: WARP service may not be running properly"
+        systemctl status warp-svc --no-pager
+        # Try to start again
+        systemctl start warp-svc
+        sleep 5
+    fi
+    
+    # Configure WARP Connector
+    echo "Configuring WARP Connector..."
+    # Register connector
+    warp-cli --accept-tos connector new ${warp_tunnel_secret_azure}
+    
+    # Wait after registration
+    sleep 5
+    
+    # Connect
+    warp-cli --accept-tos connect
+    
+    # Verify connection status
+    sleep 10
+    warp-cli status
+    
+    # If still disconnected, try to connect again
+    if ! warp-cli status | grep -q "Connected"; then
+        echo "First connection attempt failed, trying again..."
+        sleep 5
+        warp-cli connect
+        sleep 10
+        warp-cli status
+    fi
+    
+    echo "WARP Connector setup completed"
+%{ endif ~}
+
+  # Install Datadog NPM monitoring LAST (following GCP pattern)
+  - echo "Installing Datadog NPM for azure with role ${role}"
+  - DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
+  - sleep 10
+  - mkdir -p /etc/datadog-agent/conf.d
+  - |
+    cat >> /etc/datadog-agent/datadog.yaml << 'DDEOF'
+    network:
+      enabled: true
+    system_probe:
+      enabled: true
+      network:
+        enabled: true
+      runtime_security:
+        enabled: false
+      service_monitoring:
+        enabled: true
+    process:
+      enabled: true
+    tags:
+      - environment:zero-trust-demo
+      - cloud:azure
+      - role:${role}
+      - managed-by:terraform
+    log_level: info
+    log_file: /var/log/datadog/agent.log
+    DDEOF
+  - |
+    cat > /etc/datadog-agent/conf.d/network.yaml << 'NETEOF'
+    init_config:
+    instances:
+      - collect_connection_state: true
+        collect_rate_metrics: true
+        collect_count_metrics: true
+        processes:
+          - cloudflared
+          - warp-cli
+          - python3
+          - ssh
+    NETEOF
+  - chmod 755 /opt/datadog-agent/embedded/bin/system-probe 2>/dev/null || true
+  - systemctl enable datadog-agent-sysprobe 2>/dev/null || true
+  - systemctl restart datadog-agent
+  - sleep 5
+  - systemctl status datadog-agent --no-pager || true
+  - echo "Datadog NPM installation completed for azure - ${role}"
+
+final_message: |
+  Azure ${role} setup complete on ${hostname}!

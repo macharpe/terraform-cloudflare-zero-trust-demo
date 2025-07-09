@@ -107,6 +107,7 @@ locals {
   # Common user data template variables for Azure
   azure_common_user_data_vars = merge(local.global_monitoring, {
     warp_tunnel_secret_azure = module.cloudflare.azure_extracted_warp_token
+    path                     = path.module
   })
 
   # Common tags
@@ -158,7 +159,7 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
   }
 
   # VM index 0 = warp_connector, others = basic
-  custom_data = base64encode(templatefile("${path.module}/scripts/azure-init.tftpl", merge(local.azure_common_user_data_vars, {
+  custom_data = base64encode(templatefile("${path.module}/scripts/cloud-init/azure-init.tftpl", merge(local.azure_common_user_data_vars, {
     role     = count.index == 0 ? "warp_connector" : "basic"
     hostname = count.index == 0 ? "${var.azure_warp_vm_name}-${count.index}" : "${var.azure_vm_name}-${count.index}"
   })))

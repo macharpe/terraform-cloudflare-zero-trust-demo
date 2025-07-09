@@ -124,7 +124,81 @@ else
     
 fi
 
-# Datadog Agent installation
+# Install Datadog NPM monitoring
+echo "Installing Datadog NPM for gcp with role ${role}"
+
+# Install Datadog Agent
 DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
 
+# Wait for agent to be installed
+sleep 10
+
+# Create NPM config content
+cat >> /etc/datadog-agent/datadog.yaml << 'EOF'
+# Network Performance Monitoring enabled
+network:
+  enabled: true
+
+system_probe:
+  enabled: true
+  network:
+    enabled: true
+  runtime_security:
+    enabled: false
+  service_monitoring:
+    enabled: true
+    
+process:
+  enabled: true
+
+# Dynamic tags based on cloud and role
+tags:
+  - environment:zero-trust-demo
+  - cloud:gcp
+  - role:${role}
+  - managed-by:terraform
+
+# Logging configuration
+log_level: info
+log_file: /var/log/datadog/agent.log
+EOF
+
+# Create network config
+mkdir -p /etc/datadog-agent/conf.d
+cat > /etc/datadog-agent/conf.d/network.yaml << 'EOF'
+init_config:
+
+instances:
+  - collect_connection_state: true
+    collect_rate_metrics: true
+    collect_count_metrics: true
+    
+    processes:
+      - cloudflared
+      - warp-cli
+      - python3
+      - ssh
+EOF
+
+# Set proper permissions for system probe
+chmod 755 /opt/datadog-agent/embedded/bin/system-probe 2>/dev/null || true
+
+# Enable and start system probe
+systemctl enable datadog-agent-sysprobe 2>/dev/null || true
+
+# Restart agent
+echo "Restarting Datadog agent..."
+systemctl restart datadog-agent
+
+# Wait and check status
+sleep 5
+if systemctl is-active --quiet datadog-agent; then
+    echo "Datadog agent is running successfully"
+else
+    echo "WARNING: Datadog agent may not be running properly"
+    systemctl status datadog-agent --no-pager
+fi
+
+echo "Datadog NPM installation completed for gcp - ${role}"
+Ac
 echo "Startup script completed at $(date)"

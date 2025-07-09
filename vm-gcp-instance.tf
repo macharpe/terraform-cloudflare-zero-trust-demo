@@ -116,6 +116,7 @@ locals {
     tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
     gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
     warp_token             = module.cloudflare.gcp_extracted_warp_token
+    path                   = path.module
   })
 
   # Common scheduling for preemptible instances
@@ -166,7 +167,7 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
       "${username}:${module.ssh_keys.gcp_public_keys[username]}"
     ])
 
-    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", merge(local.gcp_common_user_data_vars, {
+    user-data = templatefile("${path.module}/scripts/cloud-init/gcp-init.tpl", merge(local.gcp_common_user_data_vars, {
       role = "cloudflared"
     }))
   })
@@ -212,12 +213,14 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
     enable-osconfig    = "TRUE"
     enable-core-plugin = "FALSE"
 
-    windows-startup-script-cmd = templatefile("${path.module}/scripts/gcp-windows-rdp-init.cmd", {
+    windows-startup-script-cmd = templatefile("${path.module}/scripts/cloud-init/gcp-windows-rdp-init.cmd", {
       user_name                 = var.gcp_windows_user_name
       admin_password            = var.gcp_windows_admin_password
       tunnel_secret_windows_gcp = module.cloudflare.gcp_windows_extracted_token
       admin_web_app_port        = var.cf_admin_web_app_port
       sensitive_web_app_port    = var.cf_sensitive_web_app_port
+      datadog_api_key           = var.datadog_api_key
+      datadog_region            = var.datadog_region
     })
   }
 }
@@ -257,7 +260,7 @@ resource "google_compute_instance" "gcp_vm_instance" {
     ssh-keys = "${var.gcp_vm_default_user}:${module.ssh_keys.gcp_vm_key[count.index]}"
     ROLE     = count.index == 0 ? "warp_connector" : "default"
 
-    user-data = templatefile("${path.module}/scripts/gcp-vm-init.tpl", merge(local.gcp_common_user_data_vars, {
+    user-data = templatefile("${path.module}/scripts/cloud-init/gcp-init.tpl", merge(local.gcp_common_user_data_vars, {
       role = count.index == 0 ? "warp_connector" : "default"
     }))
   })

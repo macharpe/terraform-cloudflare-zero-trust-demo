@@ -173,6 +173,7 @@ locals {
     users                 = local.global_users.aws_users
     tunnel_secret_aws     = module.cloudflare.aws_extracted_token
     ca_cloudflare_browser = module.cloudflare.pubkey_short_lived_certificate
+    path                  = path.module
   })
 
   # Common tags
@@ -192,7 +193,7 @@ resource "aws_instance" "cloudflared_aws" {
   vpc_security_group_ids = [aws_security_group.aws_cloudflared_sg.id]
   key_name               = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
 
-  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
+  user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
     role     = "cloudflared"
     hostname = "${var.aws_ec2_cloudflared_name}-${count.index}"
   }))
@@ -214,7 +215,7 @@ resource "aws_instance" "aws_ec2_service_instance" {
   vpc_security_group_ids = [aws_security_group.aws_ssh_server_sg.id]
   key_name               = aws_key_pair.aws_ec2_service_key_pair.key_name
 
-  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
+  user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
     role     = "browser_ssh"
     hostname = var.aws_ec2_browser_ssh_name
   }))
@@ -235,7 +236,7 @@ resource "aws_instance" "aws_ec2_vnc_instance" {
   vpc_security_group_ids = [aws_security_group.aws_vnc_server_sg.id]
   key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name
 
-  user_data = templatefile("${path.module}/scripts/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
+  user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
     role     = "vnc"
     hostname = var.aws_ec2_browser_vnc_name
   }))

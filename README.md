@@ -58,7 +58,7 @@ _Last Updated: 12th of June 2025_
 <td>
 
 **📁 Infrastructure Resources**
-- **161** total resources to be created
+- **161** total resources deployed
 - **9** data sources  
 - **4** custom modules
 - **196** configurable variables  
@@ -68,11 +68,11 @@ _Last Updated: 12th of June 2025_
 <td>
 
 **☁️ Cloud Distribution**
-- **30** Cloudflare resources (30.0%)
-- **24** AWS resources (24.0%)
-- **19** Google Cloud resources (19.0%)
-- **14** Azure resources (14.0%)
-- **13** supporting resources (13.0%)
+- **58** Cloudflare resources (36.0%)
+- **35** AWS resources (21.7%)
+- **20** Google Cloud resources (12.4%)
+- **18** Azure resources (11.2%)
+- **30** supporting resources (18.6%)
 
 </td>
 </tr>
@@ -90,11 +90,11 @@ _Last Updated: 12th of June 2025_
 <td>
 
 **🚀 Automation & Quality**
-- **Major refactoring** completed (June 2025)
+- **Connectivity fixes** completed (July 2025)
 - **Role-based infrastructure** deployment
 - **Modular design** with 4 reusable modules
 - **100%** Infrastructure as Code coverage
-- **Streamlined codebase** (-10.5% Terraform lines)
+- **Enhanced initialization** scripts with error handling
 
 </td>
 </tr>
