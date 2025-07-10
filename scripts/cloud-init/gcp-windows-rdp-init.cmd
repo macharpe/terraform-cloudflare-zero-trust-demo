@@ -123,60 +123,6 @@ echo } catch { >> C:\setup.ps1
 echo   Write-Output "Error installing cloudflared service: $_" >> C:\setup.ps1
 echo } >> C:\setup.ps1
 
-REM Add Datadog Agent installation
-echo # Install Datadog Agent >> C:\setup.ps1
-echo try { >> C:\setup.ps1
-echo   Write-Output "Installing Datadog Agent..." >> C:\setup.ps1
-echo   $env:DD_API_KEY = "${datadog_api_key}" >> C:\setup.ps1
-echo   $env:DD_SITE = "${datadog_region}" >> C:\setup.ps1
-echo   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 >> C:\setup.ps1
-echo   $url = "https://s3.amazonaws.com/ddagent-windows-stable/datadog-agent-7-latest.amd64.msi" >> C:\setup.ps1
-echo   $output = "C:\datadog-agent-7-latest.amd64.msi" >> C:\setup.ps1
-echo   $webClient = New-Object System.Net.WebClient >> C:\setup.ps1
-echo   $webClient.Headers.Add("User-Agent", "PowerShell") >> C:\setup.ps1
-echo   $webClient.DownloadFile($url, $output) >> C:\setup.ps1
-echo   if (Test-Path $output) { >> C:\setup.ps1
-echo     Write-Output "Downloaded Datadog Agent installer" >> C:\setup.ps1
-echo     # Install Datadog Agent >> C:\setup.ps1
-echo     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$output`" /quiet /norestart APIKEY=`"$env:DD_API_KEY`" SITE=`"$env:DD_SITE`" TAGS=`"environment:zero-trust-demo,cloud:gcp,role:windows_rdp,managed-by:terraform`"" >> C:\setup.ps1
-echo     Write-Output "Datadog Agent installed successfully" >> C:\setup.ps1
-echo     # Configure Datadog Agent >> C:\setup.ps1
-echo     $configPath = "C:\ProgramData\Datadog\datadog.yaml" >> C:\setup.ps1
-echo     if (Test-Path $configPath) { >> C:\setup.ps1
-echo       # Add NPM configuration >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "`n# Network Performance Monitoring enabled" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "network:" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "  enabled: true" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "`nsystem_probe:" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "  enabled: true" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "  network:" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "    enabled: true" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "  runtime_security:" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "    enabled: false" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "  service_monitoring:" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "    enabled: true" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "`nprocess:" >> C:\setup.ps1
-echo       Add-Content -Path $configPath -Value "  enabled: true" >> C:\setup.ps1
-echo       Write-Output "Datadog Agent configuration updated" >> C:\setup.ps1
-echo     } >> C:\setup.ps1
-echo     # Start Datadog Agent service >> C:\setup.ps1
-echo     Start-Sleep -Seconds 10 >> C:\setup.ps1
-echo     Start-Service datadogagent -ErrorAction SilentlyContinue >> C:\setup.ps1
-echo     Start-Sleep -Seconds 10 >> C:\setup.ps1
-echo     $ddServiceStatus = Get-Service datadogagent -ErrorAction SilentlyContinue >> C:\setup.ps1
-echo     if ($ddServiceStatus -and $ddServiceStatus.Status -eq 'Running') { >> C:\setup.ps1
-echo       Write-Output "SUCCESS: Datadog Agent service is running successfully" >> C:\setup.ps1
-echo     } else { >> C:\setup.ps1
-echo       Write-Output "Warning: Datadog Agent service may not be running properly" >> C:\setup.ps1
-echo       Write-Output "Service status: $($ddServiceStatus.Status)" >> C:\setup.ps1
-echo     } >> C:\setup.ps1
-echo     Remove-Item $output -Force -ErrorAction SilentlyContinue >> C:\setup.ps1
-echo   } else { >> C:\setup.ps1
-echo     Write-Output "Failed to download Datadog Agent" >> C:\setup.ps1
-echo   } >> C:\setup.ps1
-echo } catch { >> C:\setup.ps1
-echo   Write-Output "Error installing Datadog Agent: $_" >> C:\setup.ps1
-echo } >> C:\setup.ps1
 
 REM Add logging with user info
 echo Add-Content -Path "C:\Windows\Temp\cmd-setup.log" -Value "$(Get-Date) - Setup completed successfully for user ${user_name}" >> C:\setup.ps1
