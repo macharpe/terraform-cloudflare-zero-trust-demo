@@ -90,23 +90,13 @@ runcmd:
     echo "WARP Connector setup completed"
 %{ endif ~}
 
-  # Install Datadog NPM monitoring LAST (following GCP pattern)
-  - echo "Installing Datadog NPM for azure with role ${role}"
+  # Install Datadog monitoring LAST (following GCP pattern)
+  - echo "Installing Datadog monitoring for azure with role ${role}"
   - DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
   - sleep 10
   - mkdir -p /etc/datadog-agent/conf.d
   - |
     cat >> /etc/datadog-agent/datadog.yaml << 'DDEOF'
-    network:
-      enabled: true
-    system_probe:
-      enabled: true
-      network:
-        enabled: true
-      runtime_security:
-        enabled: false
-      service_monitoring:
-        enabled: true
     process:
       enabled: true
     tags:
@@ -118,24 +108,57 @@ runcmd:
     log_file: /var/log/datadog/agent.log
     DDEOF
   - |
-    cat > /etc/datadog-agent/conf.d/network.yaml << 'NETEOF'
+    # Process monitoring for zero-trust components
+    cat > /etc/datadog-agent/conf.d/process.yaml << 'PROCEOF'
     init_config:
     instances:
-      - collect_connection_state: true
-        collect_rate_metrics: true
-        collect_count_metrics: true
-        processes:
+      - name: zero_trust_processes
+        search_string:
           - cloudflared
           - warp-cli
+          - warp-svc
           - python3
           - ssh
-    NETEOF
+        exact_match: false
+        collect_children: true
+        user: root
+    PROCEOF
+  - |
+    # System metrics enhancement
+    cat > /etc/datadog-agent/conf.d/system_core.yaml << 'SYSEOF'
+    init_config:
+    instances:
+      - collect_service_check: true
+        tags:
+          - environment:zero-trust-demo
+          - cloud:azure
+          - role:${role}
+    SYSEOF
+  - |
+    # Directory monitoring for configuration files
+    cat > /etc/datadog-agent/conf.d/directory.yaml << 'DIREOF'
+    init_config:
+    instances:
+      - directory: /etc/ssh
+        name: ssh_config_monitoring
+        pattern: "*.conf"
+        tags:
+          - config_type:ssh
+          - cloud:azure
+          - role:${role}
+      - directory: /etc/datadog-agent
+        name: datadog_config_monitoring
+        pattern: "*.yaml"
+        tags:
+          - config_type:datadog
+          - cloud:azure
+          - role:${role}
+    DIREOF
   - chmod 755 /opt/datadog-agent/embedded/bin/system-probe 2>/dev/null || true
-  - systemctl enable datadog-agent-sysprobe 2>/dev/null || true
   - systemctl restart datadog-agent
   - sleep 5
   - systemctl status datadog-agent --no-pager || true
-  - echo "Datadog NPM installation completed for azure - ${role}"
+  - echo "Datadog monitoring installation completed for azure - ${role}"
 
 final_message: |
   Azure ${role} setup complete on ${hostname}!

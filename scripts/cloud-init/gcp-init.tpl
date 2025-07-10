@@ -56,15 +56,15 @@ if [[ "$ROLE" == "warp_connector" ]]; then
     
     # Verify connection status
     sleep 10
-    warp-cli status
+    warp-cli --accept-tos status || echo "WARP status check failed, continuing..."
     
     # If still disconnected, try to connect again
-    if ! warp-cli status | grep -q "Connected"; then
+    if ! warp-cli --accept-tos status | grep -q "Connected" 2>/dev/null; then
         echo "First connection attempt failed, trying again..."
         sleep 5
-        warp-cli connect
+        warp-cli --accept-tos connect || echo "WARP connect retry failed, continuing..."
         sleep 10
-        warp-cli status
+        warp-cli --accept-tos status || echo "WARP final status check failed, continuing..."
     fi
 
 elif [[ "$ROLE" == "cloudflared" ]]; then
@@ -133,21 +133,9 @@ DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https
 # Wait for agent to be installed
 sleep 10
 
-# Create NPM config content
+# Create Datadog agent configuration
 cat >> /etc/datadog-agent/datadog.yaml << 'EOF'
-# Network Performance Monitoring enabled
-network:
-  enabled: true
-
-system_probe:
-  enabled: true
-  network:
-    enabled: true
-  runtime_security:
-    enabled: false
-  service_monitoring:
-    enabled: true
-    
+# Basic monitoring configuration for free tier
 process:
   enabled: true
 
@@ -163,28 +151,86 @@ log_level: info
 log_file: /var/log/datadog/agent.log
 EOF
 
-# Create network config
+# Create comprehensive monitoring configs
 mkdir -p /etc/datadog-agent/conf.d
-cat > /etc/datadog-agent/conf.d/network.yaml << 'EOF'
+
+# Process monitoring for zero-trust components
+cat > /etc/datadog-agent/conf.d/process.yaml << 'EOF'
 init_config:
 
 instances:
-  - collect_connection_state: true
-    collect_rate_metrics: true
-    collect_count_metrics: true
-    
-    processes:
+  - name: zero_trust_processes
+    search_string:
       - cloudflared
       - warp-cli
+      - warp-svc
       - python3
       - ssh
+    exact_match: false
+    collect_children: true
+    user: root
 EOF
 
-# Set proper permissions for system probe
-chmod 755 /opt/datadog-agent/embedded/bin/system-probe 2>/dev/null || true
+# Custom metrics for zero-trust services (only for cloudflared role)
+if [[ "$ROLE" == "cloudflared" ]]; then
+cat > /etc/datadog-agent/conf.d/http_check.yaml << 'EOF'
+init_config:
 
-# Enable and start system probe
-systemctl enable datadog-agent-sysprobe 2>/dev/null || true
+instances:
+  - name: local_web_services
+    url: http://localhost:8080
+    timeout: 5
+    tags:
+      - service:admin_web_app
+      - cloud:gcp
+      - role:${role}
+    
+  - name: local_web_services_sensitive
+    url: http://localhost:8081
+    timeout: 5
+    tags:
+      - service:sensitive_web_app
+      - cloud:gcp
+      - role:${role}
+EOF
+fi
+
+# System metrics enhancement
+cat > /etc/datadog-agent/conf.d/system_core.yaml << 'EOF'
+init_config:
+
+instances:
+  - collect_service_check: true
+    tags:
+      - environment:zero-trust-demo
+      - cloud:gcp
+      - role:${role}
+EOF
+
+# Directory monitoring for configuration files
+cat > /etc/datadog-agent/conf.d/directory.yaml << 'EOF'
+init_config:
+
+instances:
+  - directory: /etc/ssh
+    name: ssh_config_monitoring
+    pattern: "*.conf"
+    tags:
+      - config_type:ssh
+      - cloud:gcp
+      - role:${role}
+      
+  - directory: /etc/datadog-agent
+    name: datadog_config_monitoring
+    pattern: "*.yaml"
+    tags:
+      - config_type:datadog
+      - cloud:gcp
+      - role:${role}
+EOF
+
+# Basic agent permissions
+chmod 755 /opt/datadog-agent/embedded/bin/system-probe 2>/dev/null || true
 
 # Restart agent
 echo "Restarting Datadog agent..."
@@ -199,6 +245,6 @@ else
     systemctl status datadog-agent --no-pager
 fi
 
-echo "Datadog NPM installation completed for gcp - ${role}"
-Ac
+echo "Datadog monitoring installation completed for gcp - ${role}"
+
 echo "Startup script completed at $(date)"

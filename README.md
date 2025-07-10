@@ -46,12 +46,12 @@ _Last Updated: 12th of June 2025_
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 30 | 4,382 | Infrastructure as Code |
-| **Templates (.tftpl, .tpl)** | 3 | 424 | Cloud-init & startup scripts |
-| **Python (.py)** | 2 | 255 | Subnet calculation & automation |
+| **Terraform (.tf)** | 31 | 4,586 | Infrastructure as Code |
+| **Templates (.tftpl, .tpl)** | 3 | 780 | Cloud-init & startup scripts |
+| **Python (.py)** | 8 | 1,158 | Automation & utilities |
 | **Shell Scripts (.sh)** | 2 | 294 | Cleanup & maintenance |
-| **Batch Scripts (.cmd)** | 1 | 148 | Windows initialization |
-| **Total Core Code** | 38 | **5,503** | **Enhanced codebase** |
+| **Batch Scripts (.cmd)** | 1 | 149 | Windows initialization |
+| **Total Core Code** | 45 | **6,967** | **Enhanced monitoring & diagnostics** |
 
 <table>
 <tr>

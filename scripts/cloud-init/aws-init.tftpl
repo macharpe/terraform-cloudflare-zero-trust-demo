@@ -272,8 +272,91 @@ runcmd:
     chown ubuntu:ubuntu /home/ubuntu/VNC_INFO.txt
 %{ endif ~}
 
-  # Datadog Agent installation
+  # Datadog Agent installation and configuration
   - 'DD_API_KEY=${datadog_api_key} DD_SITE=${datadog_region} bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)" > /tmp/dd_install.log 2>&1'
+  - sleep 10
+  - mkdir -p /etc/datadog-agent/conf.d
+  - |
+    # Enhanced Datadog configuration for AWS
+    cat >> /etc/datadog-agent/datadog.yaml << 'DDEOF'
+    process:
+      enabled: true
+    tags:
+      - environment:zero-trust-demo
+      - cloud:aws
+      - role:${role}
+      - managed-by:terraform
+    log_level: info
+    log_file: /var/log/datadog/agent.log
+    DDEOF
+  - |
+    # Process monitoring for zero-trust components
+    cat > /etc/datadog-agent/conf.d/process.yaml << 'PROCEOF'
+    init_config:
+    instances:
+      - name: zero_trust_processes
+        search_string:
+          - cloudflared
+          - vnc
+          - Xvnc
+          - python3
+          - ssh
+        exact_match: false
+        collect_children: true
+        user: root
+    PROCEOF
+  - |
+    # System metrics enhancement
+    cat > /etc/datadog-agent/conf.d/system_core.yaml << 'SYSEOF'
+    init_config:
+    instances:
+      - collect_service_check: true
+        tags:
+          - environment:zero-trust-demo
+          - cloud:aws
+          - role:${role}
+    SYSEOF
+  - |
+    # Directory monitoring for configuration files
+    cat > /etc/datadog-agent/conf.d/directory.yaml << 'DIREOF'
+    init_config:
+    instances:
+      - directory: /etc/ssh
+        name: ssh_config_monitoring
+        pattern: "*.conf"
+        tags:
+          - config_type:ssh
+          - cloud:aws
+          - role:${role}
+      - directory: /etc/datadog-agent
+        name: datadog_config_monitoring
+        pattern: "*.yaml"
+        tags:
+          - config_type:datadog
+          - cloud:aws
+          - role:${role}
+    DIREOF
+  - |
+    # VNC-specific monitoring for AWS VNC instances
+    if [ "${role}" = "vnc" ]; then
+      cat > /etc/datadog-agent/conf.d/tcp_check.yaml << 'VNCEOF'
+      init_config:
+      instances:
+        - name: vnc_service_check
+          host: localhost
+          port: 5901
+          timeout: 5
+          tags:
+            - service:vnc
+            - cloud:aws
+            - role:${role}
+      VNCEOF
+    fi
+  - chmod 755 /opt/datadog-agent/embedded/bin/system-probe 2>/dev/null || true
+  - systemctl restart datadog-agent
+  - sleep 5
+  - systemctl status datadog-agent --no-pager || true
+  - echo "Datadog monitoring setup completed for aws - ${role}"
 
 %{ if role == "vnc" ~}
 final_message: |
