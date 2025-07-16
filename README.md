@@ -476,7 +476,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region | `string` | `"eu-central-1"` | no |
 | <a name="input_aws_users"></a> [aws\_users](#input\_aws\_users) | List of all the AWS users | `list(string)` | n/a | yes |
 | <a name="input_aws_vm_default_user"></a> [aws\_vm\_default\_user](#input\_aws\_vm\_default\_user) | default user for AWS VM | `string` | n/a | yes |
-| <a name="input_aws_vnc_password"></a> [aws\_vnc\_password](#input\_aws\_vnc\_password) | default user for AWS VM | `string` | n/a | yes |
+| <a name="input_aws_vnc_password"></a> [aws\_vnc\_password](#input\_aws\_vnc\_password) | VNC password for AWS VM | `string` | n/a | yes |
 | <a name="input_aws_vpc_cidr"></a> [aws\_vpc\_cidr](#input\_aws\_vpc\_cidr) | AWS vpc cidr, subnet for vpc in AWS | `string` | n/a | yes |
 | <a name="input_azure_default_tags"></a> [azure\_default\_tags](#input\_azure\_default\_tags) | default tags for Azure | `map(string)` | <pre>{<br/>  "Owner": "macharpe",<br/>  "environment": "dev",<br/>  "service": "cloudflare-zero-trust-demo"<br/>}</pre> | no |
 | <a name="input_azure_developer1_name"></a> [azure\_developer1\_name](#input\_azure\_developer1\_name) | User 1 in Azure AD | `string` | n/a | yes |
@@ -519,7 +519,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_osx_version_posture_rule_id"></a> [cf\_osx\_version\_posture\_rule\_id](#input\_cf\_osx\_version\_posture\_rule\_id) | Rule ID for the posture check on latest version of macos | `string` | n/a | yes |
 | <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_sensitive_web_app_port"></a> [cf\_sensitive\_web\_app\_port](#input\_cf\_sensitive\_web\_app\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
+| <a name="input_cf_sensitive_web_app_port"></a> [cf\_sensitive\_web\_app\_port](#input\_cf\_sensitive\_web\_app\_port) | Port for the Sensitive web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |
 | <a name="input_cf_subdomain_ssh"></a> [cf\_subdomain\_ssh](#input\_cf\_subdomain\_ssh) | Name of the subdomain for ssh public hostname of tunnel | `string` | n/a | yes |
 | <a name="input_cf_subdomain_vnc"></a> [cf\_subdomain\_vnc](#input\_cf\_subdomain\_vnc) | Name of the subdomain for VNC public hostname of tunnel | `string` | n/a | yes |
@@ -561,24 +561,12 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_windows_user_name"></a> [gcp\_windows\_user\_name](#input\_gcp\_windows\_user\_name) | vm user name for GCP Windows VM | `string` | n/a | yes |
 | <a name="input_okta_bob_user_linux_password"></a> [okta\_bob\_user\_linux\_password](#input\_okta\_bob\_user\_linux\_password) | Linux password for user bob in EC2 instance | `string` | n/a | yes |
 | <a name="input_okta_bob_user_login"></a> [okta\_bob\_user\_login](#input\_okta\_bob\_user\_login) | User login for bob, in an email format | `string` | n/a | yes |
-| <a name="input_okta_contractors_group_id"></a> [okta\_contractors\_group\_id](#input\_okta\_contractors\_group\_id) | ID for Contractors group in Okta | `string` | n/a | yes |
 | <a name="input_okta_contractors_saml_group_name"></a> [okta\_contractors\_saml\_group\_name](#input\_okta\_contractors\_saml\_group\_name) | SAML Group name for Contractors group | `string` | n/a | yes |
-| <a name="input_okta_infra_admin_group_id"></a> [okta\_infra\_admin\_group\_id](#input\_okta\_infra\_admin\_group\_id) | ID for InfrastructureAdmin group in Okta | `string` | n/a | yes |
 | <a name="input_okta_infra_admin_saml_group_name"></a> [okta\_infra\_admin\_saml\_group\_name](#input\_okta\_infra\_admin\_saml\_group\_name) | SAML Group name for InfrastructureAdmin group | `string` | n/a | yes |
-| <a name="input_okta_itadmin_group_id"></a> [okta\_itadmin\_group\_id](#input\_okta\_itadmin\_group\_id) | ID for ITAdmin group in Okta | `string` | n/a | yes |
 | <a name="input_okta_itadmin_saml_group_name"></a> [okta\_itadmin\_saml\_group\_name](#input\_okta\_itadmin\_saml\_group\_name) | SAML Group name for ITAdmin group | `string` | n/a | yes |
-| <a name="input_okta_jose_user_id"></a> [okta\_jose\_user\_id](#input\_okta\_jose\_user\_id) | ID for Jose user in Okta | `string` | n/a | yes |
-| <a name="input_okta_jose_user_login"></a> [okta\_jose\_user\_login](#input\_okta\_jose\_user\_login) | User login for jose, in an email format | `string` | n/a | yes |
-| <a name="input_okta_matthieu_user_id"></a> [okta\_matthieu\_user\_id](#input\_okta\_matthieu\_user\_id) | ID for Matthieu user in Okta | `string` | n/a | yes |
-| <a name="input_okta_matthieu_user_login"></a> [okta\_matthieu\_user\_login](#input\_okta\_matthieu\_user\_login) | User login for stephane, in an email format | `string` | n/a | yes |
-| <a name="input_okta_meraki_group_id"></a> [okta\_meraki\_group\_id](#input\_okta\_meraki\_group\_id) | ID for Meraki group in Okta | `string` | n/a | yes |
-| <a name="input_okta_sales_eng_group_id"></a> [okta\_sales\_eng\_group\_id](#input\_okta\_sales\_eng\_group\_id) | ID for SalesEngineering group in Okta | `string` | n/a | yes |
+| <a name="input_okta_matthieu_user_login"></a> [okta\_matthieu\_user\_login](#input\_okta\_matthieu\_user\_login) | User login for matthieu, in an email format | `string` | n/a | yes |
 | <a name="input_okta_sales_eng_saml_group_name"></a> [okta\_sales\_eng\_saml\_group\_name](#input\_okta\_sales\_eng\_saml\_group\_name) | SAML Group name for SalesEngineering group | `string` | n/a | yes |
-| <a name="input_okta_sales_group_id"></a> [okta\_sales\_group\_id](#input\_okta\_sales\_group\_id) | ID for Sales group in Okta | `string` | n/a | yes |
 | <a name="input_okta_sales_saml_group_name"></a> [okta\_sales\_saml\_group\_name](#input\_okta\_sales\_saml\_group\_name) | SAML Group name for Sales group | `string` | n/a | yes |
-| <a name="input_okta_stephane_user_id"></a> [okta\_stephane\_user\_id](#input\_okta\_stephane\_user\_id) | ID for Stephane user in Okta | `string` | n/a | yes |
-| <a name="input_okta_stephane_user_login"></a> [okta\_stephane\_user\_login](#input\_okta\_stephane\_user\_login) | User login for stephane, in an email format | `string` | n/a | yes |
-| <a name="input_okta_zerotrust_group_id"></a> [okta\_zerotrust\_group\_id](#input\_okta\_zerotrust\_group\_id) | ID for ZeroTrust group in Okta | `string` | n/a | yes |
 
 ## Outputs
 
