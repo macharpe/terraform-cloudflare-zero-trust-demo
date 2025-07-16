@@ -28,50 +28,59 @@ gcp_windows_rdp_cidr        = "10.156.90.0/24"
 #=====================================
 # Cloudflare variables
 #=====================================
-cf_team_name                   = "macharpe"
-cf_subdomain_ssh               = "ssh-database***"
-cf_subdomain_vnc               = "vnc***"
-cf_subdomain_web               = "administration-app***"
-cf_subdomain_web_sensitive     = "competition-app****"
-cf_subdomain_rdp               = "rdp.*********"
+cf_team_name    = "macharpe"
+cf_email_domain = "passfwd.com"
 
-cf_target_ssh_name             = "GCP-database"
-cf_target_rdp_name             = "GCP-Browser-RDP"
+# Tunnels
+cf_tunnel_name_gcp         = "Tunnel GCP (Access For Infrastructure)"
+cf_tunnel_name_aws         = "Tunnel AWS (SSH Browser Rendered)"
+cf_windows_rdp_tunnel_name = "Tunnel GCP (Windows RDP)"
 
-cf_tunnel_name_gcp             = "Tunnel GCP (Access For Infrastructure)"
-cf_tunnel_name_aws             = "Tunnel AWS (SSH Browser Rendered)"
-cf_windows_rdp_tunnel_name     = "Tunnel GCP (Windows RDP)"
+# WARP Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
+cf_warp_tunnel_azure_id = "185f0bc0-986d-********"
+cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-********"
 
-#Manually retrieved
-cf_warp_tunnel_azure_id        = "185f0bc0-986d-********"
-cf_warp_tunnel_gcp_id          = "ad04a3ed-a1a1-********"
+# Subdomains
+cf_subdomain_ssh           = "ssh-database***"
+cf_subdomain_vnc           = "vnc***"
+cf_subdomain_web           = "administration-app***"
+cf_subdomain_rdp           = "rdp.*********"
+cf_subdomain_web_sensitive = "competition-app****"
 
-cf_infra_app_name              = "GCP Infrastructure SSH database"
-cf_browser_ssh_app_name        = "AWS Browser SSH database"
-cf_browser_vnc_app_name        = "AWS Browser VNC database"
-cf_browser_rdp_app_name        = "GCP Browser RDP windows"
-cf_sensitive_web_app_name      = "Competition App"
-cf_admin_web_app_name          = "Administration App"
-cf_sensitive_web_app_port      = 8080
-cf_admin_web_app_port          = 8181
-cf_domain_controller_rdp_port  = 3389
+# Targets
+cf_target_ssh_name = "GCP-database"
+cf_target_rdp_name = "GCP-Browser-RDP"
 
-# Manually retrieved
-cf_gateway_posture_id          = "4d8d7499-38c3-4bf0-********"
-cf_macos_posture_id            = "6d64ff80-1308-4462-********"
-cf_windows_posture_id          = "67b05735-3b9b-4bcc-********"
-cf_linux_posture_id            = "ed5639c7-3305-4a91-********"
-cf_okta_identity_provider_id   = "8fd4786e-97d7-4257-********"
-cf_otp_identity_provider_id    = "a6dfbf35-0e20-4244-********"
-cf_azure_identity_provider_id  = "8c593fe8-aee3-4075-********"
-cf_azure_admin_rule_group_id   = "5f253130-a400-4215-********"
+# Applications
+cf_infra_app_name         = "GCP Infrastructure SSH database"
+cf_browser_ssh_app_name   = "AWS Browser SSH database"
+cf_browser_vnc_app_name   = "AWS Browser VNC database"
+cf_browser_rdp_app_name   = "GCP Browser RDP windows"
+cf_sensitive_web_app_name = "Competition App"
+cf_admin_web_app_name     = "Administration App"
 
-cf_email_domain                = "passfwd.com"
+# Application Ports
+cf_sensitive_web_app_port     = 8080
+cf_admin_web_app_port         = 8181
+cf_domain_controller_rdp_port = 3389
 
-# Device profile
-cf_device_os                   = "mac"                                  # "linux", "windows" or "mac"
-cf_osx_version_posture_rule_id = "6d64ff80-1308-4462-********" # Manually retrieved
+# Identity Providers - Sensitive: manually retrieved from Cloudflare dashboard
+cf_okta_identity_provider_id  = "8fd4786e-97d7-4257-********"
+cf_otp_identity_provider_id   = "a6dfbf35-0e20-4244-********"
+cf_azure_identity_provider_id = "8c593fe8-aee3-4075-********"
+cf_azure_admin_rule_group_id  = "5f253130-a400-4215-********"
 
+# Device Posture - Sensitive: manually retrieved from Cloudflare dashboard
+cf_gateway_posture_id = "4d8d7499-38c3-4bf0-********"
+cf_macos_posture_id   = "6d64ff80-1308-4462-********"
+cf_windows_posture_id = "67b05735-3b9b-4bcc-********"
+cf_linux_posture_id   = "ed5639c7-3305-4a91-********"
+
+# Device Profile
+cf_device_os                   = "mac"                              # Options: "linux", "windows", "mac"
+cf_osx_version_posture_rule_id = "6d64ff80-1308-4462-********" # Sensitive: manually retrieved
+
+# WARP CGNAT Routes
 cf_custom_cgnat_routes = [
   {
     address     = "100.64.0.0/11"
@@ -96,15 +105,7 @@ cf_warp_cgnat_cidr = "100.96.0.0/12"
 # Okta
 #=====================================
 
-# SAML Group IDs
-#Manually retrieved
-okta_zerotrust_group_id        = "00grzr********"
-okta_sales_eng_group_id        = "00grzr********"
-okta_itadmin_group_id          = "00grzr********"
-okta_infra_admin_group_id      = "00grzr********"
-okta_contractors_group_id      = "00grzr********"
-okta_meraki_group_id           = "00grzr********"
-okta_sales_group_id            = "00grzr********"
+# SAML Group IDs - Unused variables removed
 
 # SAML Group names
 okta_sales_eng_saml_group_name   = "SalesEngineering"
@@ -113,17 +114,11 @@ okta_sales_saml_group_name       = "Sales"
 okta_contractors_saml_group_name = "Contractors"
 okta_infra_admin_saml_group_name = "InfrastructureAdmin"
 
-# User IDs
-#Manually retrieved
-okta_stephane_user_id = "00urzr********"
-okta_matthieu_user_id = "00urzr********"
-okta_jose_user_id     = "00urzr********"
+# User IDs - Unused variables removed
 
 # User logins
 okta_bob_user_login      = "********3@passfwd.com"
-okta_jose_user_login     = "********"
 okta_matthieu_user_login = "********"
-okta_stephane_user_login = "b********"
 
 okta_bob_user_linux_password = "bob"
 
@@ -144,10 +139,10 @@ aws_users                      = ["matthieu", "jose", "bob", "andy"]
 aws_vm_default_user            = "ubuntu"
 aws_vnc_password               = "vnc"
 
-# networking
-aws_vpc_cidr                   = "172.16.0.0/16"
-aws_private_cidr        = "172.16.69.0/24"
-aws_public_cidr         = "172.16.84.0/24"
+# Networking
+aws_vpc_cidr     = "172.16.0.0/16"
+aws_private_cidr = "172.16.69.0/24"
+aws_public_cidr  = "172.16.84.0/24"
 
 
 #=====================================
@@ -172,12 +167,12 @@ azure_vm_admin_password        = "********"
 azure_warp_vm_name             = "cloudflare-warp-connector-azure"
 azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
 
-# networking
-azure_subnet_cidr         = "192.168.71.0/24"
-azure_vnet_cidr             = "192.168.0.0/16"
-azure_public_dns_domain        = "westeurope.cloudapp.azure.com"
+# Networking
+azure_subnet_cidr       = "192.168.71.0/24"
+azure_vnet_cidr         = "192.168.0.0/16"
+azure_public_dns_domain = "westeurope.cloudapp.azure.com"
 
-# Manually retrieved
+# Sensitive: manually retrieved from Azure AD
 azure_matthieu_user_object_id = "58c64a9c-df3c-********"
 
 

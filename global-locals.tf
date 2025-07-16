@@ -14,10 +14,10 @@ locals {
 
   # Common network configuration for cross-cloud connectivity
   global_network = {
-    cf_warp_cgnat_cidr      = var.cf_warp_cgnat_cidr
-    aws_private_cidr = var.aws_private_cidr
+    cf_warp_cgnat_cidr = var.cf_warp_cgnat_cidr
+    aws_private_cidr   = var.aws_private_cidr
     azure_subnet_cidr  = var.azure_subnet_cidr
-    gcp_warp_cidr        = var.gcp_warp_cidr
+    gcp_warp_cidr      = var.gcp_warp_cidr
   }
 
   # Common Cloudflare configuration

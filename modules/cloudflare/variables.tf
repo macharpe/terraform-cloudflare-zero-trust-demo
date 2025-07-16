@@ -1,6 +1,6 @@
-#==========================================
-# Cloudflare
-#==========================================
+#======================================================
+# CLOUDFLARE CORE CONFIGURATION
+#======================================================
 variable "cloudflare_api_key" {
   description = "Cloudflare API key"
   type        = string
@@ -22,30 +22,19 @@ variable "cloudflare_zone_id" {
   type        = string
 }
 
-variable "cf_gateway_posture_id" {
-  description = "Gateway posture ID in Cloudflare"
+variable "cf_team_name" {
+  description = "Name of the Team in Cloudflare, essentially zero-trust org name"
   type        = string
-  sensitive   = true
 }
 
-variable "cf_macos_posture_id" {
-  description = "Latest macOS version posture ID in Cloudflare"
+variable "cf_email_domain" {
+  description = "Email Domain used for email authentication in App policies"
   type        = string
-  sensitive   = true
 }
 
-variable "cf_windows_posture_id" {
-  description = "Latest Windows version posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_linux_posture_id" {
-  description = "Latest Linux Kernel version posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
+#======================================================
+# IDENTITY PROVIDERS
+#======================================================
 variable "cf_okta_identity_provider_id" {
   description = "Okta Identity Provider ID in Cloudflare"
   type        = string
@@ -70,16 +59,46 @@ variable "cf_azure_admin_rule_group_id" {
   sensitive   = true
 }
 
-variable "cf_email_domain" {
-  description = "Email Domain used for email authentication in App policies"
+#======================================================
+# DEVICE POSTURE CHECKS
+#======================================================
+variable "cf_gateway_posture_id" {
+  description = "Gateway posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_macos_posture_id" {
+  description = "Latest macOS version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_windows_posture_id" {
+  description = "Latest Windows version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_linux_posture_id" {
+  description = "Latest Linux Kernel version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_device_os" {
+  description = "This is the OS you are running on your own client machine"
   type        = string
 }
 
+variable "cf_osx_version_posture_rule_id" {
+  description = "Rule ID for the posture check on latest version of macos"
+  type        = string
+}
 
-
-#==========================================
-# Tunnel
-#==========================================
+#======================================================
+# TUNNEL CONFIGURATION
+#======================================================
 variable "cf_tunnel_name_gcp" {
   description = "Name of the Cloudflared tunnel for GCP"
   type        = string
@@ -95,32 +114,9 @@ variable "cf_windows_rdp_tunnel_name_gcp" {
   type        = string
 }
 
-variable "cf_tunnel_warp_connector_azure_id" {
-  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
-  type        = string
-}
-
-variable "cf_tunnel_warp_connector_gcp_id" {
-  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
-  type        = string
-}
-
-#variable "azure_warp_connector_name" {
-#  type        = string
-#  description = "Name of the Warp Connector tunnel for Azure"
-#}
-
-
-
-variable "cf_team_name" {
-  description = "Name of the Team in Cloudflare, essentially zero-trust org name"
-  type        = string
-}
-
-
-#==========================================
-# DNS
-#==========================================
+#======================================================
+# DNS SUBDOMAIN CONFIGURATION
+#======================================================
 variable "cf_subdomain_ssh" {
   description = "Name of the subdomain for ssh public hostname of tunnel"
   type        = string
@@ -146,27 +142,9 @@ variable "cf_subdomain_rdp" {
   type        = string
 }
 
-
-
-
-#==========================================
-# Target names
-#==========================================
-variable "cf_target_ssh_name" {
-  description = "Friendly name for the Target hostname in Infrastructure App"
-  type        = string
-}
-
-variable "cf_target_rdp_name" {
-  description = "Friendly name for the Target hostname in RDP windows browser rendered App"
-  type        = string
-}
-
-
-
-#==========================================
-# Application names
-#==========================================
+#======================================================
+# ACCESS APPLICATION CONFIGURATION
+#======================================================
 variable "cf_infra_app_name" {
   description = "Name of the Infrastructure App in Cloudflare"
   type        = string
@@ -197,33 +175,47 @@ variable "cf_browser_rdp_app_name" {
   type        = string
 }
 
-
+#======================================================
+# APPLICATION PORTS
+#======================================================
 variable "cf_admin_web_app_port" {
-  description = "Name of the Sensitive web App in Cloudflare"
+  description = "Port for the Administration web App in Cloudflare"
   type        = number
 }
 
 variable "cf_sensitive_web_app_port" {
-  description = "Port for the Administration web App in Cloudflare"
+  description = "Port for the Sensitive web App in Cloudflare"
   type        = number
 }
 
 variable "cf_domain_controller_rdp_port" {
-  description = "Port for the Administration web App in Cloudflare"
+  description = "Port for the RDP domain controller"
   type        = number
 }
 
+#======================================================
+# TARGET NAMES
+#======================================================
+variable "cf_target_ssh_name" {
+  description = "Friendly name for the Target hostname in Infrastructure App"
+  type        = string
+}
 
-#==========================================
-# Okta
-#==========================================
+variable "cf_target_rdp_name" {
+  description = "Friendly name for the Target hostname in RDP windows browser rendered App"
+  type        = string
+}
+
+#======================================================
+# OKTA SAML GROUPS
+#======================================================
 variable "okta_infra_admin_saml_group_name" {
   description = "SAML Group name for InfrastructureAdmin group"
   type        = string
 }
 
 variable "okta_contractors_saml_group_name" {
-  description = "SAML Group name for InfrastructureAdmin group"
+  description = "SAML Group name for Contractors group"
   type        = string
 }
 
@@ -242,20 +234,22 @@ variable "okta_itadmin_saml_group_name" {
   type        = string
 }
 
+#======================================================
+# OKTA USER LOGINS
+#======================================================
 variable "okta_bob_user_login" {
   description = "User login for bob, in an email format"
   type        = string
 }
 
 variable "okta_matthieu_user_login" {
-  description = "User login for stephane, in an email format"
+  description = "User login for matthieu, in an email format"
   type        = string
 }
 
-
-#==========================================
-# GCP
-#==========================================
+#======================================================
+# GCP INFRASTRUCTURE
+#======================================================
 variable "gcp_vm_internal_ip" {
   description = "Internal Private IP of GCP Compute Engine Instance"
   type        = string
@@ -267,7 +261,8 @@ variable "gcp_windows_vm_internal_ip" {
 }
 
 variable "gcp_cloudflared_vm_instance" {
-  type = any
+  description = "GCP Cloudflared VM instance object"
+  type        = any
 }
 
 variable "gcp_infra_cidr" {
@@ -285,10 +280,9 @@ variable "gcp_windows_rdp_cidr" {
   type        = string
 }
 
-
-#==========================================
-# AWS
-#==========================================
+#======================================================
+# AWS INFRASTRUCTURE
+#======================================================
 variable "aws_ec2_ssh_service_private_ip" {
   description = "private ip address of the SSH service running in AWS"
   type        = string
@@ -298,7 +292,6 @@ variable "aws_ec2_vnc_service_private_ip" {
   description = "private ip address of the VNC service running in AWS"
   type        = string
 }
-
 
 variable "aws_private_cidr" {
   description = "AWS private subnet, subnet for VMs in AWS"
@@ -310,18 +303,17 @@ variable "aws_public_cidr" {
   type        = string
 }
 
-
-#==========================================
-# Azure
-#==========================================
+#======================================================
+# AZURE INFRASTRUCTURE
+#======================================================
 variable "azure_engineering_group_id" {
-  type        = string
   description = "Object ID of Azure_Engineering group from Azure AD"
+  type        = string
 }
 
 variable "azure_sales_group_id" {
-  type        = string
   description = "Object ID of Azure_Sales group from Azure AD"
+  type        = string
 }
 
 variable "azure_subnet_cidr" {
@@ -329,22 +321,9 @@ variable "azure_subnet_cidr" {
   type        = string
 }
 
-
-
-#==========================================
-# Device profile
-#==========================================
-variable "cf_device_os" {
-  description = "This is the OS you are running on your own client machine"
-  type        = string
-}
-
-variable "cf_osx_version_posture_rule_id" {
-  description = "Rule ID for the posture check on latest version of macos"
-  type        = string
-}
-
-
+#======================================================
+# WARP CONNECTOR CONFIGURATION
+#======================================================
 variable "cf_default_cgnat_routes" {
   description = "default cgnat routes"
   type = list(object({
@@ -366,6 +345,9 @@ variable "cf_warp_cgnat_cidr" {
   type        = string
 }
 
+#======================================================
+# SUBNET GENERATION (JSON)
+#======================================================
 variable "cf_azure_json_subnet_generation" {
   description = "Results of the Azure Subnet generation in json format"
   type        = any
@@ -381,11 +363,34 @@ variable "cf_aws_json_subnet_generation" {
   type        = any
 }
 
-
-#=====================================
-# AWS and Cloudflare Tag
-#=====================================
+#======================================================
+# TAGS
+#======================================================
 variable "cf_aws_tag" {
   description = "tag to be assigned to cloudflare application and aws environment"
   type        = string
 }
+
+#======================================================
+# WARP CONNECTOR TUNNEL IDS
+#======================================================
+
+variable "cf_tunnel_warp_connector_azure_id" {
+  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
+  type        = string
+}
+
+variable "cf_tunnel_warp_connector_gcp_id" {
+  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
+  type        = string
+}
+
+#======================================================
+# COMMENTED OUT VARIABLES
+#======================================================
+# The following variables are commented out but kept for reference
+
+#variable "azure_warp_connector_name" {
+#  type        = string
+#  description = "Name of the Warp Connector tunnel for Azure"
+#}

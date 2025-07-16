@@ -1,6 +1,8 @@
-#======================================
-# GCP Variables
-#======================================
+#======================================================
+# GCP CONFIGURATION
+#======================================================
+
+# Core GCP Settings
 variable "gcp_project_id" {
   description = "GCP project ID"
   type        = string
@@ -12,9 +14,12 @@ variable "gcp_region" {
   default     = "europe-west3"
 }
 
+variable "gcp_service_account_email" {
+  description = "Service Account email for Terraform project in GCP"
+  type        = string
+}
 
-
-## Users
+# GCP Users and Authentication
 variable "gcp_users" {
   description = "List of all the GCP users"
   type        = list(string)
@@ -36,21 +41,32 @@ variable "gcp_windows_admin_password" {
   sensitive   = true
 }
 
-variable "gcp_service_account_email" {
-  description = "Service Account email for Terraform project in GCP"
-  type        = string
+variable "gcp_enable_oslogin" {
+  description = "Whether to enable OS Login"
+  type        = bool
+  default     = true
 }
 
+# GCP VM Configuration
 variable "gcp_vm_count" {
   description = "number of vm not running cloudflared"
   type        = number
   default     = 1
 }
 
+variable "gcp_machine_size" {
+  description = "size of the compute engine instance"
+  type        = string
+  default     = "e2-micro"
+}
 
+variable "gcp_windows_machine_size" {
+  description = "size of the compute engine instance for Windows specifically"
+  type        = string
+  default     = "e2-medium"
+}
 
-
-## VM names
+# GCP VM Names
 variable "gcp_cloudflared_vm_name" {
   description = "Name for the VM instance running cloudflared for infrastructure access demo"
   type        = string
@@ -66,37 +82,12 @@ variable "gcp_vm_name" {
   type        = string
 }
 
-
-
 variable "gcp_warp_connector_vm_name" {
   description = "Name of the GCP VM where WARP Connector is installed"
   type        = string
 }
 
-
-
-
-
-variable "gcp_enable_oslogin" {
-  description = "Whether to enable OS Login"
-  type        = bool
-  default     = true
-}
-
-variable "gcp_machine_size" {
-  description = "size of the compute engine instance"
-  type        = string
-  default     = "e2-micro"
-}
-
-variable "gcp_windows_machine_size" {
-  description = "size of the compute engine instance for Windows specifically"
-  type        = string
-  default     = "e2-medium"
-}
-
-
-# Networking
+# GCP Networking
 variable "gcp_infra_cidr" {
   description = "CIDR Range for GCP VMs running cloudflared"
   type        = string
@@ -112,376 +103,18 @@ variable "gcp_windows_rdp_cidr" {
   type        = string
 }
 
-
-
-
-
-#======================================
-# Cloudflare Variables
-#======================================
-
-variable "cloudflare_api_key" {
-  description = "Cloudflare API key"
-  type        = string
-  sensitive   = true
-}
-
-variable "cloudflare_email" {
-  description = "Cloudflare login email"
-  type        = string
-}
-
-variable "cloudflare_account_id" {
-  description = "Cloudflare account ID"
-  type        = string
-}
-
-variable "cloudflare_zone_id" {
-  description = "Cloudflare zone ID"
-  type        = string
-}
-
-
-####
-
-variable "cf_team_name" {
-  description = "Name of the Team in Cloudflare, essentially zero-trust org name"
-  type        = string
-}
-
-variable "cf_tunnel_name_gcp" {
-  description = "Name of the Cloudflare tunnel to GCP"
-  type        = string
-}
-
-variable "cf_tunnel_name_aws" {
-  description = "Name of the Cloudflare tunnel to AWS"
-  type        = string
-}
-
-variable "cf_windows_rdp_tunnel_name" {
-  description = "Name of the Cloudflared tunnel for Windows RDP Server GCP"
-  type        = string
-}
-
-variable "cf_warp_tunnel_azure_id" {
-  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
-  type        = string
-}
-
-variable "cf_warp_tunnel_gcp_id" {
-  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
-  type        = string
-}
-
-
-variable "cf_subdomain_ssh" {
-  description = "Name of the subdomain for ssh public hostname of tunnel"
-  type        = string
-}
-
-variable "cf_subdomain_vnc" {
-  description = "Name of the subdomain for VNC public hostname of tunnel"
-  type        = string
-}
-
-variable "cf_subdomain_web" {
-  description = "Name of the subdomain for web public hostname of tunnel"
-  type        = string
-}
-
-variable "cf_subdomain_web_sensitive" {
-  description = "Name of the subdomain for web sensitive public hostname of tunnel"
-  type        = string
-}
-
-variable "cf_subdomain_rdp" {
-  description = "Name of the subdomain for rdp browser rendered public hostname"
-  type        = string
-}
-
-variable "cf_browser_ssh_app_name" {
-  description = "Name of the Browser Rendering SSH App in Cloudflare"
-  type        = string
-}
-
-variable "cf_browser_vnc_app_name" {
-  description = "Name of the Browser Rendering VNC App in Cloudflare"
-  type        = string
-}
-
-variable "cf_infra_app_name" {
-  description = "Name of the Infrastructure App in Cloudflare"
-  type        = string
-}
-
-variable "cf_sensitive_web_app_name" {
-  description = "Name of the Sensitive web App in Cloudflare"
-  type        = string
-}
-
-variable "cf_admin_web_app_name" {
-  description = "Name of the Administration web App in Cloudflare"
-  type        = string
-}
-
-variable "cf_browser_rdp_app_name" {
-  description = "Name of the RDP windows browser rendered App in Cloudflare"
-  type        = string
-}
-
-variable "cf_admin_web_app_port" {
-  description = "Port for the Administration web App in Cloudflare"
-  type        = number
-}
-
-variable "cf_sensitive_web_app_port" {
-  description = "Port for the Administration web App in Cloudflare"
-  type        = number
-}
-
-variable "cf_domain_controller_rdp_port" {
-  description = "Port for the Domain Controller RDP in Cloudflare"
-  type        = number
-}
-
-
-
-###
-variable "cf_target_ssh_name" {
-  description = "Friendly name for the Target hostname in Infrastructure App"
-  type        = string
-}
-
-variable "cf_target_rdp_name" {
-  description = "Friendly name for the Target hostname in RDP windows browser rendered App"
-  type        = string
-}
-
-
-
-
-variable "cf_gateway_posture_id" {
-  description = "Gateway posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_macos_posture_id" {
-  description = "Latest macOS version posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_windows_posture_id" {
-  description = "Latest Windows version posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_linux_posture_id" {
-  description = "Latest Linux Kernel version posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_okta_identity_provider_id" {
-  description = "Okta Identity Provider ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_otp_identity_provider_id" {
-  description = "OneTime PIN identity provider ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_azure_identity_provider_id" {
-  description = "Azure Entra ID identity provider ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_azure_admin_rule_group_id" {
-  description = "Azure Administrators Rule Group ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_email_domain" {
-  description = "Email Domain used for email authentication in App policies"
-  type        = string
-}
-
-
-
-# device profiles
-variable "cf_device_os" {
-  description = "This is the OS you are running on your own client machine"
-  type        = string
-}
-
-variable "cf_osx_version_posture_rule_id" {
-  description = "Rule ID for the posture check on latest version of macos"
-  type        = string
-}
-
-variable "cf_default_cgnat_routes" {
-  description = "default cgnat routes"
-  type = list(object({
-    address     = string
-    description = string
-  }))
-  default = [{
-    address     = "100.64.0.0/10"
-    description = "Default CGNAT Range"
-  }]
-}
-
-variable "cf_custom_cgnat_routes" {
-  description = "List of custom CGNAT routes to add to the device profile"
-  type = list(object({
-    address     = string
-    description = string
-  }))
-}
-
-variable "cf_warp_cgnat_cidr" {
-  description = "default ip range for WARP when overriding local interface IP"
-  type        = string
-}
-
-
-
-#======================================
-# OKTA Variables
-#======================================
-# Groups
-variable "okta_zerotrust_group_id" {
-  description = "ID for ZeroTrust group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_contractors_group_id" {
-  description = "ID for Contractors group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_infra_admin_group_id" {
-  description = "ID for InfrastructureAdmin group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_itadmin_group_id" {
-  description = "ID for ITAdmin group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_sales_eng_group_id" {
-  description = "ID for SalesEngineering group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_sales_group_id" {
-  description = "ID for Sales group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_meraki_group_id" {
-  description = "ID for Meraki group in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_infra_admin_saml_group_name" {
-  description = "SAML Group name for InfrastructureAdmin group"
-  type        = string
-}
-
-variable "okta_contractors_saml_group_name" {
-  description = "SAML Group name for Contractors group"
-  type        = string
-}
-
-variable "okta_sales_eng_saml_group_name" {
-  description = "SAML Group name for SalesEngineering group"
-  type        = string
-}
-
-variable "okta_sales_saml_group_name" {
-  description = "SAML Group name for Sales group"
-  type        = string
-}
-
-variable "okta_itadmin_saml_group_name" {
-  description = "SAML Group name for ITAdmin group"
-  type        = string
-}
-
-
-
-# User
-variable "okta_matthieu_user_id" {
-  description = "ID for Matthieu user in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_jose_user_id" {
-  description = "ID for Jose user in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_stephane_user_id" {
-  description = "ID for Stephane user in Okta"
-  type        = string
-  sensitive   = true
-}
-
-variable "okta_bob_user_login" {
-  description = "User login for bob, in an email format"
-  type        = string
-}
-
-variable "okta_jose_user_login" {
-  description = "User login for jose, in an email format"
-  type        = string
-}
-
-variable "okta_stephane_user_login" {
-  description = "User login for stephane, in an email format"
-  type        = string
-}
-
-variable "okta_matthieu_user_login" {
-  description = "User login for stephane, in an email format"
-  type        = string
-}
-
-variable "okta_bob_user_linux_password" {
-  description = "Linux password for user bob in EC2 instance"
-  type        = string
-  sensitive   = true
-}
-
-
-#======================================
-# AWS Variables
-#======================================
+#======================================================
+# AWS CONFIGURATION
+#======================================================
+
+# Core AWS Settings
 variable "aws_region" {
   description = "AWS region"
   type        = string
   default     = "eu-central-1"
 }
 
+# AWS EC2 Configuration
 variable "aws_ec2_instance_config_type" {
   description = "type of EC2 instance"
   type        = string
@@ -494,6 +127,13 @@ variable "aws_ec2_instance_config_ami_id" {
   default     = "ami-086ecbd485d8bb032"
 }
 
+variable "aws_cloudflared_count" {
+  description = "number of cloudflared replicas"
+  type        = number
+  default     = 1
+}
+
+# AWS Instance Names
 variable "aws_ec2_browser_ssh_name" {
   description = "Name of the EC2 instance browser rendered SSH"
   type        = string
@@ -504,22 +144,29 @@ variable "aws_ec2_browser_vnc_name" {
   type        = string
 }
 
-variable "aws_cloudflared_count" {
-  description = "number of cloudflared replicas"
-  type        = number
-  default     = 1
-}
-
 variable "aws_ec2_cloudflared_name" {
   description = "name of cloudflared replica"
   type        = string
 }
 
+# AWS Users and Authentication
 variable "aws_users" {
   description = "List of all the AWS users"
   type        = list(string)
 }
 
+variable "aws_vm_default_user" {
+  description = "default user for AWS VM"
+  type        = string
+}
+
+variable "aws_vnc_password" {
+  description = "VNC password for AWS VM"
+  type        = string
+  sensitive   = true
+}
+
+# AWS Networking
 variable "aws_vpc_cidr" {
   description = "AWS vpc cidr, subnet for vpc in AWS"
   type        = string
@@ -535,20 +182,26 @@ variable "aws_public_cidr" {
   type        = string
 }
 
-variable "aws_vm_default_user" {
-  description = "default user for AWS VM"
+#======================================================
+# AZURE CONFIGURATION
+#======================================================
+
+# Core Azure Settings
+variable "azure_subscription_id" {
+  description = "Azure Subscription ID"
   type        = string
 }
 
-variable "aws_vnc_password" {
-  description = "default user for AWS VM"
+variable "azure_resource_group_location" {
+  description = "Location for all resources"
   type        = string
-  sensitive   = true
+  default     = "Germany West Central"
 }
 
-#======================================
-# AZURE Variables
-#======================================
+variable "azure_resource_group_name" {
+  description = "Ressource Group Name"
+  type        = string
+}
 
 variable "azure_default_tags" {
   description = "default tags for Azure"
@@ -560,12 +213,7 @@ variable "azure_default_tags" {
   }
 }
 
-# Terraform local
-variable "azure_subscription_id" {
-  description = "Azure Subscription ID"
-  type        = string
-}
-
+# Azure Users and Authentication
 variable "azure_developer1_name" {
   description = "User 1 in Azure AD"
   type        = string
@@ -597,12 +245,13 @@ variable "azure_user_principal_domain" {
   type        = string
 }
 
-variable "azure_resource_group_location" {
-  description = "Location for all resources"
+variable "azure_matthieu_user_object_id" {
+  description = "Object ID in Azure for user Matthieu"
   type        = string
-  default     = "Germany West Central"
+  sensitive   = true
 }
 
+# Azure VM Configuration
 variable "azure_vm_size" {
   description = "Azure VM size"
   type        = string
@@ -620,6 +269,13 @@ variable "azure_vm_admin_password" {
   sensitive   = true
 }
 
+variable "azure_vm_count" {
+  description = "number of Azure VM"
+  type        = number
+  default     = 1
+}
+
+# Azure VM Names
 variable "azure_warp_vm_name" {
   description = "Name of the Azure VM where WARP Connector is installed"
   type        = string
@@ -630,17 +286,7 @@ variable "azure_vm_name" {
   type        = string
 }
 
-variable "azure_resource_group_name" {
-  description = "Ressource Group Name"
-  type        = string
-}
-
-variable "azure_vm_count" {
-  description = "number of Azure VM"
-  type        = number
-  default     = 1
-}
-
+# Azure Networking
 variable "azure_subnet_cidr" {
   description = "Azure address prefix, subnet for VM in Azure"
   type        = string
@@ -651,23 +297,315 @@ variable "azure_vnet_cidr" {
   type        = string
 }
 
-variable "azure_matthieu_user_object_id" {
-  description = "Object ID in Azure for user Matthieu"
-  type        = string
-  sensitive   = true
-}
-
 variable "azure_public_dns_domain" {
   description = "Azure Public DNS Domain"
   type        = string
 }
 
+#======================================================
+# CLOUDFLARE CORE CONFIGURATION
+#======================================================
 
+# Cloudflare Authentication
+variable "cloudflare_api_key" {
+  description = "Cloudflare API key"
+  type        = string
+  sensitive   = true
+}
 
+variable "cloudflare_email" {
+  description = "Cloudflare login email"
+  type        = string
+}
 
-#======================================
-# Datadog Variables
-#======================================
+variable "cloudflare_account_id" {
+  description = "Cloudflare account ID"
+  type        = string
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare zone ID"
+  type        = string
+}
+
+variable "cf_team_name" {
+  description = "Name of the Team in Cloudflare, essentially zero-trust org name"
+  type        = string
+}
+
+variable "cf_email_domain" {
+  description = "Email Domain used for email authentication in App policies"
+  type        = string
+}
+
+#======================================================
+# CLOUDFLARE TUNNEL CONFIGURATION
+#======================================================
+
+variable "cf_tunnel_name_gcp" {
+  description = "Name of the Cloudflare tunnel to GCP"
+  type        = string
+}
+
+variable "cf_tunnel_name_aws" {
+  description = "Name of the Cloudflare tunnel to AWS"
+  type        = string
+}
+
+variable "cf_windows_rdp_tunnel_name" {
+  description = "Name of the Cloudflared tunnel for Windows RDP Server GCP"
+  type        = string
+}
+
+#======================================================
+# CLOUDFLARE DNS SUBDOMAIN CONFIGURATION
+#======================================================
+
+variable "cf_subdomain_ssh" {
+  description = "Name of the subdomain for ssh public hostname of tunnel"
+  type        = string
+}
+
+variable "cf_subdomain_vnc" {
+  description = "Name of the subdomain for VNC public hostname of tunnel"
+  type        = string
+}
+
+variable "cf_subdomain_web" {
+  description = "Name of the subdomain for web public hostname of tunnel"
+  type        = string
+}
+
+variable "cf_subdomain_web_sensitive" {
+  description = "Name of the subdomain for web sensitive public hostname of tunnel"
+  type        = string
+}
+
+variable "cf_subdomain_rdp" {
+  description = "Name of the subdomain for rdp browser rendered public hostname"
+  type        = string
+}
+
+#======================================================
+# CLOUDFLARE ACCESS APPLICATION CONFIGURATION
+#======================================================
+
+variable "cf_browser_ssh_app_name" {
+  description = "Name of the Browser Rendering SSH App in Cloudflare"
+  type        = string
+}
+
+variable "cf_browser_vnc_app_name" {
+  description = "Name of the Browser Rendering VNC App in Cloudflare"
+  type        = string
+}
+
+variable "cf_infra_app_name" {
+  description = "Name of the Infrastructure App in Cloudflare"
+  type        = string
+}
+
+variable "cf_sensitive_web_app_name" {
+  description = "Name of the Sensitive web App in Cloudflare"
+  type        = string
+}
+
+variable "cf_admin_web_app_name" {
+  description = "Name of the Administration web App in Cloudflare"
+  type        = string
+}
+
+variable "cf_browser_rdp_app_name" {
+  description = "Name of the RDP windows browser rendered App in Cloudflare"
+  type        = string
+}
+
+#======================================================
+# CLOUDFLARE APPLICATION PORTS
+#======================================================
+
+variable "cf_admin_web_app_port" {
+  description = "Port for the Administration web App in Cloudflare"
+  type        = number
+}
+
+variable "cf_sensitive_web_app_port" {
+  description = "Port for the Sensitive web App in Cloudflare"
+  type        = number
+}
+
+variable "cf_domain_controller_rdp_port" {
+  description = "Port for the Domain Controller RDP in Cloudflare"
+  type        = number
+}
+
+#======================================================
+# CLOUDFLARE TARGET NAMES
+#======================================================
+
+variable "cf_target_ssh_name" {
+  description = "Friendly name for the Target hostname in Infrastructure App"
+  type        = string
+}
+
+variable "cf_target_rdp_name" {
+  description = "Friendly name for the Target hostname in RDP windows browser rendered App"
+  type        = string
+}
+
+#======================================================
+# CLOUDFLARE IDENTITY PROVIDERS
+#======================================================
+
+variable "cf_okta_identity_provider_id" {
+  description = "Okta Identity Provider ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_otp_identity_provider_id" {
+  description = "OneTime PIN identity provider ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_azure_identity_provider_id" {
+  description = "Azure Entra ID identity provider ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_azure_admin_rule_group_id" {
+  description = "Azure Administrators Rule Group ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+#======================================================
+# CLOUDFLARE DEVICE POSTURE CHECKS
+#======================================================
+
+variable "cf_gateway_posture_id" {
+  description = "Gateway posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_macos_posture_id" {
+  description = "Latest macOS version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_windows_posture_id" {
+  description = "Latest Windows version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_linux_posture_id" {
+  description = "Latest Linux Kernel version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_device_os" {
+  description = "This is the OS you are running on your own client machine"
+  type        = string
+}
+
+variable "cf_osx_version_posture_rule_id" {
+  description = "Rule ID for the posture check on latest version of macos"
+  type        = string
+}
+
+#======================================================
+# CLOUDFLARE WARP CONNECTOR CONFIGURATION
+#======================================================
+
+variable "cf_default_cgnat_routes" {
+  description = "default cgnat routes"
+  type = list(object({
+    address     = string
+    description = string
+  }))
+  default = [{
+    address     = "100.64.0.0/10"
+    description = "Default CGNAT Range"
+  }]
+}
+
+variable "cf_custom_cgnat_routes" {
+  description = "List of custom CGNAT routes to add to the device profile"
+  type = list(object({
+    address     = string
+    description = string
+  }))
+}
+
+variable "cf_warp_cgnat_cidr" {
+  description = "default ip range for WARP when overriding local interface IP"
+  type        = string
+}
+
+#======================================================
+# OKTA CONFIGURATION
+#======================================================
+
+# Okta Group IDs (only used variables retained)
+
+# Okta SAML Group Names
+variable "okta_infra_admin_saml_group_name" {
+  description = "SAML Group name for InfrastructureAdmin group"
+  type        = string
+}
+
+variable "okta_contractors_saml_group_name" {
+  description = "SAML Group name for Contractors group"
+  type        = string
+}
+
+variable "okta_sales_eng_saml_group_name" {
+  description = "SAML Group name for SalesEngineering group"
+  type        = string
+}
+
+variable "okta_sales_saml_group_name" {
+  description = "SAML Group name for Sales group"
+  type        = string
+}
+
+variable "okta_itadmin_saml_group_name" {
+  description = "SAML Group name for ITAdmin group"
+  type        = string
+}
+
+# Okta User IDs (unused variables removed)
+
+# Okta User Logins
+variable "okta_bob_user_login" {
+  description = "User login for bob, in an email format"
+  type        = string
+}
+
+# Unused okta_jose_user_login and okta_stephane_user_login removed
+
+variable "okta_matthieu_user_login" {
+  description = "User login for matthieu, in an email format"
+  type        = string
+}
+
+# Okta User Passwords
+variable "okta_bob_user_linux_password" {
+  description = "Linux password for user bob in EC2 instance"
+  type        = string
+  sensitive   = true
+}
+
+#======================================================
+# DATADOG CONFIGURATION
+#======================================================
+
 variable "datadog_api_key" {
   description = "Datadog API Key from https://app.datadoghq.com/organization-settings/api-keys"
   type        = string
@@ -679,9 +617,24 @@ variable "datadog_region" {
   default     = "datadoghq.eu"
 }
 
-#=====================================
-# AWS and Cloudflare Tag
-#=====================================
+#======================================================
+# WARP CONNECTOR TUNNEL IDS
+#======================================================
+
+variable "cf_warp_tunnel_azure_id" {
+  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
+  type        = string
+}
+
+variable "cf_warp_tunnel_gcp_id" {
+  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
+  type        = string
+}
+
+#======================================================
+# TAGS
+#======================================================
+
 variable "cf_aws_tag" {
   description = "tag to be assigned to cloudflare application and aws environment"
   type        = string

@@ -78,6 +78,12 @@ resource "azurerm_nat_gateway" "cloudflare_natgw" {
   resource_group_name = local.azure_common_config.resource_group_name
   sku_name            = "Standard"
 
+  timeouts {
+    create = local.azure_common_timeouts.create
+    update = local.azure_common_timeouts.update
+    delete = local.azure_common_timeouts.delete
+  }
+
   tags = local.azure_common_tags
 }
 

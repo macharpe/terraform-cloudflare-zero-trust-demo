@@ -159,6 +159,12 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
     automatic_restart = local.preemptible_scheduling.automatic_restart
   }
 
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
+
   tags = ["infrastructure-access-instances"]
 
   metadata = merge(local.common_metadata_vars, {
@@ -200,6 +206,12 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
     automatic_restart   = local.standard_scheduling.automatic_restart
     on_host_maintenance = local.standard_scheduling.on_host_maintenance
     provisioning_model  = local.standard_scheduling.provisioning_model
+  }
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
   }
 
   service_account {
@@ -252,6 +264,12 @@ resource "google_compute_instance" "gcp_vm_instance" {
   scheduling {
     preemptible       = local.preemptible_scheduling.preemptible
     automatic_restart = local.preemptible_scheduling.automatic_restart
+  }
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
   }
 
   tags = ["warp-instances"]

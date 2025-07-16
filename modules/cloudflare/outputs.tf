@@ -142,7 +142,7 @@ output "cf_subdomain_web" {
 
 output "cf_subdomain_web_sensitive" {
   description = "Public hostname for the Cloudflare Tunnel sensitive web service"
-  value       = var.cf_subdomain_web
+  value       = var.cf_subdomain_web_sensitive
 }
 
 output "gateway_ca_certificate" {

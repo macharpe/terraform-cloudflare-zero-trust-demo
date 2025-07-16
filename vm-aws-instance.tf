@@ -105,6 +105,12 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.aws_public_subnet.id # Requires public subnet
   depends_on    = [aws_internet_gateway.igw]
 
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
+
   tags = {
     Name        = "NAT Gateway for zero-trust demo"
     Environment = var.cf_aws_tag
@@ -193,6 +199,12 @@ resource "aws_instance" "cloudflared_aws" {
   vpc_security_group_ids = [aws_security_group.aws_cloudflared_sg.id]
   key_name               = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
 
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
+
   user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
     role     = "cloudflared"
     hostname = "${var.aws_ec2_cloudflared_name}-${count.index}"
@@ -215,6 +227,12 @@ resource "aws_instance" "aws_ec2_service_instance" {
   vpc_security_group_ids = [aws_security_group.aws_ssh_server_sg.id]
   key_name               = aws_key_pair.aws_ec2_service_key_pair.key_name
 
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
+
   user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
     role     = "browser_ssh"
     hostname = var.aws_ec2_browser_ssh_name
@@ -235,6 +253,12 @@ resource "aws_instance" "aws_ec2_vnc_instance" {
   subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_vnc_server_sg.id]
   key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
 
   user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
     role     = "vnc"
@@ -280,6 +304,10 @@ resource "aws_security_group" "aws_cloudflared_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = merge(local.aws_common_tags, {
+    Name = "Cloudflared Replica Security Group"
+  })
 }
 
 
@@ -320,6 +348,10 @@ resource "aws_security_group" "aws_ssh_server_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = merge(local.aws_common_tags, {
+    Name = "Browser SSH Security Group"
+  })
 
   lifecycle {
     create_before_destroy = true

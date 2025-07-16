@@ -4,11 +4,10 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 
 [![Generate terraform docs on main](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/macharpe/terraform-cloudflare-zero-trust-demo)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/commits/main)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
 [![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/f9641cfc-17c4-406f-8f64-5038484adbba/repos/8bce00d3-4748-4e36-b419-a8dde3817846/branch/4a9ced8a-0d3d-47a1-87f1-ccf012dfba79)](https://dashboard.infracost.io/org/macharpe/repos/8bce00d3-4748-4e36-b419-a8dde3817846?tab=branches)
 [![Terraform](https://img.shields.io/badge/terraform-1.11.0+-blueviolet?logo=terraform)](https://www.terraform.io/)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Zero%20Trust-orange?logo=cloudflare)](https://www.cloudflare.com/zero-trust/)
-[![Zero Trust](https://img.shields.io/badge/security-Zero%20Trust-red?logo=security)](https://www.cloudflare.com/zero-trust/)
 [![Multi-Cloud](https://img.shields.io/badge/multi--cloud-AWS%20%7C%20Azure%20%7C%20GCP-blue)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo)
 [![Monitoring](https://img.shields.io/badge/monitoring-Datadog-purple?logo=datadog)](https://www.datadoghq.com/)
 
@@ -40,28 +39,28 @@ _Last Updated: 12th of June 2025_
 
 ### 📁 **Core Project Overview**
 - **Core Project Size**: 20.7 MB
-- **Core Files**: 51 files *(focused on infrastructure and automation)*
+- **Core Files**: 44 files *(focused on infrastructure and automation)*
 - **Core Directories**: 15 directories *(well-organized modular structure)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 31 | 4,586 | Infrastructure as Code |
+| **Terraform (.tf)** | 30 | 4,399 | Infrastructure as Code |
 | **Templates (.tftpl, .tpl)** | 3 | 780 | Cloud-init & startup scripts |
 | **Python (.py)** | 8 | 1,158 | Automation & utilities |
 | **Shell Scripts (.sh)** | 2 | 294 | Cleanup & maintenance |
 | **Batch Scripts (.cmd)** | 1 | 149 | Windows initialization |
-| **Total Core Code** | 45 | **6,967** | **Enhanced monitoring & diagnostics** |
+| **Total Core Code** | 44 | **6,780** | **Production-ready infrastructure** |
 
 <table>
 <tr>
 <td>
 
 **📁 Infrastructure Resources**
-- **161** total resources deployed
-- **9** data sources  
+- **87** total resources deployed
+- **12** data sources  
 - **4** custom modules
-- **196** configurable variables  
+- **184** configurable variables  
 - **30** Terraform files
 
 </td>
@@ -233,24 +232,43 @@ Configure device posture checks as shown:
 
 ### 4. Configure terraform.tfvars
 
-Fill in all required variables in `terraform.tfvars`. Variables marked with `# Manually retrieved` need to be obtained from your existing accounts:
+Copy `terraform.tfvars.example` to `terraform.tfvars` and customize the values for your environment:
+
+```bash
+cp terraform.tfvars.example terraform.tfvars
+```
+
+The configuration file is organized into logical sections for easy navigation:
+
+- **🏗️ GCP Configuration**: Project settings, VM configurations, and networking
+- **☁️ Cloudflare Configuration**: Tunnels, WARP connectors, applications, and security policies  
+- **🔐 Okta Configuration**: Identity provider groups and user management
+- **⚡ AWS Configuration**: EC2 instances, networking, and security groups
+- **🔷 Azure Configuration**: Resource groups, VMs, and Active Directory integration
+- **📊 Datadog Configuration**: Monitoring and observability settings
+
+**Key variables requiring manual configuration:**
 
 ```hcl
-# Cloudflare Identity Providers (manually retrieved)
-cf_gateway_posture_id                     = "your_gateway_posture_id"
-cf_macos_posture_id                       = "your_macos_posture_id"
-cf_windows_posture_id                     = "your_windows_posture_id"
-cf_linux_posture_id                       = "your_linux_posture_id"
-cf_okta_identity_provider_id              = "your_okta_provider_id"
-cf_otp_identity_provider_id               = "your_otp_provider_id"
-cf_azure_identity_provider_id             = "your_azure_provider_id"
+# WARP Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
+cf_warp_tunnel_azure_id = "your_azure_warp_tunnel_id"
+cf_warp_tunnel_gcp_id   = "your_gcp_warp_tunnel_id"
 
-# Okta Groups (manually retrieved)
-okta_zerotrust_group_id           = "your_zerotrust_group_id"
-okta_contractors_group_id         = "your_contractors_group_id"
-okta_infrastructureadmin_group_id = "your_infra_admin_group_id"
-# ... (continue with other variables)
+# Identity Providers - Sensitive: manually retrieved from Cloudflare dashboard
+cf_okta_identity_provider_id  = "your_okta_provider_id"
+cf_azure_identity_provider_id = "your_azure_provider_id"
+
+# Device Posture - Sensitive: manually retrieved from Cloudflare dashboard
+cf_gateway_posture_id = "your_gateway_posture_id"
+cf_macos_posture_id   = "your_macos_posture_id"
+cf_windows_posture_id = "your_windows_posture_id"
+
+# SAML Group IDs - Sensitive: manually retrieved from Okta
+okta_infra_admin_group_id = "your_infra_admin_group_id"
+okta_contractors_group_id = "your_contractors_group_id"
 ```
+
+💡 **Tip**: Look for variables marked as `Sensitive:` - these require values from your existing accounts and dashboards.
 
 ### 5. Deploy Infrastructure
 
