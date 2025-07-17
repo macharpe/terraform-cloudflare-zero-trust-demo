@@ -498,7 +498,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
 | <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
-| <a name="input_cf_admin_web_app_name"></a> [cf\_admin\_web\_app\_name](#input\_cf\_admin\_web\_app\_name) | Name of the Administration web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_admin_web_app_port"></a> [cf\_admin\_web\_app\_port](#input\_cf\_admin\_web\_app\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to cloudflare application and aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
@@ -513,6 +512,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_email_domain"></a> [cf\_email\_domain](#input\_cf\_email\_domain) | Email Domain used for email authentication in App policies | `string` | n/a | yes |
 | <a name="input_cf_gateway_posture_id"></a> [cf\_gateway\_posture\_id](#input\_cf\_gateway\_posture\_id) | Gateway posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_infra_app_name"></a> [cf\_infra\_app\_name](#input\_cf\_infra\_app\_name) | Name of the Infrastructure App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_intranet_web_app_name"></a> [cf\_intranet\_web\_app\_name](#input\_cf\_intranet\_web\_app\_name) | Name of the Intranet web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_okta_identity_provider_id"></a> [cf\_okta\_identity\_provider\_id](#input\_cf\_okta\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare | `string` | n/a | yes |
