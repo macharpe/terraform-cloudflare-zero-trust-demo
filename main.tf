@@ -94,7 +94,7 @@ module "cloudflare" {
   cf_browser_vnc_app_name       = var.cf_browser_vnc_app_name
   cf_infra_app_name             = var.cf_infra_app_name
   cf_sensitive_web_app_name     = var.cf_sensitive_web_app_name
-  cf_admin_web_app_name         = var.cf_admin_web_app_name
+  cf_intranet_web_app_name      = var.cf_intranet_web_app_name
   cf_browser_rdp_app_name       = var.cf_browser_rdp_app_name
   cf_team_name                  = var.cf_team_name
   cf_admin_web_app_port         = var.cf_admin_web_app_port

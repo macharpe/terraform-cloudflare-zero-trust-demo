@@ -4,14 +4,14 @@
 locals {
   # Common access policy configurations
   access_policies = {
-    web_app = {
-      name                  = "Administration Web App Policy"
+    intranet_web_app = {
+      name                  = "Intranet App Policy"
       include_groups        = ["it_admin"]
       require_posture       = true
       require_mfa           = false
       purpose_justification = false
     }
-    sensitive_web_server = {
+    competition_web_app = {
       name                            = "Competition App Policy"
       include_groups                  = ["sales", "sales_engineering"]
       require_posture                 = true

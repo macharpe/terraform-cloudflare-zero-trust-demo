@@ -2,7 +2,7 @@
 # Access for Infrastructure App
 #======================================================
 # Creating the Target
-resource "cloudflare_zero_trust_access_infrastructure_target" "ssh_gcp_instance" {
+resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_ssh_target" {
   account_id = var.cloudflare_account_id
   hostname   = var.cf_target_ssh_name
   ip = {
@@ -13,7 +13,7 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "ssh_gcp_instance"
 }
 
 # Creating the infrastructure Application
-resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
+resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
   account_id       = var.cloudflare_account_id
   type             = "infrastructure"
   name             = var.cf_infra_app_name
@@ -95,7 +95,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_gcp_infrastructure" {
 # SELF-HOSTED: AWS Database (Browser rendered SSH)
 #======================================================
 # Creating the Self-hosted Application for Browser rendering SSH
-resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" {
+resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" {
   account_id           = var.cloudflare_account_id
   type                 = "ssh"
   name                 = var.cf_browser_ssh_app_name
@@ -129,7 +129,7 @@ resource "cloudflare_zero_trust_access_application" "ssh_aws_browser_rendering" 
 # SELF-HOSTED: AWS Browser Rendered VNC
 #======================================================
 # Creating the Self-hosted Application for Browser rendering VNC
-resource "cloudflare_zero_trust_access_application" "vnc_aws_browser_rendering" {
+resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" {
   account_id           = var.cloudflare_account_id
   type                 = "vnc"
   name                 = var.cf_browser_vnc_app_name
@@ -165,7 +165,7 @@ resource "cloudflare_zero_trust_access_application" "vnc_aws_browser_rendering" 
 # SELF-HOSTED App: Competition App
 #======================================================
 # Creating the Self-hosted Application for Competition web application
-resource "cloudflare_zero_trust_access_application" "sensitive_web_server" {
+resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
   account_id           = var.cloudflare_account_id
   type                 = "self_hosted"
   name                 = var.cf_sensitive_web_app_name
@@ -185,7 +185,7 @@ resource "cloudflare_zero_trust_access_application" "sensitive_web_server" {
 
   policies = [{
     decision = "allow"
-    id       = cloudflare_zero_trust_access_policy.policies["sensitive_web_server"].id
+    id       = cloudflare_zero_trust_access_policy.policies["competition_web_app"].id
   }]
 }
 
@@ -196,10 +196,10 @@ resource "cloudflare_zero_trust_access_application" "sensitive_web_server" {
 # SELF-HOSTED App: Administration APP
 #======================================================
 # Creating the Self-hosted Application for Administration web application
-resource "cloudflare_zero_trust_access_application" "administration_web_app" {
+resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
   account_id           = var.cloudflare_account_id
   type                 = "self_hosted"
-  name                 = var.cf_admin_web_app_name
+  name                 = var.cf_intranet_web_app_name
   app_launcher_visible = true
   logo_url             = "https://raw.githubusercontent.com/uditkumar489/Icon-pack/master/Entrepreneur/digital-marketing/svg/computer-1.svg"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
@@ -216,7 +216,7 @@ resource "cloudflare_zero_trust_access_application" "administration_web_app" {
 
   policies = [{
     decision = "allow"
-    id       = cloudflare_zero_trust_access_policy.policies["web_app"].id
+    id       = cloudflare_zero_trust_access_policy.policies["intranet_web_app"].id
   }]
 }
 
@@ -225,7 +225,7 @@ resource "cloudflare_zero_trust_access_application" "administration_web_app" {
 # SELF-HOSTED App: RDP Browser Rendered
 #======================================================
 # Creating the Target
-resource "cloudflare_zero_trust_access_infrastructure_target" "rdp_gcp_instance" {
+resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_rdp_target" {
   account_id = var.cloudflare_account_id
   hostname   = var.cf_target_rdp_name
   ip = {

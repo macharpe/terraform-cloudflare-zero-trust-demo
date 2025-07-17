@@ -23,12 +23,12 @@ locals {
         {
           hostname = var.cf_subdomain_web
           service  = "http://localhost:${var.cf_admin_web_app_port}"
-          aud_tag  = "administration_web_app"
+          aud_tag  = "gcp_intranet_web_app"
         },
         {
           hostname = var.cf_subdomain_web_sensitive
           service  = "http://localhost:${var.cf_sensitive_web_app_port}"
-          aud_tag  = "sensitive_web_server"
+          aud_tag  = "competition_web_app"
         }
       ]
     }
@@ -136,7 +136,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
         service  = "http://localhost:${var.cf_admin_web_app_port}"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.administration_web_app.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.gcp_intranet_web_app.aud]
             required  = true
             team_name = var.cf_team_name
           }
@@ -147,7 +147,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
         service  = "http://localhost:${var.cf_sensitive_web_app_port}"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.sensitive_web_server.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.gcp_competition_web_app.aud]
             required  = true
             team_name = var.cf_team_name
           }
@@ -174,7 +174,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
         service  = "ssh://${var.aws_ec2_ssh_service_private_ip}:22"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.ssh_aws_browser_rendering.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.aws_ssh_browser_rendering.aud]
             required  = true
             team_name = var.cf_team_name
           }
@@ -185,7 +185,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
         service  = "tcp://${var.aws_ec2_vnc_service_private_ip}:5901"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.vnc_aws_browser_rendering.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.aws_vnc_browser_rendering.aud]
             required  = true
             team_name = var.cf_team_name
           }
