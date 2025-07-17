@@ -102,6 +102,32 @@ resource "cloudflare_zero_trust_access_group" "employees_rule_group" {
   ]
 }
 
+resource "cloudflare_zero_trust_access_group" "sales_team_rule_group" {
+  account_id = var.cloudflare_account_id
+  name       = "Sales Team"
+
+  include = [
+    for group_key in ["sales", "sales_engineering"] : {
+      group = {
+        id = cloudflare_zero_trust_access_group.saml_groups[group_key].id
+      }
+    }
+  ]
+}
+
+resource "cloudflare_zero_trust_access_group" "admins_rule_group" {
+  account_id = var.cloudflare_account_id
+  name       = "Administrators"
+
+  include = [
+    for group_key in ["it_admin", "infrastructure_admin"] : {
+      group = {
+        id = cloudflare_zero_trust_access_group.saml_groups[group_key].id
+      }
+    }
+  ]
+}
+
 #==================================================
 # Azure AD Rule Groups
 #===================================================

@@ -193,7 +193,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
 
 
 #======================================================
-# SELF-HOSTED App: Administration APP
+# SELF-HOSTED App: Intranet APP
 #======================================================
 # Creating the Self-hosted Application for Administration web application
 resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
