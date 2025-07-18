@@ -7,29 +7,31 @@
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
       margin: 0;
       padding: 40px 20px;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: #ffffff;
     }
     .container {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border-radius: 20px;
       padding: 40px;
       text-align: center;
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       max-width: 600px;
+      color: #2c3e50;
     }
     h1 {
       font-size: 2.5em;
       margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      text-shadow: none;
+      color: #1e3c72;
     }
     .emoji {
       font-size: 3em;
@@ -38,18 +40,25 @@
     p {
       font-size: 1.2em;
       margin-bottom: 30px;
-      opacity: 0.9;
+      color: #34495e;
+      line-height: 1.6;
     }
     .sensitive-notice {
-      background: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
       border-radius: 10px;
       padding: 20px;
       margin-top: 30px;
-      border-left: 4px solid #ffd700;
+      border-left: 4px solid #a93226;
+      color: #ffffff;
     }
     .sensitive-notice h3 {
       margin: 0 0 10px 0;
-      color: #ffd700;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .sensitive-notice p {
+      color: #ffffff;
+      margin-bottom: 0;
     }
   </style>
 </head>

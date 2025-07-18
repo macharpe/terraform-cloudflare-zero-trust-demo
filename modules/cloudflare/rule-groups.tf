@@ -128,6 +128,24 @@ resource "cloudflare_zero_trust_access_group" "admins_rule_group" {
   ]
 }
 
+resource "cloudflare_zero_trust_access_group" "contractors_rule_group" {
+  account_id = var.cloudflare_account_id
+  name       = "Contractors Extended"
+
+  include = [
+    {
+      group = {
+        id = cloudflare_zero_trust_access_group.saml_groups["contractors"].id
+      }
+    },
+    {
+      email_domain = {
+        domain = var.cf_email_domain
+      }
+    }
+  ]
+}
+
 #==================================================
 # Azure AD Rule Groups
 #===================================================

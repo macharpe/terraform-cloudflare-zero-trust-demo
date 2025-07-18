@@ -8,9 +8,9 @@ locals {
     employees   = cloudflare_zero_trust_access_group.employees_rule_group.id
     sales_team  = cloudflare_zero_trust_access_group.sales_team_rule_group.id
     admins      = cloudflare_zero_trust_access_group.admins_rule_group.id
+    contractors = cloudflare_zero_trust_access_group.contractors_rule_group.id
     
     # Individual SAML groups
-    contractors          = cloudflare_zero_trust_access_group.saml_groups["contractors"].id
     infrastructure_admin = cloudflare_zero_trust_access_group.saml_groups["infrastructure_admin"].id
     sales_engineering    = cloudflare_zero_trust_access_group.saml_groups["sales_engineering"].id
     sales                = cloudflare_zero_trust_access_group.saml_groups["sales"].id
@@ -21,7 +21,7 @@ locals {
   access_policies = {
     intranet_web_app = {
       name                  = "Intranet App Policy"
-      include_groups        = ["employees"]
+      include_groups        = ["employees", "contractors"]
       require_posture       = true
       require_mfa           = false
       purpose_justification = false
@@ -51,7 +51,6 @@ locals {
       require_mfa                  = false
       purpose_justification        = true
       purpose_justification_prompt = "Please enter a justification as this is a production Application."
-      include_email_domain         = true
     }
     aws = {
       name            = "AWS Cloud Policy"
