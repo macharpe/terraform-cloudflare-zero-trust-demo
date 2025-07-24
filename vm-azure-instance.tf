@@ -141,12 +141,6 @@ locals {
     delete = "10m"
   }
 
-  # Azure Spot VM configuration
-  azure_spot_options = {
-    priority        = "Spot"
-    eviction_policy = "Deallocate"
-    max_bid_price   = -1  # Use current market price
-  }
 }
 
 #==========================================================
@@ -162,10 +156,6 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
   #  admin_password                  = var.azure_vm_admin_password
   #  disable_password_authentication = false
 
-  # Azure Spot VM configuration
-  priority        = local.azure_spot_options.priority
-  eviction_policy = local.azure_spot_options.eviction_policy
-  max_bid_price   = local.azure_spot_options.max_bid_price
 
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id,
