@@ -186,6 +186,16 @@ locals {
   aws_common_tags = {
     Environment = var.cf_aws_tag
   }
+
+  # Spot instance configuration
+  aws_spot_instance_options = {
+    market_type = "spot"
+    spot_options = {
+      max_price                      = "0.010"
+      spot_instance_type             = "one-time"
+      instance_interruption_behavior = "terminate"
+    }
+  }
 }
 
 #==========================================================
@@ -198,6 +208,15 @@ resource "aws_instance" "cloudflared_aws" {
   subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_cloudflared_sg.id]
   key_name               = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
+
+  instance_market_options {
+    market_type = local.aws_spot_instance_options.market_type
+    spot_options {
+      max_price                      = local.aws_spot_instance_options.spot_options.max_price
+      spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
+      instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+    }
+  }
 
   timeouts {
     create = "10m"
@@ -227,6 +246,15 @@ resource "aws_instance" "aws_ec2_service_instance" {
   vpc_security_group_ids = [aws_security_group.aws_ssh_server_sg.id]
   key_name               = aws_key_pair.aws_ec2_service_key_pair.key_name
 
+  instance_market_options {
+    market_type = local.aws_spot_instance_options.market_type
+    spot_options {
+      max_price                      = local.aws_spot_instance_options.spot_options.max_price
+      spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
+      instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+    }
+  }
+
   timeouts {
     create = "10m"
     update = "10m"
@@ -253,6 +281,15 @@ resource "aws_instance" "aws_ec2_vnc_instance" {
   subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_vnc_server_sg.id]
   key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name
+
+  instance_market_options {
+    market_type = local.aws_spot_instance_options.market_type
+    spot_options {
+      max_price                      = local.aws_spot_instance_options.spot_options.max_price
+      spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
+      instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+    }
+  }
 
   timeouts {
     create = "10m"

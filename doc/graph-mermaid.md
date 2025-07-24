@@ -163,16 +163,16 @@ flowchart TB
     end
     
     subgraph CFApps ["Access Applications"]
-      cf_app_admin["App: Administration Web App"]
-      cf_app_sensitive["App: Sensitive Web Server"]
-      cf_app_ssh_gcp["App: GCP Infrastructure SSH"]
+      cf_app_intranet["App: Intranet Web App"]
+      cf_app_competition["App: Competition Web App"]
+      cf_app_ssh_gcp["App: GCP Infrastructure SSH<br/>(gcp_ssh_target)"]
       cf_app_ssh_aws["App: AWS Browser SSH"]
       cf_app_vnc_aws["App: AWS Browser VNC"]
       cf_app_rdp_gcp["App: GCP RDP Target<br/>(Infrastructure)"]
     end
     
     subgraph CFPolicies ["Access Policies & Groups"]
-      cf_rule_groups["Rule Groups<br/>• Contractors<br/>• Infrastructure Admins<br/>• Sales Engineering<br/>• Sales<br/>• IT Admins"]
+      cf_rule_groups["Rule Groups<br/>• Contractors Extended<br/>• Employees<br/>• Sales Team<br/>• Administrators<br/>• Country Requirements<br/>• Latest OS Version Requirements"]
       cf_access_policies["Access Policies<br/>• Group-based access<br/>• Device posture<br/>• MFA requirements<br/>• Purpose justification"]
       cf_gateway_policies["Gateway Policies<br/>• RDP Admin Access<br/>• Lateral Movement Prevention<br/>• Content Filtering<br/>• IP Restrictions"]
     end
@@ -229,6 +229,15 @@ flowchart TB
     cleanup_hosts["Cleanup: known_hosts"]
     cleanup_devices["Cleanup: CF devices"]
     macos_posture["macOS Posture Updates"]
+    html_templates["HTML Templates<br/>• scripts/html/intranet.html<br/>• scripts/html/competition.html"]
+  end
+
+  %% Monitoring Infrastructure
+  subgraph Monitoring ["Monitoring & Observability"]
+    direction TB
+    datadog_aws["Datadog: AWS Monitoring<br/>• Process monitoring<br/>• System metrics<br/>• VNC TCP checks"]
+    datadog_gcp["Datadog: GCP Monitoring<br/>• Cloudflared monitoring<br/>• WARP connector checks<br/>• Directory monitoring"]
+    datadog_azure["Datadog: Azure Monitoring<br/>• WARP process monitoring<br/>• System performance<br/>• SSH configuration checks"]
   end
 
   %% Cross-Service Connections
@@ -245,14 +254,14 @@ flowchart TB
   azure_vms -.-> Cloudflare
   
   %% DNS to Service Mappings
-  cf_dns_web --> cf_app_admin
-  cf_dns_web_sensitive --> cf_app_sensitive
+  cf_dns_web --> cf_app_intranet
+  cf_dns_web_sensitive --> cf_app_competition
   cf_dns_ssh --> cf_app_ssh_aws
   cf_dns_vnc --> cf_app_vnc_aws
   
   %% Access Control Flow
-  cf_access_policies --> cf_app_admin
-  cf_access_policies --> cf_app_sensitive
+  cf_access_policies --> cf_app_intranet
+  cf_access_policies --> cf_app_competition
   cf_access_policies --> cf_app_ssh_gcp
   cf_access_policies --> cf_app_ssh_aws
   cf_access_policies --> cf_app_vnc_aws
@@ -279,6 +288,17 @@ flowchart TB
   KeyMgmt --> AWS
   KeyMgmt --> GCP
   KeyMgmt --> Azure
+  html_templates --> cf_app_intranet
+  html_templates --> cf_app_competition
+
+  %% Monitoring Connections
+  datadog_aws --> aws_cloudflared_instances
+  datadog_aws --> aws_ssh_instance
+  datadog_aws --> aws_vnc_instance
+  datadog_gcp --> gcp_infra_vm
+  datadog_gcp --> gcp_windows_vm
+  datadog_gcp --> gcp_warp_vms
+  datadog_azure --> azure_vms
 
   %% Styling
   classDef awsStyle fill:#ff9900,stroke:#000000,stroke-width:2px,color:#000000
@@ -287,6 +307,7 @@ flowchart TB
   classDef cloudflareStyle fill:#f38020,stroke:#000000,stroke-width:2px,color:#000000
   classDef externalStyle fill:#e0e0e0,stroke:#000000,stroke-width:2px,color:#000000
   classDef moduleStyle fill:#90EE90,stroke:#000000,stroke-width:2px,color:#000000
+  classDef monitoringStyle fill:#FFD700,stroke:#000000,stroke-width:2px,color:#000000
   
   class AWS,AWSNetwork,AWSCompute,AWSSecurity awsStyle
   class GCP,GCPNetwork,GCPCompute,GCPSecurity,GCPRouting gcpStyle
@@ -294,11 +315,12 @@ flowchart TB
   class Cloudflare,CFTunnels,CFDNS,CFApps,CFPolicies,CFDevice,CFAuth,CFSecurity cloudflareStyle
   class External,AzureAD,Utilities externalStyle
   class KeyMgmt,WARPRouting moduleStyle
+  class Monitoring monitoringStyle
 ```
 
 ## Architecture Overview
 
-This comprehensive diagram represents a multi-cloud Zero Trust architecture using Cloudflare Zero Trust to secure access across AWS, GCP, and Azure environments. Key components include:
+This comprehensive diagram represents a multi-cloud Zero Trust architecture using Cloudflare Zero Trust to secure access across AWS, GCP, and Azure environments. The architecture has been recently enhanced with improved access policies, monitoring capabilities, and modular template-based applications. Key components include:
 
 ### **Multi-Cloud Infrastructure**
 - **AWS**: SSH/VNC browser-rendered services with cloudflared replicas
@@ -322,6 +344,9 @@ This comprehensive diagram represents a multi-cloud Zero Trust architecture usin
 - **Certificate Authority**: Short-lived SSH certificates for infrastructure access
 - **Automated Cleanup**: Scripts for maintaining SSH known_hosts and device registrations
 - **Posture Checking**: macOS version compliance for device access
+- **Enhanced Rule Groups**: Composite access groups (Employees, Sales Team, Administrators, Contractors Extended)
+- **Comprehensive Monitoring**: Datadog integration across AWS, GCP, and Azure with process and system monitoring
+- **Template-Based Web Apps**: Separate HTML templates for intranet and competition applications
 
 ### **Lateral Movement Prevention**
 - **SSH Blocking**: Prevents unauthorized SSH connections between internal VMs (port 22)
