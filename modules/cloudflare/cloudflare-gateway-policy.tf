@@ -31,7 +31,7 @@ locals {
   # Gateway policies configuration
   gateway_policies = {
     access_infra_target = {
-      name                 = "Access Infra Target Policy"
+      name                 = "NETWORK-Allow: Access Infra Target Policy"
       description          = "Evaluate Access applications before or after specific Gateway policies"
       enabled              = true
       action               = "allow"
@@ -41,7 +41,7 @@ locals {
       notification_enabled = false
     }
     rdp_admin_access = {
-      name                 = "Zero-Trust demo RDP - IT Admin Access Policy"
+      name                 = "NETWORK-Allow: Zero-Trust demo RDP - IT Admin Access Policy"
       description          = "Allow RDP access for IT administrators"
       enabled              = true
       action               = "allow"
@@ -53,7 +53,7 @@ locals {
       notification_enabled = false
     }
     block_lateral_ssh = {
-      name                 = "Zero-Trust demo Block SSH Lateral Movement"
+      name                 = "NETWORK-Block: Zero-Trust demo Block SSH Lateral Movement"
       description          = "Block SSH connections between internal VMs for lateral movement prevention, while allowing direct SSH from WARP clients"
       enabled              = true
       action               = "block"
@@ -64,7 +64,7 @@ locals {
       notification_enabled = true
     }
     block_lateral_rdp = {
-      name                 = "Zero-Trust demo Block RDP Lateral Movement"
+      name                 = "NETWORK-Block: Zero-Trust demo Block RDP Lateral Movement"
       description          = "Block RDP connections between internal VMs for lateral movement prevention, while allowing direct RDP from WARP clients"
       enabled              = true
       action               = "block"
@@ -75,7 +75,7 @@ locals {
       notification_enabled = true
     }
     block_lateral_smb = {
-      name                 = "Zero-Trust demo Block SMB Lateral Movement"
+      name                 = "NETWORK-Block: Zero-Trust demo Block SMB Lateral Movement"
       description          = "Block SMB/CIFS connections between internal VMs for lateral movement prevention, while allowing direct SMB from WARP clients"
       enabled              = true
       action               = "block"
@@ -86,7 +86,7 @@ locals {
       notification_enabled = true
     }
     block_lateral_winrm = {
-      name                 = "Zero-Trust demo Block WinRM Lateral Movement"
+      name                 = "NETWORK-Block: Zero-Trust demo Block WinRM Lateral Movement"
       description          = "Block WinRM connections between internal VMs for lateral movement prevention, while allowing direct WinRM from WARP clients"
       enabled              = true
       action               = "block"
@@ -97,7 +97,7 @@ locals {
       notification_enabled = true
     }
     block_lateral_database = {
-      name                 = "Zero-Trust demo Block Database Lateral Movement"
+      name                 = "NETWORK-Block: Zero-Trust demo Block Database Lateral Movement"
       description          = "Block database connections between internal VMs for lateral movement prevention, while allowing direct database access from WARP clients"
       enabled              = true
       action               = "block"
@@ -108,7 +108,7 @@ locals {
       notification_enabled = true
     }
     block_pdf_download = {
-      name                 = "Zero-Trust demo Block PDF Files download"
+      name                 = "HTTP-Block: Zero-Trust demo Block PDF Files download"
       description          = "Block Downloading PDF Files for Sales Engineering group"
       enabled              = false
       action               = "block"
@@ -120,7 +120,7 @@ locals {
       notification_enabled = true
     }
     block_sfdc_setup = {
-      name                 = "Zero-Trust demo Block Access to \"Setup\" in Salesforce"
+      name                 = "HTTP-Block: Zero-Trust demo Block Access to \"Setup\" in Salesforce"
       description          = "Block the access to \"setup\" in salesforce.com"
       enabled              = true
       action               = "block"
@@ -131,7 +131,7 @@ locals {
       notification_enabled = true
     }
     block_ai_tools = {
-      name                 = "Zero-Trust demo Block Access to popular AI Tools"
+      name                 = "HTTP-Block: Zero-Trust demo Block Access to popular AI Tools"
       description          = "This rule blocks access to popular AI Tools"
       enabled              = false
       action               = "block"
@@ -142,7 +142,7 @@ locals {
       notification_enabled = true
     }
     block_gambling = {
-      name                 = "Zero-Trust demo Block Gambling websites"
+      name                 = "HTTP-Block: Zero-Trust demo Block Gambling websites"
       description          = "Block Gambling website according to corporate policies (HTTP)."
       enabled              = true
       action               = "block"
@@ -154,7 +154,7 @@ locals {
       notification_enabled = true
     }
     block_ip_access = {
-      name                 = "Zero-Trust demo Blocking access GCP Apps via Private IP"
+      name                 = "NETWORK-Block: Zero-Trust demo Blocking access GCP Apps via Private IP"
       description          = "This rule blocks the access of Competition App and Administration App via ip address and port"
       enabled              = true
       action               = "block"
@@ -165,7 +165,7 @@ locals {
       notification_enabled = true
     }
     rdp_default_deny = {
-      name                 = "Zero-Trust demo RDP - Default Deny Policy"
+      name                 = "NETWORK-Block: Zero-Trust demo RDP - Default Deny Policy"
       description          = "Deny RDP access for others"
       enabled              = true
       action               = "block"

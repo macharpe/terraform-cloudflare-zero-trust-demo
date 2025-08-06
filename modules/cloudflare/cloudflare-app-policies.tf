@@ -2,18 +2,33 @@
 # Local Variables
 #==========================================================
 locals {
+  # Group mapping for policies (supports both SAML and composite groups)
+  policy_groups = {
+    # Composite groups
+    employees   = cloudflare_zero_trust_access_group.employees_rule_group.id
+    sales_team  = cloudflare_zero_trust_access_group.sales_team_rule_group.id
+    admins      = cloudflare_zero_trust_access_group.admins_rule_group.id
+    contractors = cloudflare_zero_trust_access_group.contractors_rule_group.id
+    
+    # Individual SAML groups
+    infrastructure_admin = cloudflare_zero_trust_access_group.saml_groups["infrastructure_admin"].id
+    sales_engineering    = cloudflare_zero_trust_access_group.saml_groups["sales_engineering"].id
+    sales                = cloudflare_zero_trust_access_group.saml_groups["sales"].id
+    it_admin             = cloudflare_zero_trust_access_group.saml_groups["it_admin"].id
+  }
+
   # Common access policy configurations
   access_policies = {
-    web_app = {
-      name                  = "Administration Web App Policy"
-      include_groups        = ["it_admin"]
+    intranet_web_app = {
+      name                  = "Intranet App Policy"
+      include_groups        = ["employees", "contractors"]
       require_posture       = true
       require_mfa           = false
       purpose_justification = false
     }
-    sensitive_web_server = {
+    competition_web_app = {
       name                            = "Competition App Policy"
-      include_groups                  = ["sales", "sales_engineering"]
+      include_groups                  = ["sales_team"]
       require_posture                 = true
       require_mfa                     = true
       purpose_justification           = true
@@ -36,7 +51,6 @@ locals {
       require_mfa                  = false
       purpose_justification        = true
       purpose_justification_prompt = "Please enter a justification as this is a production Application."
-      include_email_domain         = true
     }
     aws = {
       name            = "AWS Cloud Policy"
@@ -46,7 +60,7 @@ locals {
     }
     salesforce = {
       name               = "Salesforce Policy"
-      include_groups     = ["sales", "sales_engineering"]
+      include_groups     = ["sales_team"]
       require_posture    = true
       require_mfa        = true
       require_country    = true
@@ -84,11 +98,11 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
 
   # Include groups
   include = concat(
-    # SAML groups
+    # Groups (both SAML and composite groups via mapping)
     [
       for group in each.value.include_groups : {
         group = {
-          id = cloudflare_zero_trust_access_group.saml_groups[group].id
+          id = local.policy_groups[group]
         }
       }
     ],
