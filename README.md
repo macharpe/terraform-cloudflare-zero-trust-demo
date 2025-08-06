@@ -11,6 +11,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Zero%20Trust-orange?logo=cloudflare)](https://www.cloudflare.com/zero-trust/)
 [![Multi-Cloud](https://img.shields.io/badge/multi--cloud-AWS%20%7C%20Azure%20%7C%20GCP-blue)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo)
 [![Monitoring](https://img.shields.io/badge/monitoring-Datadog-purple?logo=datadog)](https://www.datadoghq.com/)
+[![Security](https://img.shields.io/badge/security-Semgrep%20✓-green?logo=semgrep)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/security/code-scanning)
 
 > **Note**: This is a work in progress 🚧. While functional, I intend to maintain and improve it continuously based on community feedback and evolving best practices.
 
