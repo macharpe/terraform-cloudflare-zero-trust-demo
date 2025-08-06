@@ -96,12 +96,16 @@ elif [[ "$ROLE" == "cloudflared" ]]; then
 
     # very basic webserver 1
     cd /home/webserver1/
-    echo '<html><body><h1>Hello from GCP! This is my Administration Application</h1></body></html>' > /home/webserver1/index.html
+    cat > /home/webserver1/index.html << 'EOF'
+${intranet_html}
+EOF
     python3 -m http.server ${admin_web_app_port} &
 
     # very basic webserver 2
     cd /home/webserver2/
-    echo '<html><body><h1>Hello from GCP! This the Sensitive Competition App</h1></body></html>' > /home/webserver2/index.html
+    cat > /home/webserver2/index.html << 'EOF'
+${competition_html}
+EOF
     python3 -m http.server ${sensitive_web_app_port} &
 
     # Restart SSH service

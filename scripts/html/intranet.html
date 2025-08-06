@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Macharpe Company Intranet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --container-width: 1140px;
+      --gutter: 2rem;
+      --brand: #234ad1;
+      --brand2: #e63978;
+      --bg-light: #f8f9fb;
+      --bg-mid: #f4f6f8;
+      --font-dark: #161c2d;
+      --font-gray: #6d7580;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg-light);
+      margin: 0;
+      color: var(--font-dark);
+    }
+
+    /* HEADER */
+    header {
+      background: transparent;
+      width: 100vw;
+      margin-bottom: 1.6rem;
+    }
+    .header-content {
+      max-width: var(--container-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.3rem var(--gutter) 0.2rem var(--gutter);
+    }
+    .logo {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      margin: 0;
+    }
+    nav {
+      display: flex;
+      gap: 2.1em;
+    }
+    nav a {
+      color: #e63978;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.02em;
+      transition: color 0.18s;
+      letter-spacing: 0.008em;
+    }
+    nav a:hover {
+      color: var(--brand);
+      text-decoration: underline;
+    }
+
+    /* HERO: center-aligned, side by side */
+    main {
+      max-width: var(--container-width);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+    .hero {
+      margin: 2.4rem 0 2.9rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.6rem;
+    }
+    .hero-description {
+      flex: 1 1 410px;
+      min-width: 320px;
+    }
+    .hero-title {
+      font-size: 2.4em;
+      font-weight: 700;
+      margin: 0 0 0.3em 0;
+      letter-spacing: -1px;
+    }
+    .hero-info {
+      color: var(--font-gray);
+      font-size: 1.07em;
+      margin-bottom: .5em;
+    }
+    .hero-image {
+      width: 370px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 2px 14px #e4eefb;
+      background: #eaeaea;
+    }
+
+    /* NEWS */
+    .news-section-wrap {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin: 0 0 2.8rem 0;
+    }
+    .news-section {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px #eef2f8;
+      padding: 2.1rem 2rem;
+      max-width: 850px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 2.2rem;
+    }
+    .news-images {
+      display: grid;
+      grid-template-columns: 74px 74px;
+      grid-template-rows: 54px 54px;
+      gap: 7px;
+    }
+    .news-images img {
+      width: 74px;
+      height: 54px;
+      border-radius: 7px;
+      object-fit: cover;
+      background: #d8e7f2;
+      box-shadow: 0 1px 7px #e7e6e6;
+    }
+    .news-content {
+      flex: 1;
+    }
+    .news-title {
+      font-size: 1.14em;
+      font-weight: bold;
+      margin-bottom: 0.45em;
+      color: #161c2d;
+    }
+    .news-text {
+      font-size: .98em;
+      color: #62687a;
+      margin-bottom: 1.14em;
+      max-width: 330px;
+    }
+    .btn {
+      background: var(--brand);
+      color: #fff;
+      padding: 0.6em 1.3em;
+      text-decoration: none;
+      border-radius: 7px;
+      font-weight: 500;
+      font-size: .98em;
+      transition: background 0.2s;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #304eea;
+    }
+
+    /* DEPARTMENTS */
+    .departments-section {
+      margin: 1.8rem 0 2.4rem 0;
+      width: 100%;
+    }
+    .departments-title {
+      text-align: center;
+      font-size: 1.7em;
+      font-weight: bold;
+      margin-bottom: 1.6em;
+      letter-spacing: -1px;
+    }
+    .departments-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.6rem;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .department {
+      flex: 1 1 220px;
+      max-width: 275px;
+      background: #f6f7fb;
+      border-radius: 10px;
+      padding: 1.25rem 1.3rem;
+      text-align: center;
+      box-shadow: 0 2px 8px #eff1f7;
+      margin-bottom: 1.2rem;
+      min-width: 200px;
+      transition: box-shadow 0.16s;
+    }
+    .department:hover { box-shadow: 0 8px 16px rgba(58,72,178,0.07);}
+    .department-title {
+      font-weight: 600;
+      font-size: 1.06em;
+      margin-bottom: 0.5em;
+    }
+    .department-info {
+      color: #8189a1;
+      font-size: .98em;
+    }
+
+    /* FOOTER */
+    footer {
+      width: 100vw;
+      background: var(--bg-mid);
+      margin-top: 4.6em;
+      border-top: 1px solid #e4e8f0;
+      font-size: 1em;
+    }
+    .footer-main {
+      max-width: var(--container-width);
+      margin: 0 auto;
+      padding: 2.2rem var(--gutter) 1.2rem var(--gutter);
+      display: flex;
+      flex-direction: column;
+    }
+    .footer-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 3rem 1rem;
+      margin-bottom: 1.1rem;
+    }
+    .footer-links,
+    .footer-policies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5em;
+      align-items: center;
+      margin-bottom: 0.4em;
+    }
+    .footer-links a,
+    .footer-policies a {
+      color: #4a4a67;
+      text-decoration: none;
+      transition: color 0.18s;
+      font-size: .98em;
+    }
+    .footer-links a:hover,
+    .footer-policies a:hover {
+      color: var(--brand);
+      text-decoration: underline;
+    }
+    .footer-social {
+      display: flex;
+      gap: 1.2em;
+      align-items: center;
+    }
+    .footer-social a img {
+      width: 22px;
+      height: 22px;
+      opacity: 0.7;
+      filter: grayscale(10%);
+      transition: opacity 0.18s, filter 0.18s;
+    }
+    .footer-social a img:hover {
+      opacity: 1;
+      filter: none;
+    }
+    .footer-divider {
+      border-top: 1px solid #e0e3e8;
+      margin: 0.6em 0 0.9em 0;
+      width: 100%;
+    }
+    .footer-copy {
+      color: #999;
+      font-size: 0.95em;
+      margin-top: 1.2em;
+      text-align: left;
+    }
+
+    @media (max-width: 1200px) {
+      .header-content, .footer-main, main {
+        max-width: 98vw;
+        padding-left: 1em;
+        padding-right: 1em;
+      }
+    }
+    @media (max-width: 950px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.9rem;
+      }
+      .news-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.6rem;
+        padding: 1.2rem 0.5rem;
+      }
+      .departments-list {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+      }
+      .footer-main {
+        padding: 1.4rem 0.5rem 1rem 0.5rem;
+      }
+      .footer-top {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+      }
+      .footer-links,
+      .footer-policies,
+      .footer-social {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="header-content">
+      <img src="https://img.icons8.com/color/96/cloud--v1.png" alt="Company logo" class="logo">
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Resources</a>
+        <a href="#">Projects</a>
+        <a href="#">Confidential</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-description">
+        <h1 class="hero-title">Macharpe Company Intranet</h1>
+        <div class="hero-info">
+          Information about the company for employees and contractors.
+        </div>
+      </div>
+      <img class="hero-image" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80" alt="Office team meeting">
+    </section>
+    <!-- NEWS SECTION -->
+    <div class="news-section-wrap">
+      <section class="news-section">
+        <div class="news-images">
+          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt="">
+        </div>
+        <div class="news-content">
+          <div class="news-title">Latest News</div>
+          <div class="news-text">
+            We are currently working through the integration of our new sister company. Keep an eye out for a company-wide meeting next week to learn about progress.
+          </div>
+          <a href="#" class="btn">Learn More</a>
+        </div>
+      </section>
+    </div>
+    <!-- DEPARTMENTS -->
+    <section class="departments-section">
+      <div class="departments-title">Departments</div>
+      <div class="departments-list">
+        <div class="department">
+          <div class="department-title">Executive</div>
+          <div class="department-info">
+            Learn about the leadership team and vision.
+          </div>
+        </div>
+        <div class="department">
+          <div class="department-title">Human Resources</div>
+          <div class="department-info">
+            Access HR tools, benefits and employee resources.
+          </div>
+        </div>
+        <div class="department">
+          <div class="department-title">Product & Engineering</div>
+          <div class="department-info">
+            Discover our latest projects and development progress.
+          </div>
+        </div>
+        <div class="department">
+          <div class="department-title">Sales & Marketing</div>
+          <div class="department-info">
+            See sales materials, campaigns, and outreach tools.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-main">
+      <div class="footer-top">
+        <div class="footer-links">
+          <a href="#">About Us</a>
+          <a href="#">Contact</a>
+          <a href="#">Careers</a>
+          <a href="#">Partners</a>
+          <a href="#">Newsroom</a>
+          <a href="#">Sitemap</a>
+        </div>
+        <div class="footer-social">
+          <a href="#" aria-label="Facebook"><img src="https://img.icons8.com/ios-filled/50/999999/facebook--v1.png" alt="Facebook"></a>
+          <a href="#" aria-label="X (Twitter)"><img src="https://img.icons8.com/ios-filled/50/999999/twitterx.png" alt="X"></a>
+          <a href="#" aria-label="LinkedIn"><img src="https://img.icons8.com/ios-filled/50/999999/linkedin.png" alt="LinkedIn"></a>
+          <a href="#" aria-label="YouTube"><img src="https://img.icons8.com/ios-filled/50/999999/youtube-play.png" alt="YouTube"></a>
+          <a href="#" aria-label="Instagram"><img src="https://img.icons8.com/ios-filled/50/999999/instagram-new.png" alt="Instagram"></a>
+        </div>
+      </div>
+      <div class="footer-policies">
+        <a href="#">Feedback</a>
+        <a href="#">Help</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Privacy</a>
+        <a href="#">Cookies</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Trademarks</a>
+        <a href="#">Supply Chain Transparency</a>
+        <a href="#">Newsroom</a>
+        <a href="#">Sitemap</a>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-copy">
+        &copy; 2025 Macharpe Inc. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
