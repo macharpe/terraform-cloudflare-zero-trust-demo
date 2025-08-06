@@ -17,6 +17,9 @@ terraform.tfstate.backup
 logs/
 *.log
 
+# Claude
+CLAUDE.md
+
 # Ignore Terraform working directory
 .terraform/
 0-documentation/
