@@ -1,0 +1,1 @@
+{"version":"1.130.0","results":[],"errors":[{"code":2,"level":"error","type":"SemgrepError","message":"Failed to download configuration from https://semgrep.dev/p/bash HTTP 404."},{"code":7,"level":"error","type":"SemgrepError","message":"invalid configuration file found (1 configs were invalid)"}],"paths":{"scanned":[],"skipped":[]},"engine_requested":"OSS","skipped_rules":[]}

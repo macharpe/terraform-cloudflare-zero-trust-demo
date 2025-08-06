@@ -3,6 +3,7 @@
 A comprehensive, production-ready Terraform infrastructure that demonstrates Cloudflare's Zero Trust capabilities across multi-cloud environments. This project showcases advanced security policies, identity integration, and seamless connectivity between AWS, Azure, and GCP
 
 [![Generate terraform docs on main](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml)
+[![Semgrep Security Scan](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/semgrep.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/semgrep.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/macharpe/terraform-cloudflare-zero-trust-demo)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/commits/main)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
 [![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/f9641cfc-17c4-406f-8f64-5038484adbba/repos/8bce00d3-4748-4e36-b419-a8dde3817846/branch/4a9ced8a-0d3d-47a1-87f1-ccf012dfba79)](https://dashboard.infracost.io/org/macharpe/repos/8bce00d3-4748-4e36-b419-a8dde3817846?tab=branches)
