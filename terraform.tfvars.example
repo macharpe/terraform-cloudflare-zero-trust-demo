@@ -43,9 +43,9 @@ cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-********"
 # Subdomains
 cf_subdomain_ssh           = "ssh-database***"
 cf_subdomain_vnc           = "vnc***"
-cf_subdomain_web           = "administration-app***"
+cf_subdomain_web           = "intranet.******.com"
 cf_subdomain_rdp           = "rdp.*********"
-cf_subdomain_web_sensitive = "competition-app****"
+cf_subdomain_web_sensitive = "competition.******.com"
 
 # Targets
 cf_target_ssh_name = "GCP-database"
@@ -57,7 +57,7 @@ cf_browser_ssh_app_name   = "AWS Browser SSH database"
 cf_browser_vnc_app_name   = "AWS Browser VNC database"
 cf_browser_rdp_app_name   = "GCP Browser RDP windows"
 cf_sensitive_web_app_name = "Competition App"
-cf_admin_web_app_name     = "Administration App"
+cf_intranet_web_app_name  = "Intranet"
 
 # Application Ports
 cf_sensitive_web_app_port     = 8080

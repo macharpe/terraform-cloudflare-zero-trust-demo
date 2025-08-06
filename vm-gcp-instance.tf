@@ -116,7 +116,8 @@ locals {
     tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
     gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
     warp_token             = module.cloudflare.gcp_extracted_warp_token
-    path                   = path.module
+    intranet_html          = file("${path.module}/scripts/html/intranet.html")
+    competition_html       = file("${path.module}/scripts/html/competition.html")
   })
 
   # Common scheduling for preemptible instances

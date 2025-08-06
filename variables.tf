@@ -410,8 +410,8 @@ variable "cf_sensitive_web_app_name" {
   type        = string
 }
 
-variable "cf_admin_web_app_name" {
-  description = "Name of the Administration web App in Cloudflare"
+variable "cf_intranet_web_app_name" {
+  description = "Name of the Intranet web App in Cloudflare"
   type        = string
 }
 

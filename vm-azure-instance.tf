@@ -140,6 +140,7 @@ locals {
     update = "10m"
     delete = "10m"
   }
+
 }
 
 #==========================================================
@@ -154,6 +155,7 @@ resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
   admin_username      = var.azure_vm_admin_username
   #  admin_password                  = var.azure_vm_admin_password
   #  disable_password_authentication = false
+
 
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id,
