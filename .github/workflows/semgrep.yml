@@ -1,0 +1,122 @@
+name: Semgrep Security Scan
+
+on:
+  # Scan on push to main branch
+  push:
+    branches: [ main ]
+  # Scan on pull requests to main
+  pull_request:
+    branches: [ main ]
+  # Run weekly security scans
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+  # Allow manual triggering
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  semgrep:
+    name: Security Scan with Semgrep
+    runs-on: ubuntu-latest
+    
+    container:
+      image: semgrep/semgrep
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history for better analysis
+          fetch-depth: 0
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep \
+            --config=auto \
+            --config=p/security-audit \
+            --config=p/secrets \
+            --config=p/owasp-top-ten \
+            --config=p/terraform \
+            --config=p/bash \
+            --config=p/python \
+            --config=p/ci \
+            --json \
+            --output=semgrep-results.json \
+            --verbose || true
+
+      - name: Save Semgrep results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30
+
+      - name: Generate SARIF report
+        run: |
+          semgrep \
+            --config=auto \
+            --config=p/security-audit \
+            --config=p/secrets \
+            --config=p/owasp-top-ten \
+            --config=p/terraform \
+            --config=p/bash \
+            --config=p/python \
+            --config=p/ci \
+            --sarif \
+            --output=semgrep.sarif || true
+
+      - name: Upload SARIF file to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+      - name: Comment on PR with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const results = JSON.parse(fs.readFileSync('semgrep-results.json', 'utf8'));
+              const findings = results.results || [];
+              
+              let comment = '## 🔍 Semgrep Security Scan Results\n\n';
+              
+              if (findings.length === 0) {
+                comment += '✅ **No security issues found!** Great job maintaining secure code.\n\n';
+              } else {
+                const critical = findings.filter(f => f.extra.severity === 'ERROR').length;
+                const warnings = findings.filter(f => f.extra.severity === 'WARNING').length;
+                const info = findings.filter(f => f.extra.severity === 'INFO').length;
+                
+                comment += `Found **${findings.length}** potential issues:\n`;
+                comment += `- 🔴 **${critical}** Critical/Error\n`;
+                comment += `- 🟡 **${warnings}** Warning\n`;
+                comment += `- ℹ️ **${info}** Info\n\n`;
+                
+                comment += '**Top Issues:**\n';
+                findings.slice(0, 5).forEach(finding => {
+                  const severity = finding.extra.severity === 'ERROR' ? '🔴' : 
+                                 finding.extra.severity === 'WARNING' ? '🟡' : 'ℹ️';
+                  comment += `- ${severity} **${finding.check_id}**: ${finding.extra.message} (${finding.path}:${finding.start.line})\n`;
+                });
+                
+                comment += '\n📋 Check the Security tab for detailed results and remediation guidance.';
+              }
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } catch (error) {
+              console.log('Could not parse results or post comment:', error);
+            }
