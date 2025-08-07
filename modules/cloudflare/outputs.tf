@@ -103,20 +103,20 @@ output "aws_tunnel_status" {
 # Tunnel Version
 #======================================================
 output "gcp_tunnel_version" {
-  description = "version of Cloudflared running on GCP VM"
-  value       = length(cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_infrastructure"].connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_infrastructure"].connections[0].client_version : "no connections yet"
+  description = "Cloudflared tunnel status for GCP VM"
+  value       = "tunnel created - check dashboard for connection status"
   depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.tunnels]
 }
 
 output "gcp_windows_rdp_tunnel_version" {
-  description = "version of Cloudflared running on GCP Windows VM"
-  value       = length(cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_windows_rdp"].connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_windows_rdp"].connections[0].client_version : "no connections yet"
+  description = "Cloudflared tunnel status for GCP Windows VM"
+  value       = "tunnel created - check dashboard for connection status"
   depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.tunnels]
 }
 
 output "aws_tunnel_version" {
-  description = "version of Cloudflared running on AWS VM"
-  value       = length(cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].connections[0].client_version : "no connections yet"
+  description = "Cloudflared tunnel status for AWS VM"
+  value       = "tunnel created - check dashboard for connection status"
   depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.tunnels]
 }
 
