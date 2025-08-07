@@ -14,12 +14,11 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_ssh_target" {
 
 # Creating the infrastructure Application
 resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
-  account_id       = var.cloudflare_account_id
-  type             = "infrastructure"
-  name             = var.cf_infra_app_name
-  logo_url         = "https://upload.wikimedia.org/wikipedia/commons/0/01/Google-cloud-platform.svg"
-  tags             = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration = "0s"
+  account_id = var.cloudflare_account_id
+  type       = "infrastructure"
+  name       = var.cf_infra_app_name
+  logo_url   = "https://upload.wikimedia.org/wikipedia/commons/0/01/Google-cloud-platform.svg"
+  tags       = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
 
   target_criteria = [{
     port     = "22",
@@ -113,16 +112,9 @@ resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" 
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
-  policies = [
-    {
-      decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
-    },
-    {
-      decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.policies["contractors_browser_rendering"].id
-    },
-  ]
+  policies = [{
+    id = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
+  }]
 }
 
 #======================================================
@@ -147,16 +139,9 @@ resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" 
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
-  policies = [
-    {
-      decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
-    },
-    {
-      decision = "allow"
-      id       = cloudflare_zero_trust_access_policy.policies["contractors_browser_rendering"].id
-    },
-  ]
+  policies = [{
+    id = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
+  }]
 }
 
 
@@ -184,8 +169,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
   allow_authenticate_via_warp = false
 
   policies = [{
-    decision = "allow"
-    id       = cloudflare_zero_trust_access_policy.policies["competition_web_app"].id
+    id = cloudflare_zero_trust_access_policy.policies["competition_web_app"].id
   }]
 }
 
@@ -215,8 +199,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
   allow_authenticate_via_warp = false
 
   policies = [{
-    decision = "allow"
-    id       = cloudflare_zero_trust_access_policy.policies["intranet_web_app"].id
+    id = cloudflare_zero_trust_access_policy.policies["intranet_web_app"].id
   }]
 }
 
