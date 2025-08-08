@@ -40,8 +40,7 @@ OPTIONS:
     -p, --prefix PREFIX Set device name prefix to filter (default: cloudflare-warp-connector-)
 
 ENVIRONMENT VARIABLES:
-    CLOUDFLARE_EMAIL            Your Cloudflare account email (required)
-    CLOUDFLARE_API_KEY          Your Cloudflare Global API Key (required)
+    CLOUDFLARE_API_TOKEN        Your Cloudflare API Token (required)
     CLOUDFLARE_ACCOUNT_ID       Your Cloudflare account ID (required)
     PREFIX                          Device name prefix to filter (optional)
     DRY_RUN                         Set to "false" to enable live deletion (optional)
@@ -94,13 +93,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check environment variables
-if [[ -z "${CLOUDFLARE_EMAIL:-}" ]]; then
-    print_color $RED "Error: CLOUDFLARE_EMAIL environment variable is required"
-    exit 1
-fi
-
-if [[ -z "${CLOUDFLARE_API_KEY:-}" ]]; then
-    print_color $RED "Error: CLOUDFLARE_API_KEY environment variable is required"
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+    print_color $RED "Error: CLOUDFLARE_API_TOKEN environment variable is required"
     exit 1
 fi
 
@@ -130,7 +124,6 @@ fi
 # Show configuration
 print_color $BLUE "Cloudflare Zero Trust Device Cleanup"
 print_color $BLUE "=================================================="
-echo "Email: $CLOUDFLARE_EMAIL"
 echo "Account ID: $CLOUDFLARE_ACCOUNT_ID"
 echo "Filter prefix: $PREFIX"
 echo "Mode: $(if [[ "$DRY_RUN" == "true" ]]; then echo "DRY RUN"; else echo "LIVE DELETION"; fi)"
@@ -143,8 +136,7 @@ print_color $BLUE "=================================================="
 print_color $BLUE "Fetching devices from Cloudflare Zero Trust..."
 
 devices_response=$(curl -s \
-    -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
-    -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
+    -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
     -H "Content-Type: application/json" \
     "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/devices/physical-devices")
 
@@ -214,8 +206,7 @@ while IFS= read -r device_data; do
         # Actually delete the device
         delete_response=$(curl -s \
             -X DELETE \
-            -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
-            -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             -H "Content-Type: application/json" \
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/devices/physical-devices/$device_id")
         

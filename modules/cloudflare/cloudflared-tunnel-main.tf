@@ -54,9 +54,8 @@ locals {
 
   # HTTP request headers for API calls
   cloudflare_api_headers = {
-    "X-Auth-Email" = var.cloudflare_email
-    "X-Auth-Key"   = var.cloudflare_api_key
-    "Content-Type" = "application/json"
+    "Authorization" = "Bearer ${var.cloudflare_api_token}"
+    "Content-Type"  = "application/json"
   }
 }
 

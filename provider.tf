@@ -52,8 +52,7 @@ provider "tls" {
 }
 
 provider "cloudflare" {
-  api_key = var.cloudflare_api_key
-  email   = var.cloudflare_email
+  api_token = var.cloudflare_api_token
 }
 
 provider "azuread" {
