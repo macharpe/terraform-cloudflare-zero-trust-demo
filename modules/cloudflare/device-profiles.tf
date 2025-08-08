@@ -12,9 +12,8 @@ resource "null_resource" "update_macos_version_rule" {
 
     environment = {
       CLOUDFLARE_ACCOUNT_ID      = var.cloudflare_account_id
-      CLOUDFLARE_API_KEY         = var.cloudflare_api_key
+      CLOUDFLARE_API_TOKEN       = var.cloudflare_api_token
       CLOUDFLARE_POSTURE_RULE_ID = var.cf_osx_version_posture_rule_id
-      CLOUDFLARE_EMAIL           = var.cloudflare_email
     }
   }
 }

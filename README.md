@@ -149,9 +149,8 @@ Create a `.envrc` file (or set environment variables) with your credentials:
 
 ```bash
 # Cloudflare
-export TF_VAR_cloudflare_api_key="your_cloudflare_api_key"
+export TF_VAR_cloudflare_api_token="your_cloudflare_api_token"
 export TF_VAR_cloudflare_account_id="your_account_id"
-export TF_VAR_cloudflare_email="your_email@domain.com"
 export TF_VAR_cloudflare_zone_id="your_zone_id"
 
 # AWS
@@ -230,6 +229,41 @@ Create two enrollment policies in **Settings > WARP Client**:
 Configure device posture checks as shown:
 
 <img src="doc/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
+
+#### Self-Hosted App: GCP Browser RDP Windows
+
+Create a self-hosted application for accessing RDP Browser-rendered workloads on GCP Windows VMs:
+
+1. **Create Self-Hosted Application**:
+   - Navigate to **Access > Applications > Add an application**
+   - Select **Self-hosted**
+   - Configure the application as shown:
+
+   <img src="doc/images/gcp_browser_rdp_self_hosted_app.png" alt="GCP Browser RDP Self-Hosted App Configuration" width="500" />
+
+   **Key Configuration Details:**
+   - **Application name**: `GCP Browser RDP Windows`
+   - **Subdomain**: Use value from `cf_subdomain_rdp` variable (e.g., `rdpwin.macharpe.com`)
+   - **Domain**: Your configured domain (automatically created by Terraform)
+
+2. **Configure Browser Rendering Settings**:
+   - Navigate to the **Settings** tab
+   - Enable **Browser Rendering**
+   - Set **Target Criteria** to match the `cf_target_rdp_name` variable value:
+
+   <img src="doc/images/gcp_rdp_browser_rendering_settings.png" alt="GCP RDP Browser Rendering Settings" width="500" />
+
+   **Important**: Ensure the **Value** field matches exactly with your `cf_target_rdp_name` variable (e.g., `GCP-Browser-RDP`)
+
+3. **Customize Experience Settings**:
+   - Navigate to the **Experience Settings** tab
+   - Add custom application logo URL: `https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png`
+
+   <img src="doc/images/gcp_rdp_experience_settings.png" alt="GCP RDP Experience Settings" width="500" />
+
+**Variable References:**
+- The domain `rdpwin.macharpe.com` corresponds to the `cf_subdomain_rdp` variable in terraform.tfvars
+- The target criteria `GCP-Browser-RDP` corresponds to the `cf_target_rdp_name` variable in terraform.tfvars
 
 ### 4. Configure terraform.tfvars
 
@@ -335,6 +369,35 @@ This prevents the common SSH warning:
 #### Cloudflare Devices Cleanup
 
 The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up WARP connector device registrations.
+
+#### macOS Version Posture Script
+
+The `latest_osx_version_posture.sh` script automatically updates Cloudflare device posture rules with the latest macOS version. This script:
+
+- Fetches the current macOS version from Apple's API (`gdmf.apple.com`)
+- Reads the posture rule ID from `terraform.tfvars`
+- Updates the Cloudflare Zero Trust posture rule via API
+
+**WARP SSL Inspection Considerations**:
+
+If you're running WARP client with SSL inspection enabled, you may encounter certificate validation errors when the script contacts Apple's API. To resolve this:
+
+1. **Option 1**: Add `gdmf.apple.com` to your WARP "Do Not Inspect" list:
+   - Go to **Settings > Network > Do Not Inspect**
+   - Add domain: `gdmf.apple.com`
+   - Description: "Apple macOS version API for posture script"
+
+2. **Option 2**: The script includes the `-k` flag as a fallback for SSL certificate bypassing
+
+**Usage**:
+```bash
+# Set required environment variables
+export CLOUDFLARE_ACCOUNT_ID="your_account_id"
+export CLOUDFLARE_API_TOKEN="your_api_token"
+
+# Run the script
+./modules/cloudflare/scripts/latest_osx_version_posture.sh
+```
 
 ## 🧹 Cleanup and Destruction
 
@@ -537,8 +600,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_windows_posture_id"></a> [cf\_windows\_posture\_id](#input\_cf\_windows\_posture\_id) | Latest Windows version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_windows_rdp_tunnel_name"></a> [cf\_windows\_rdp\_tunnel\_name](#input\_cf\_windows\_rdp\_tunnel\_name) | Name of the Cloudflared tunnel for Windows RDP Server GCP | `string` | n/a | yes |
 | <a name="input_cloudflare_account_id"></a> [cloudflare\_account\_id](#input\_cloudflare\_account\_id) | Cloudflare account ID | `string` | n/a | yes |
-| <a name="input_cloudflare_api_key"></a> [cloudflare\_api\_key](#input\_cloudflare\_api\_key) | Cloudflare API key | `string` | n/a | yes |
-| <a name="input_cloudflare_email"></a> [cloudflare\_email](#input\_cloudflare\_email) | Cloudflare login email | `string` | n/a | yes |
+| <a name="input_cloudflare_api_token"></a> [cloudflare\_api\_token](#input\_cloudflare\_api\_token) | Cloudflare API token | `string` | n/a | yes |
 | <a name="input_cloudflare_zone_id"></a> [cloudflare\_zone\_id](#input\_cloudflare\_zone\_id) | Cloudflare zone ID | `string` | n/a | yes |
 | <a name="input_datadog_api_key"></a> [datadog\_api\_key](#input\_datadog\_api\_key) | Datadog API Key from https://app.datadoghq.com/organization-settings/api-keys | `string` | n/a | yes |
 | <a name="input_datadog_region"></a> [datadog\_region](#input\_datadog\_region) | location of the datadog region | `string` | `"datadoghq.eu"` | no |

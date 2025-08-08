@@ -17,8 +17,7 @@ resource "null_resource" "cleanup_devices" {
   provisioner "local-exec" {
     command = "chmod u+x ${path.root}/scripts/cleanup/cloudflare_devices_cleanup.sh && ${path.root}/scripts/cleanup/cloudflare_devices_cleanup.sh"
     environment = {
-      CLOUDFLARE_EMAIL      = var.cloudflare_email
-      CLOUDFLARE_API_KEY    = var.cloudflare_api_key
+      CLOUDFLARE_API_TOKEN  = var.cloudflare_api_token
       CLOUDFLARE_ACCOUNT_ID = var.cloudflare_account_id
       DRY_RUN               = "false"
       FORCE_DELETE          = "true"
@@ -48,8 +47,7 @@ module "cloudflare" {
 
   cloudflare_account_id = var.cloudflare_account_id
   cloudflare_zone_id    = var.cloudflare_zone_id
-  cloudflare_email      = var.cloudflare_email
-  cloudflare_api_key    = var.cloudflare_api_key
+  cloudflare_api_token  = var.cloudflare_api_token
 
   # Tunnel
   cf_tunnel_name_gcp             = var.cf_tunnel_name_gcp

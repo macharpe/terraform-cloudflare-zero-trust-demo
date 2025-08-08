@@ -307,15 +307,10 @@ variable "azure_public_dns_domain" {
 #======================================================
 
 # Cloudflare Authentication
-variable "cloudflare_api_key" {
-  description = "Cloudflare API key"
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token"
   type        = string
   sensitive   = true
-}
-
-variable "cloudflare_email" {
-  description = "Cloudflare login email"
-  type        = string
 }
 
 variable "cloudflare_account_id" {
