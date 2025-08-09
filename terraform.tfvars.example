@@ -50,7 +50,7 @@ cf_subdomain_training_status = "training-status.example.com"  # OPTIONAL: Only n
 
 # Targets
 cf_target_ssh_name = "GCP-database"
-cf_target_rdp_name = "GCP-Browser-RDP"
+cf_target_rdp_name = "Domain-Controller"
 
 # Applications
 cf_infra_app_name         = "GCP Infrastructure SSH database"

@@ -60,40 +60,40 @@ _Last Updated: 12th of June 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Project Files**: 675 files *(focused infrastructure codebase)*
-- **Core Code Files**: 44 files *(infrastructure and automation)*
+- **Total Project Files**: 658 files *(focused infrastructure codebase)*
+- **Core Code Files**: 42 files *(infrastructure and automation)*
 - **Module Directories**: 4 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 31 | 4,560 | Infrastructure as Code |
-| **Documentation (.md)** | 5 | 1,226 | Project documentation |
-| **Shell Scripts (.sh)** | 2 | 290 | Cleanup & maintenance |
-| **Python (.py)** | 2 | 255 | WARP routing utilities |
-| **Templates (.tpl, .cmd)** | 4 | 149 | Cloud-init & startup scripts |
-| **Total Core Code** | 44 | **6,480** | **Production-ready infrastructure** |
+| **Terraform (.tf)** | 31 | 4,577 | Infrastructure as Code |
+| **Documentation (.md)** | 5 | 1,193 | Project documentation |
+| **Python (.py)** | 2 | 365 | WARP routing utilities |
+| **Scripts (.sh)** | 2 | 290 | Cleanup & maintenance |
+| **Templates (.tpl, .cmd)** | 2 | 292 | Cloud-init & startup scripts |
+| **Total Core Code** | 42 | **6,717** | **Production-ready infrastructure** |
 
 <table>
 <tr>
 <td>
 
 **📁 Infrastructure Resources** *(via terraform plan)*
-- **165** total resources deployed
+- **167** total resources deployed
 - **31** Terraform files  
 - **4** custom modules
-- **11** script files total
+- **6** script files total
 - **Multi-provider** architecture
 
 </td>
 <td>
 
 **☁️ Cloud Distribution** *(from terraform plan)*
-- **~85** Cloudflare resources (51%)
-- **~35** AWS resources (21%)
-- **~20** Google Cloud resources (12%)
-- **~18** Azure resources (11%)
-- **~7** supporting resources (4%)
+- **63** Cloudflare resources (38%)
+- **20** Google Cloud resources (12%)
+- **19** AWS resources (11%)
+- **18** Azure resources (11%)
+- **47** supporting resources (28%)
 
 </td>
 </tr>
@@ -252,40 +252,6 @@ Configure device posture checks as shown:
 
 <img src="doc/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
 
-#### Self-Hosted App: GCP Browser RDP Windows
-
-Create a self-hosted application for accessing RDP Browser-rendered workloads on GCP Windows VMs:
-
-1. **Create Self-Hosted Application**:
-   - Navigate to **Access > Applications > Add an application**
-   - Select **Self-hosted**
-   - Configure the application as shown:
-
-   <img src="doc/images/gcp_browser_rdp_self_hosted_app.png" alt="GCP Browser RDP Self-Hosted App Configuration" width="500" />
-
-   **Key Configuration Details:**
-   - **Application name**: `GCP Browser RDP Windows`
-   - **Subdomain**: Use value from `cf_subdomain_rdp` variable (e.g., `rdpwin.macharpe.com`)
-   - **Domain**: Your configured domain (automatically created by Terraform)
-
-2. **Configure Browser Rendering Settings**:
-   - Navigate to the **Settings** tab
-   - Enable **Browser Rendering**
-   - Set **Target Criteria** to match the `cf_target_rdp_name` variable value:
-
-   <img src="doc/images/gcp_rdp_browser_rendering_settings.png" alt="GCP RDP Browser Rendering Settings" width="500" />
-
-   **Important**: Ensure the **Value** field matches exactly with your `cf_target_rdp_name` variable (e.g., `GCP-Browser-RDP`)
-
-3. **Customize Experience Settings**:
-   - Navigate to the **Experience Settings** tab
-   - Add custom application logo URL: `https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png`
-
-   <img src="doc/images/gcp_rdp_experience_settings.png" alt="GCP RDP Experience Settings" width="500" />
-
-**Variable References:**
-- The domain `rdpwin.macharpe.com` corresponds to the `cf_subdomain_rdp` variable in terraform.tfvars
-- The target criteria `GCP-Browser-RDP` corresponds to the `cf_target_rdp_name` variable in terraform.tfvars
 
 ### 4. Configure terraform.tfvars
 

@@ -1,5 +1,5 @@
 #======================================================
-# Access for Infrastructure App
+# INFRASTRUCTURE APP: MySQL Database (Infrastructure)
 #======================================================
 # Creating the Target
 resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_ssh_target" {
@@ -91,7 +91,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
 
 
 #======================================================
-# SELF-HOSTED: AWS Database (Browser rendered SSH)
+# SELF-HOSTED APP: DB Server
 #======================================================
 # Creating the Self-hosted Application for Browser rendering SSH
 resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" {
@@ -118,7 +118,7 @@ resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" 
 }
 
 #======================================================
-# SELF-HOSTED: AWS Browser Rendered VNC
+# SELF-HOSTED APP: PostgresDB Admin
 #======================================================
 # Creating the Self-hosted Application for Browser rendering VNC
 resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" {
@@ -147,7 +147,7 @@ resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" 
 
 
 #======================================================
-# SELF-HOSTED App: Competition App
+# SELF-HOSTED APP: Competition App
 #======================================================
 # Creating the Self-hosted Application for Competition web application
 resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
@@ -177,7 +177,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
 
 
 #======================================================
-# SELF-HOSTED App: Intranet APP
+# SELF-HOSTED APP: Macharpe Intranet
 #======================================================
 # Creating the Self-hosted Application for Administration web application
 resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
@@ -204,8 +204,9 @@ resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
 }
 
 
+
 #======================================================
-# SELF-HOSTED App: RDP Browser Rendered
+# SELF-HOSTED APP: Domain Controller
 #======================================================
 # Creating the Target
 resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_rdp_target" {
@@ -218,35 +219,42 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_rdp_target" {
   }
 }
 
-# # Creating the Self-hosted Application for RDP Browser Rendered
-# resource "cloudflare_zero_trust_access_application" "rdp_gcp_browser_rendering" {
-#   account_id           = var.cloudflare_account_id
-#   type                 = "self_hosted"
-#   name                 = var.cf_browser_rdp_app_name
-#   app_launcher_visible = true
-#   logo_url             = "https://www.strongdm.com/hubfs/21126185/Technology%20Images/5f2b5a6d97b360a016392d7f_Windows-RDP.png"
-#   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-#   session_duration     = "0s"
+# Domain Controller Browser-Rendered RDP Application
+resource "cloudflare_zero_trust_access_application" "domain_controller" {
+  account_id           = var.cloudflare_account_id
+  type                 = "rdp"
+  name                 = "Domain Controller"
+  app_launcher_visible = true
+  logo_url             = "https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png"
+  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration     = "0s"
 
-#   target_criteria = [{
-#     port     = "3389",
-#     protocol = "rdp"
-#     target_attributes = {
-#       hostname = [var.cf_target_rdp_name]
-#     },
-#   }]
+  # Public hostname for browser rendering
+  domain = var.cf_subdomain_rdp
 
-#   destinations = [{
-#     type = "public"
-#     uri  = var.cf_subdomain_rdp
-#   }]
+  # Target criteria - references the existing gcp_rdp_target
+  target_criteria = [{
+    port     = 3389
+    protocol = "RDP"
+    target_attributes = {
+      hostname = [var.cf_target_rdp_name] # This will be "Domain-Controller"
+    }
+  }]
 
-#   allowed_idps                = [var.cf_okta_identity_provider_id]
-#   auto_redirect_to_identity   = true
-#   allow_authenticate_via_warp = false
+  # Identity provider settings
+  allowed_idps               = [var.cf_okta_identity_provider_id]
+  auto_redirect_to_identity  = true
+  enable_binding_cookie      = false
+  http_only_cookie_attribute = false
+  options_preflight_bypass   = false
 
-#   policies = [{
-#     decision = "allow"
-#     id       = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
-#   }]
-# }
+  # Reference the policy from cloudflare-app-policies.tf
+  policies = [{
+    id = cloudflare_zero_trust_access_policy.policies["domain_controller"].id
+  }]
+
+  # Depends on the existing target
+  depends_on = [
+    cloudflare_zero_trust_access_infrastructure_target.gcp_rdp_target
+  ]
+}
