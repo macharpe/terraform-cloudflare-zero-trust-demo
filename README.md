@@ -79,7 +79,7 @@ _Last Updated: 12th of June 2025_
 <td>
 
 **📁 Infrastructure Resources** *(via terraform plan)*
-- **141** total resources deployed
+- **165** total resources deployed
 - **31** Terraform files  
 - **4** custom modules
 - **11** script files total
@@ -88,12 +88,12 @@ _Last Updated: 12th of June 2025_
 </td>
 <td>
 
-**☁️ Cloud Distribution** *(estimated from plan)*
-- **~60** Cloudflare resources (43%)
-- **~30** AWS resources (21%)
-- **~25** Google Cloud resources (18%)
-- **~15** Azure resources (11%)
-- **~11** supporting resources (7%)
+**☁️ Cloud Distribution** *(from terraform plan)*
+- **~85** Cloudflare resources (51%)
+- **~35** AWS resources (21%)
+- **~20** Google Cloud resources (12%)
+- **~18** Azure resources (11%)
+- **~7** supporting resources (4%)
 
 </td>
 </tr>
