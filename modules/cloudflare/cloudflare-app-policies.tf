@@ -38,7 +38,7 @@ locals {
       external_evaluation_url         = "https://training-status.macharpe.com"
       external_evaluation_keys_url    = "https://training-status.macharpe.com/keys"
       purpose_justification           = true
-      purpose_justification_prompt    = "Please enter a justification for entering this protected domain."
+      purpose_justification_prompt    = "Access justification required: Please provide your business reason for accessing this sensitive resource."
       lifecycle_create_before_destroy = true
     }
     employees_browser_rendering = {
@@ -47,7 +47,7 @@ locals {
       require_posture              = true
       require_mfa                  = false
       purpose_justification        = true
-      purpose_justification_prompt = "Please enter a justification as this is a production Application."
+      purpose_justification_prompt = "Access justification required: Please provide your business reason for accessing this production system."
       require_login_method         = true
     }
     contractors_browser_rendering = {
@@ -57,7 +57,7 @@ locals {
       require_mfa                  = false
       require_country              = true
       purpose_justification        = true
-      purpose_justification_prompt = "Please enter a justification as this is a production Application."
+      purpose_justification_prompt = "Access justification required: Please provide your business reason for accessing this production system."
     }
     aws = {
       name            = "AWS Cloud Policy"
@@ -76,6 +76,15 @@ locals {
       include_groups  = ["it_admin"]
       require_posture = true
       require_mfa     = true
+    }
+    domain_controller = {
+      name                         = "Domain Controller Policy"
+      include_groups               = ["it_admin"]
+      require_posture              = true
+      require_mfa                  = true
+      require_country              = true
+      purpose_justification        = true
+      purpose_justification_prompt = "Access justification required: Please provide your business reason for accessing this sensitive resource."
     }
   }
 }

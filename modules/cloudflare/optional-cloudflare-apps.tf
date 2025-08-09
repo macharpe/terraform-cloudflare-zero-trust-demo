@@ -23,7 +23,7 @@
 resource "cloudflare_zero_trust_access_policy" "training_status_admin_policy" {
   account_id       = var.cloudflare_account_id
   decision         = "allow"
-  name             = "Training Status Portal Admin Policy Terraform"
+  name             = "Training Status Portal Admin Policy"
   session_duration = "24h"
 
   # Include admin groups using composite group
@@ -62,7 +62,7 @@ resource "cloudflare_zero_trust_access_policy" "training_status_admin_policy" {
 resource "cloudflare_zero_trust_access_application" "training_status_admin_portal" {
   account_id           = var.cloudflare_account_id
   type                 = "self_hosted"
-  name                 = "Training Status Admin Portal Terraform"
+  name                 = "Training Status Admin Portal"
   app_launcher_visible = true
   logo_url             = "https://cdn-icons-png.flaticon.com/512/6427/6427307.png"
   tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
