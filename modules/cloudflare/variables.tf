@@ -137,6 +137,11 @@ variable "cf_subdomain_rdp" {
   type        = string
 }
 
+variable "cf_subdomain_training_status" {
+  description = "Name of the subdomain for training status admin portal (OPTIONAL: only needed if using optional-cloudflare-apps.tf)"
+  type        = string
+}
+
 #======================================================
 # ACCESS APPLICATION CONFIGURATION
 #======================================================

@@ -41,11 +41,12 @@ cf_warp_tunnel_azure_id = "185f0bc0-986d-********"
 cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-********"
 
 # Subdomains
-cf_subdomain_ssh           = "ssh-database***"
-cf_subdomain_vnc           = "vnc***"
-cf_subdomain_web           = "intranet.******.com"
-cf_subdomain_rdp           = "rdp.*********"
-cf_subdomain_web_sensitive = "competition.******.com"
+cf_subdomain_ssh            = "ssh-database.example.com"
+cf_subdomain_vnc            = "vnc.example.com"
+cf_subdomain_web            = "intranet.example.com"
+cf_subdomain_rdp            = "rdp.example.com"
+cf_subdomain_web_sensitive  = "competition.example.com"
+cf_subdomain_training_status = "training-status.example.com"  # OPTIONAL: Only needed if using optional-cloudflare-apps.tf and Training Compliance Gateway
 
 # Targets
 cf_target_ssh_name = "GCP-database"
