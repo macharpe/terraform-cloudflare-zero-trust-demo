@@ -31,6 +31,12 @@ locals {
       include_groups                  = ["sales_team"]
       require_posture                 = true
       require_mfa                     = true
+      # IMPORTANT: Comment out the next 3 lines if you haven't deployed the "Training Compliance Gateway"
+      # Otherwise the Competition App won't work or show up in App Launcher
+      # Repository: https://github.com/macharpe/cloudflare-access-training-evaluator
+      require_external_evaluation     = true
+      external_evaluation_url         = "https://training-status.macharpe.com"
+      external_evaluation_keys_url    = "https://training-status.macharpe.com/keys"
       purpose_justification           = true
       purpose_justification_prompt    = "Please enter a justification for entering this protected domain."
       lifecycle_create_before_destroy = true
@@ -49,6 +55,7 @@ locals {
       include_groups               = ["contractors"]
       require_posture              = true
       require_mfa                  = false
+      require_country              = true
       purpose_justification        = true
       purpose_justification_prompt = "Please enter a justification as this is a production Application."
     }
@@ -58,22 +65,14 @@ locals {
       require_posture = true
       require_mfa     = true
     }
-    salesforce = {
-      name               = "Salesforce Policy"
-      include_groups     = ["sales_team"]
-      require_posture    = true
-      require_mfa        = true
-      require_country    = true
-      require_os_version = true
-    }
     okta = {
-      name            = "Okta Policy"
+      name            = "Okta Cloud Policy"
       include_groups  = ["it_admin"]
       require_posture = true
       require_mfa     = true
     }
     meraki = {
-      name            = "Meraki Policy"
+      name            = "Meraki Cloud Policy"
       include_groups  = ["it_admin"]
       require_posture = true
       require_mfa     = true
@@ -145,6 +144,13 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
       group = {
         id = cloudflare_zero_trust_access_group.latest_os_version_requirements_rule_group.id
       }
+    }] : [],
+    # External evaluation requirements
+    try(each.value.require_external_evaluation, false) ? [{
+      external_evaluation = {
+        evaluate_url = each.value.external_evaluation_url
+        keys_url     = each.value.external_evaluation_keys_url
+      }
     }] : []
   )
 
@@ -154,6 +160,16 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
       auth_method = "sms"
     }
   }] : []
+
+  # Explicit dependencies to ensure proper destruction order:
+  # Policies → Composite Groups → Individual SAML Groups
+  depends_on = [
+    cloudflare_zero_trust_access_group.employees_rule_group,
+    cloudflare_zero_trust_access_group.sales_team_rule_group,
+    cloudflare_zero_trust_access_group.admins_rule_group,
+    cloudflare_zero_trust_access_group.contractors_rule_group,
+    cloudflare_zero_trust_access_group.saml_groups
+  ]
 
   # Note: lifecycle blocks cannot be conditional in for_each resources
 }

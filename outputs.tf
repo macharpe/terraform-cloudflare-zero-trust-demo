@@ -18,7 +18,6 @@ output "GCP_COMPUTE_INSTANCES" {
         tunnel = {
           cf_tunnel_id      = module.cloudflare.gcp_tunnel_id
           cf_tunnel_status  = module.cloudflare.gcp_tunnel_status
-          cf_tunnel_version = module.cloudflare.gcp_tunnel_version
         }
       }
     ],
@@ -41,7 +40,6 @@ output "GCP_COMPUTE_INSTANCES" {
         tunnel = {
           cf_tunnel_id      = module.cloudflare.gcp_windows_rdp_tunnel_id
           cf_tunnel_status  = module.cloudflare.gcp_windows_rdp_tunnel_status
-          cf_tunnel_version = module.cloudflare.gcp_windows_rdp_tunnel_version
         }
       }
     ]
@@ -57,7 +55,6 @@ output "AWS_EC2_INSTANCES" {
       tunnel = {
         cf_tunnel_id      = module.cloudflare.aws_tunnel_id
         cf_tunnel_status  = module.cloudflare.aws_tunnel_status
-        cf_tunnel_version = module.cloudflare.aws_tunnel_version
       }
       name          = "${var.aws_ec2_cloudflared_name}-${idx}"
       internal_ip   = instance.private_ip

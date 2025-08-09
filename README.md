@@ -21,10 +21,31 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 - **Identity Integration**: Support for Okta, Azure AD, and custom identity providers
 - **Advanced Networking**: WARP Connector tunnels and private network routing
 - **Infrastructure as Code**: Fully automated with Terraform
-- **Real-World Use Cases**: Browser rendering, RDP access, and infrastructure management
+- **Real-World Use Cases**: Browser rendering, RDP access, infrastructure management, and external validation for training compliance
 - **Automated Cleanup**: Built-in scripts for environment management
 - **Device Posture Checks**: OS version compliance and security validation
 - **Policy-Based Access**: Role-based access control with comprehensive policies
+
+## 🔧 Optional Components
+
+This project includes optional components that can be enabled based on your specific requirements:
+
+### Training Status Admin Portal
+
+An optional Cloudflare Access application that integrates with the **Training Compliance Gateway** for advanced training status tracking and compliance evaluation.
+
+- **File**: `modules/cloudflare/optional-cloudflare-apps.tf` 
+- **Requirements**: Requires the [Training Compliance Gateway](https://github.com/macharpe/cloudflare-access-training-evaluator) Cloudflare Worker to be deployed
+- **Features**: 
+  - Training status tracking and compliance evaluation
+  - **External validation use case**: Demonstrates how to require training completion before app access (perfect for compliance scenarios where users must pass training to access sensitive applications)
+  - Integration with Competition App policy for conditional access
+  - Multi-path domain configuration (`/admin`, `/api/*`, `/admin*`, `/init-db`)
+
+> **⚠️ Important Notes:**
+> - The Training Status Admin Portal app and policy will only function if the Training Compliance Gateway is deployed and running
+> - If you haven't deployed the Training Compliance Gateway, you must comment out the `require_external_evaluation` settings in the Competition App Policy (located in `modules/cloudflare/cloudflare-app-policies.tf`), otherwise the Competition App won't work or appear in the App Launcher
+> - Repository: [Training Compliance Gateway for Cloudflare Worker](https://github.com/macharpe/cloudflare-access-training-evaluator)
 
 ## 🏗️ Architecture Overview
 
@@ -39,40 +60,40 @@ _Last Updated: 12th of June 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Core Project Size**: 20.7 MB
-- **Core Files**: 44 files *(focused on infrastructure and automation)*
-- **Core Directories**: 15 directories *(well-organized modular structure)*
+- **Total Project Files**: 675 files *(focused infrastructure codebase)*
+- **Core Code Files**: 44 files *(infrastructure and automation)*
+- **Module Directories**: 4 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 30 | 4,399 | Infrastructure as Code |
-| **Templates (.tftpl, .tpl)** | 3 | 780 | Cloud-init & startup scripts |
-| **Python (.py)** | 8 | 1,158 | Automation & utilities |
-| **Shell Scripts (.sh)** | 2 | 294 | Cleanup & maintenance |
-| **Batch Scripts (.cmd)** | 1 | 149 | Windows initialization |
-| **Total Core Code** | 44 | **6,780** | **Production-ready infrastructure** |
+| **Terraform (.tf)** | 31 | 4,560 | Infrastructure as Code |
+| **Documentation (.md)** | 5 | 1,226 | Project documentation |
+| **Shell Scripts (.sh)** | 2 | 290 | Cleanup & maintenance |
+| **Python (.py)** | 2 | 255 | WARP routing utilities |
+| **Templates (.tpl, .cmd)** | 4 | 149 | Cloud-init & startup scripts |
+| **Total Core Code** | 44 | **6,480** | **Production-ready infrastructure** |
 
 <table>
 <tr>
 <td>
 
-**📁 Infrastructure Resources**
-- **87** total resources deployed
-- **12** data sources  
+**📁 Infrastructure Resources** *(via terraform plan)*
+- **141** total resources deployed
+- **31** Terraform files  
 - **4** custom modules
-- **184** configurable variables  
-- **30** Terraform files
+- **11** script files total
+- **Multi-provider** architecture
 
 </td>
 <td>
 
-**☁️ Cloud Distribution**
-- **58** Cloudflare resources (36.0%)
-- **35** AWS resources (21.7%)
-- **20** Google Cloud resources (12.4%)
-- **18** Azure resources (11.2%)
-- **30** supporting resources (18.6%)
+**☁️ Cloud Distribution** *(estimated from plan)*
+- **~60** Cloudflare resources (43%)
+- **~30** AWS resources (21%)
+- **~25** Google Cloud resources (18%)
+- **~15** Azure resources (11%)
+- **~11** supporting resources (7%)
 
 </td>
 </tr>
@@ -84,17 +105,18 @@ _Last Updated: 12th of June 2025_
 - **Zero Trust** security model
 - **Identity integration** (Okta, Azure AD)
 - **WARP Connector** cross-cloud routing
-- **Browser-rendered** services (SSH, VNC and RDP)
+- **Browser-rendered** services (SSH, VNC, RDP)
+- **External validation** showcasing training compliance
 
 </td>
 <td>
 
 **🚀 Automation & Quality**
-- **Connectivity fixes** completed (July 2025)
+- **API token authentication** (modernized 2025)
 - **Role-based infrastructure** deployment
-- **Modular design** with 4 reusable modules
+- **Modular design** with 4 specialized modules
 - **100%** Infrastructure as Code coverage
-- **Enhanced initialization** scripts with error handling
+- **Enhanced initialization** with comprehensive error handling
 
 </td>
 </tr>

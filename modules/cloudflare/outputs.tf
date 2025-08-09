@@ -99,32 +99,6 @@ output "aws_tunnel_status" {
 
 
 
-#======================================================
-# Tunnel Version
-#======================================================
-output "gcp_tunnel_version" {
-  description = "Cloudflared tunnel status for GCP VM"
-  value       = length(cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_infrastructure"].connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_infrastructure"].connections[0].client_version : "no connections yet"
-  depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.tunnels]
-}
-
-output "gcp_windows_rdp_tunnel_version" {
-  description = "Cloudflared tunnel status for GCP Windows VM"
-  value       = length(cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_windows_rdp"].connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_windows_rdp"].connections[0].client_version : "no connections yet"
-  depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.tunnels]
-}
-
-output "aws_tunnel_version" {
-  description = "Cloudflared tunnel status for AWS VM"
-  value       = length(cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].connections[0].client_version : "no connections yet"
-  depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.tunnels]
-}
-
-#output "azure_tunnel_version" {
-#  value       = length(cloudflare_zero_trust_tunnel_cloudflared.ssh_azure_tunnel.connections) > 0 ? cloudflare_zero_trust_tunnel_cloudflared.ssh_azure_tunnel.connections[0].client_version : "no connections yet"
-#  description = "version of Cloudflared running on Azure VM"
-#  depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.ssh_azure_tunnel]
-#}
 
 
 
