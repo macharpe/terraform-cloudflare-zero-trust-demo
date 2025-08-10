@@ -144,7 +144,6 @@ Before deploying this infrastructure, ensure you have the following accounts and
 - **GCP Account** with service account configured
 - **Registered Domain** managed by Cloudflare
 - **Meraki Account** (for SaaS app demos)
-- **Salesforce Account** (for SaaS app demos)
 - **Datadog Account** (for observability features)
 
 ### Required Tools
@@ -165,7 +164,34 @@ cd terraform-cloudflare-zero-trust-demo
 cp terraform.tfvars.example terraform.tfvars
 ```
 
-### 2. Configure Environment Variables
+### 2. Configure Cloudflare API Token Permissions
+
+Before setting up environment variables, ensure your Cloudflare API token has the following permissions:
+
+**Account-Level Permissions:**
+- **Cloudflare One Connector: WARP** - Edit
+- **Cloudflare One Connector: cloudflared** - Edit  
+- **Access: SSH Auditing** - Edit
+- **Cloudflare Tunnel** - Edit
+- **Access: Service Tokens** - Edit
+- **Zero Trust** - Edit
+- **Access: Organizations, Identity Providers, and Groups** - Edit
+- **Access: Apps and Policies** - Edit
+
+**Account Settings:**
+- **Account Settings** - Read
+
+**Zone-Level Permissions:**
+- **Zone Settings** - Read
+- **DNS** - Edit
+
+**Account Resources:**
+- Include: All accounts
+
+**Zone Resources:** 
+- Include: All zones
+
+### 3. Configure Environment Variables
 
 Create a `.envrc` file (or set environment variables) with your credentials:
 
@@ -191,19 +217,19 @@ export TF_VAR_gcp_project_id="your_gcp_project_id"
 export TF_VAR_datadog_api_key="your_datadog_api_key"
 ```
 
-### 3. Manual Cloudflare UI Setup
+### 4. Manual Cloudflare UI Setup
 
 Due to Terraform provider limitations, some resources must be created manually in the Cloudflare dashboard:
 
 #### SaaS Applications and Identity Providers
 
-**Important Note**: All SaaS applications in Cloudflare Access (Okta, Meraki, Salesforce, etc.) as well as Identity Providers (Okta SAML, Azure AD, OneTime PIN) are manually configured and **not managed by Terraform**. These must be set up through the Cloudflare dashboard before deploying the Terraform infrastructure.
+**Important Note**: All SaaS applications in Cloudflare Access (Okta, Meraki, AWS, etc.) as well as Identity Providers (Okta SAML, Azure AD, OneTime PIN) are manually configured and **not managed by Terraform**. These must be set up through the Cloudflare dashboard before deploying the Terraform infrastructure.
 
 This includes:
 - Okta SAML Identity Provider configuration
 - Azure AD Identity Provider setup
 - OneTime PIN Identity Provider
-- SaaS application integrations (Okta, Meraki, Salesforce)
+- SaaS application integrations (Okta, Meraki, AWS)
 - Custom rule groups and posture checks
 
 #### WARP Connector Setup
@@ -253,7 +279,7 @@ Configure device posture checks as shown:
 <img src="doc/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
 
 
-### 4. Configure terraform.tfvars
+### 5. Configure terraform.tfvars
 
 Copy `terraform.tfvars.example` to `terraform.tfvars` and customize the values for your environment:
 
@@ -291,9 +317,8 @@ okta_infra_admin_group_id = "your_infra_admin_group_id"
 okta_contractors_group_id = "your_contractors_group_id"
 ```
 
-💡 **Tip**: Look for variables marked as `Sensitive:` - these require values from your existing accounts and dashboards.
 
-### 5. Deploy Infrastructure
+### 6. Deploy Infrastructure
 
 ```bash
 # Initialize Terraform
@@ -306,7 +331,7 @@ terraform plan
 terraform apply
 ```
 
-### 6. Post-Deployment Configuration
+### 7. Post-Deployment Configuration
 
 After Terraform completes successfully:
 
