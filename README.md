@@ -7,7 +7,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 [![Last Commit](https://img.shields.io/github/last-commit/macharpe/terraform-cloudflare-zero-trust-demo)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/commits/main)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
 [![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/f9641cfc-17c4-406f-8f64-5038484adbba/repos/8bce00d3-4748-4e36-b419-a8dde3817846/branch/4a9ced8a-0d3d-47a1-87f1-ccf012dfba79)](https://dashboard.infracost.io/org/macharpe/repos/8bce00d3-4748-4e36-b419-a8dde3817846?tab=branches)
-[![Terraform](https://img.shields.io/badge/terraform-1.11.0+-blueviolet?logo=terraform)](https://www.terraform.io/)
+[![Terraform](https://img.shields.io/badge/terraform-1.12.0+-blueviolet?logo=terraform)](https://www.terraform.io/)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Zero%20Trust-orange?logo=cloudflare)](https://www.cloudflare.com/zero-trust/)
 [![Multi-Cloud](https://img.shields.io/badge/multi--cloud-AWS%20%7C%20Azure%20%7C%20GCP-blue)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo)
 [![Monitoring](https://img.shields.io/badge/monitoring-Datadog-purple?logo=datadog)](https://www.datadoghq.com/)
@@ -148,7 +148,7 @@ Before deploying this infrastructure, ensure you have the following accounts and
 
 ### Required Tools
 
-- **Terraform** >= 1.11.0
+- **Terraform** >= 1.12.0
 - **AWS CLI** configured with credentials
 - **Azure CLI** configured with subscription
 - **Google Cloud SDK** with service account
