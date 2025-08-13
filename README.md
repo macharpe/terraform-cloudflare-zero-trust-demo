@@ -42,6 +42,29 @@ An optional Cloudflare Access application that integrates with the **Training Co
   - Integration with Competition App policy for conditional access
   - Multi-path domain configuration (`/admin`, `/api/*`, `/admin*`, `/init-db`)
 
+#### Worker Configuration
+
+When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_PORTAL_AUD` value, which is the unique Application Audience (AUD) Tag required for the Training Compliance Gateway worker authentication.
+
+**Setup Steps:**
+
+1. **Deploy this Terraform configuration** - The AUD value will be available in outputs
+2. **Configure the worker secret** using the AUD value:
+   ```bash
+   # Get the AUD value from Terraform output
+   terraform output TRAINING_STATUS_ADMIN_PORTAL_AUD
+   
+   # Set the worker secret (replace with your actual AUD value)
+   echo "8a47b4391d556b42e9c7b0bba0d3896c7579bd0ffad37453b608bc489ed070fc" | wrangler secret put ACCESS_APP_AUD --name cloudflare-access-training-evaluator
+   ```
+
+3. **Deploy/update the worker** - After setting the secret, deploy or redeploy your worker:
+   ```bash
+   wrangler deploy --name cloudflare-access-training-evaluator
+   ```
+   
+   > **Note**: The worker needs to be redeployed after setting the `ACCESS_APP_AUD` secret to ensure the new configuration is loaded properly.
+
 > **⚠️ Important Notes:**
 > - The Training Status Admin Portal app and policy will only function if the Training Compliance Gateway is deployed and running
 > - If you haven't deployed the Training Compliance Gateway, you must comment out the `require_external_evaluation` settings in the Competition App Policy (located in `modules/cloudflare/cloudflare-app-policies.tf`), otherwise the Competition App won't work or appear in the App Launcher
