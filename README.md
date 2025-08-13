@@ -677,4 +677,5 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="output_GCP_COMPUTE_INSTANCES"></a> [GCP\_COMPUTE\_INSTANCES](#output\_GCP\_COMPUTE\_INSTANCES) | GCP instance details |
 | <a name="output_MY_IP"></a> [MY\_IP](#output\_MY\_IP) | This is your Public IP |
 | <a name="output_SSH_FOR_INFRASTRUCTURE_ACCESS"></a> [SSH\_FOR\_INFRASTRUCTURE\_ACCESS](#output\_SSH\_FOR\_INFRASTRUCTURE\_ACCESS) | SSH with Access for Infrastructure command |
+| <a name="output_TRAINING_STATUS_ADMIN_PORTAL_AUD"></a> [TRAINING\_STATUS\_ADMIN\_PORTAL\_AUD](#output\_TRAINING\_STATUS\_ADMIN\_PORTAL\_AUD) | Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS\_APP\_AUD in your worker |
 <!-- END_TF_DOCS -->
