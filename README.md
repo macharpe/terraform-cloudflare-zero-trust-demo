@@ -74,7 +74,7 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
 
 This demo environment creates a sophisticated Zero Trust network spanning three major cloud providers, connected through Cloudflare's global network.
 
-_Last Updated: 12th of June 2025_
+_Last Updated: 13th of August 2025_
 
 ![Architecture Diagram](doc/Architecture-diagram.svg)
 
