@@ -124,3 +124,8 @@ output "gateway_ca_certificate" {
   value       = local.gateway_ca_certificate.result.public_key
   sensitive   = true
 }
+
+output "training_status_admin_portal_aud" {
+  description = "Application Audience (AUD) Tag for the Training Status Admin Portal"
+  value       = cloudflare_zero_trust_access_application.training_status_admin_portal.aud
+}

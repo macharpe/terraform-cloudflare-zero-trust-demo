@@ -99,3 +99,9 @@ output "SSH_FOR_INFRASTRUCTURE_ACCESS" {
     username => "ssh ${username}@${google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip}"
   }
 }
+
+# Training Status Admin Portal Application Audience (AUD) Tag
+output "TRAINING_STATUS_ADMIN_PORTAL_AUD" {
+  description = "Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS_APP_AUD in your worker"
+  value       = module.cloudflare.training_status_admin_portal_aud
+}
