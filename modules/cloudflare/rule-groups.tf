@@ -20,7 +20,7 @@ locals {
 
   # Allowed countries
   allowed_countries = ["FR", "DE", "US", "GB"]
-  blocked_countries = ["CN", "RU"]
+  blocked_countries = ["CN", "RU", "AF", "BY", "CD", "CU", "IR", "IQ", "KP", "MM", "SD", "SY", "UA", "ZW"]
 
   # OS posture checks
   os_posture_checks = [

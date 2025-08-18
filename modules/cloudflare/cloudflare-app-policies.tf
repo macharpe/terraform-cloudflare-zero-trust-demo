@@ -79,7 +79,7 @@ locals {
     }
     domain_controller = {
       name                         = "Domain Controller Policy"
-      include_groups               = ["it_admin"]
+      include_groups               = ["it_admin", "contractors"]
       require_posture              = true
       require_mfa                  = true
       require_country              = true

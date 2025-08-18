@@ -12,7 +12,6 @@ locals {
     block_lateral_winrm    = 30
     block_lateral_database = 35
     pdf_block              = 170
-    sfdc_setup_block       = 252
     ai_tools_block         = 335
     gambling_block         = 502
     ip_access_block        = 669
@@ -119,17 +118,6 @@ locals {
       block_reason         = "This download is blocked because it is a pdf file (not approved)"
       notification_enabled = true
     }
-    block_sfdc_setup = {
-      name                 = "HTTP-Block: Zero-Trust demo Block Access to \"Setup\" in Salesforce"
-      description          = "Block the access to \"setup\" in salesforce.com"
-      enabled              = true
-      action               = "block"
-      precedence           = local.precedence.sfdc_setup_block
-      filters              = ["http"]
-      traffic              = "http.request.uri == \"https://power-business-8049.lightning.force.com/lightning/setup/home?setupApp=all\" or http.request.uri == \"https://power-business-8049.lightning.force.com/lightning/setup/SetupOneHome/home\""
-      block_reason         = "You are not allowed to access setup page on SFDC"
-      notification_enabled = true
-    }
     block_ai_tools = {
       name                 = "HTTP-Block: Zero-Trust demo Block Access to popular AI Tools"
       description          = "This rule blocks access to popular AI Tools"
@@ -149,7 +137,7 @@ locals {
       precedence           = local.precedence.gambling_block
       filters              = ["http"]
       traffic              = "any(http.request.uri.content_category[*] in {99})"
-      identity             = "not(any(identity.groups.name[*] in {\"${var.okta_contractors_saml_group_name}\"})) and not(identity.email == \"${var.okta_bob_user_login}\")"
+      identity             = "not(any(identity.saml_attributes[*] == \"groups=${var.okta_contractors_saml_group_name}\")) or not(identity.email == \"${var.okta_bob_user_login}\")"
       block_reason         = "This website is blocked according to corporate policies (HTTP)"
       notification_enabled = true
     }

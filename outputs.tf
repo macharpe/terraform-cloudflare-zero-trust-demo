@@ -16,8 +16,8 @@ output "GCP_COMPUTE_INSTANCES" {
         internal_ip = google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip
         public_ip   = google_compute_address.cloud_nat_ip.address
         tunnel = {
-          cf_tunnel_id      = module.cloudflare.gcp_tunnel_id
-          cf_tunnel_status  = module.cloudflare.gcp_tunnel_status
+          cf_tunnel_id     = module.cloudflare.gcp_tunnel_id
+          cf_tunnel_status = module.cloudflare.gcp_tunnel_status
         }
       }
     ],
@@ -38,8 +38,8 @@ output "GCP_COMPUTE_INSTANCES" {
         public_ip            = google_compute_address.cloud_nat_ip.address
         ssh                  = "ssh -o PubkeyAuthentication=no ${var.gcp_windows_user_name}@${google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip}"
         tunnel = {
-          cf_tunnel_id      = module.cloudflare.gcp_windows_rdp_tunnel_id
-          cf_tunnel_status  = module.cloudflare.gcp_windows_rdp_tunnel_status
+          cf_tunnel_id     = module.cloudflare.gcp_windows_rdp_tunnel_id
+          cf_tunnel_status = module.cloudflare.gcp_windows_rdp_tunnel_status
         }
       }
     ]
@@ -53,8 +53,8 @@ output "AWS_EC2_INSTANCES" {
   value = concat(
     [for idx, instance in aws_instance.cloudflared_aws : {
       tunnel = {
-        cf_tunnel_id      = module.cloudflare.aws_tunnel_id
-        cf_tunnel_status  = module.cloudflare.aws_tunnel_status
+        cf_tunnel_id     = module.cloudflare.aws_tunnel_id
+        cf_tunnel_status = module.cloudflare.aws_tunnel_status
       }
       name          = "${var.aws_ec2_cloudflared_name}-${idx}"
       internal_ip   = instance.private_ip
