@@ -3,13 +3,13 @@ name: Semgrep Security Scan
 on:
   # Scan on push to main branch
   push:
-    branches: [ main ]
+    branches: [main]
   # Scan on pull requests to main
   pull_request:
-    branches: [ main ]
+    branches: [main]
   # Run weekly security scans
   schedule:
-    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+    - cron: "0 2 * * 1" # Every Monday at 2 AM UTC
   # Allow manual triggering
   workflow_dispatch:
 
@@ -18,15 +18,16 @@ permissions:
   security-events: write
   actions: read
   pull-requests: write
+  issues: write
 
 jobs:
   semgrep:
     name: Security Scan with Semgrep
     runs-on: ubuntu-latest
-    
+
     container:
       image: semgrep/semgrep
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

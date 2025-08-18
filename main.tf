@@ -65,11 +65,11 @@ module "cloudflare" {
   gcp_windows_rdp_cidr        = var.gcp_windows_rdp_cidr
 
   # Domain
-  cf_subdomain_ssh            = var.cf_subdomain_ssh
-  cf_subdomain_vnc            = var.cf_subdomain_vnc
-  cf_subdomain_web            = var.cf_subdomain_web
-  cf_subdomain_web_sensitive  = var.cf_subdomain_web_sensitive
-  cf_subdomain_rdp            = var.cf_subdomain_rdp
+  cf_subdomain_ssh             = var.cf_subdomain_ssh
+  cf_subdomain_vnc             = var.cf_subdomain_vnc
+  cf_subdomain_web             = var.cf_subdomain_web
+  cf_subdomain_web_sensitive   = var.cf_subdomain_web_sensitive
+  cf_subdomain_rdp             = var.cf_subdomain_rdp
   cf_subdomain_training_status = var.cf_subdomain_training_status
 
   # Targets

@@ -112,9 +112,14 @@ resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" 
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
-  policies = [{
-    id = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
-  }]
+  policies = [
+    {
+      id = cloudflare_zero_trust_access_policy.policies["employees_browser_rendering"].id
+    },
+    {
+      id = cloudflare_zero_trust_access_policy.policies["contractors_browser_rendering"].id
+    }
+  ]
 }
 
 #======================================================
