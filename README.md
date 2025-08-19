@@ -83,7 +83,7 @@ _Last Updated: 13th of August 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Project Files**: 658 files *(focused infrastructure codebase)*
+- **Total Project Files**: 44 files *(focused infrastructure codebase)*
 - **Core Code Files**: 42 files *(infrastructure and automation)*
 - **Module Directories**: 4 directories *(modular architecture)*
 
@@ -102,7 +102,7 @@ _Last Updated: 13th of August 2025_
 <td>
 
 **📁 Infrastructure Resources** *(via terraform plan)*
-- **167** total resources deployed
+- **166** total resources deployed
 - **31** Terraform files  
 - **4** custom modules
 - **6** script files total
@@ -364,23 +364,6 @@ After Terraform completes successfully:
 
 ## 🔧 Environment Management
 
-### Connectivity Status
-
-The following table shows expected connectivity status for deployed resources:
-
-| Host | Cloud Provider | Status | Notes |
-|------|----------------|---------|-------|
-| cloudflared-replica-aws-0 | AWS | ❌ **FAIL** | Cloudflared tunnel endpoint (being fixed) |
-| cloudflare-zero-trust-demo-aws | AWS | ❌ **FAIL** | Demo instance (being fixed) |
-| cloudflare-warp-connector-azure-0 | Azure | ❌ **FAIL** | WARP Connector |
-| cloudflare-zero-trust-demo-azure-1 | Azure | ✅ **SUCCESS** | Demo instance |
-| cloudflare-infrastructure-access-gcp | GCP | ✅ **SUCCESS** | Infrastructure access |
-| cloudflare-warp-connector-gcp-0 | GCP | ❌ **FAIL** | WARP Connector |
-| cloudflare-zero-trust-demo-gcp-1 | GCP | ✅ **SUCCESS** | Demo instance |
-| windows-rdp-server-gcp | GCP | ✅ **SUCCESS** | Windows RDP server |
-
-> **Note**: AWS connectivity issues are being actively resolved.
-
 ### Automated Cleanup Scripts
 
 This environment includes automated cleanup utilities:
@@ -452,9 +435,6 @@ Planned enhancements and features:
 
 - **Enhanced Secret Management**: Implement SSM Parameter Store for AWS and equivalents for other cloud providers
 - **Advanced Security Groups**: More granular network security configurations
-- **Entra ID Integration**: Enhanced Azure Active Directory integration
-- **WARP Connector Extensions**: Site-to-Site and Site-to-Internet scenarios ([documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/warp-connector/))
-- **SaaS Application Management**: Terraform-managed SaaS applications in Cloudflare Access
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
 
