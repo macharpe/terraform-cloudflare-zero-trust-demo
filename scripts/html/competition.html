@@ -1,77 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Competition App - Skyflash</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
-      margin: 0;
-      padding: 40px 20px;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-    }
-    .container {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      max-width: 600px;
-      color: #2c3e50;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      text-shadow: none;
-      color: #1e3c72;
-    }
-    .emoji {
-      font-size: 3em;
-      margin-bottom: 20px;
-    }
-    p {
-      font-size: 1.2em;
-      margin-bottom: 30px;
-      color: #34495e;
-      line-height: 1.6;
-    }
-    .sensitive-notice {
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 30px;
-      border-left: 4px solid #a93226;
-      color: #ffffff;
-    }
-    .sensitive-notice h3 {
-      margin: 0 0 10px 0;
-      color: #ffffff;
-      font-weight: 600;
-    }
-    .sensitive-notice p {
-      color: #ffffff;
-      margin-bottom: 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Competitive Intelligence Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(249, 115, 22, 0.2);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo::before {
+            content: "☁️";
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #f97316;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .access-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+        }
+
+        .access-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+            border-color: #f97316;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .security-notice {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .security-icon {
+            font-size: 2rem;
+        }
+
+        .security-content h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="emoji">🏆</div>
-    <h1>Competition App</h1>
-    <p>Welcome to the sensitive competition application. This area contains confidential information about our competitive strategies and analysis.</p>
-    
-    <div class="sensitive-notice">
-      <h3>⚠️ Confidential Content</h3>
-      <p>Access to this application is restricted and monitored. All activities are logged for security purposes.</p>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">Cloudflare Competitive Intelligence</div>
+            <div class="user-info">
+                <span>👤 Sales Team</span>
+                <span>|</span>
+                <span>🔒 Secure Access</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="welcome-section">
+            <h1 class="welcome-title">Welcome to Competitive Intelligence Portal</h1>
+            <p class="welcome-subtitle">Access confidential competitive analysis, battlecards, and strategic insights to stay ahead in the market.</p>
+        </div>
+
+        <div class="quick-access">
+            <div class="access-card">
+                <div class="card-icon">📊</div>
+                <h3 class="card-title">Competitor Analysis</h3>
+                <p class="card-description">Detailed analysis of key competitors including AWS, Azure, Google Cloud, and emerging CDN providers.</p>
+            </div>
+
+            <div class="access-card">
+                <div class="card-icon">🎯</div>
+                <h3 class="card-title">Battle Cards</h3>
+                <p class="card-description">Ready-to-use competitive positioning documents and objection handling guides for sales conversations.</p>
+            </div>
+
+            <div class="access-card">
+                <div class="card-icon">📈</div>
+                <h3 class="card-title">Market Intelligence</h3>
+                <p class="card-description">Latest market research, analyst reports, and competitive landscape insights from Gartner, Forrester, and more.</p>
+            </div>
+
+            <div class="access-card">
+                <div class="card-icon">🎬</div>
+                <h3 class="card-title">Training Materials</h3>
+                <p class="card-description">Video training sessions, presentation decks, and certification materials for competitive enablement.</p>
+            </div>
+
+            <div class="access-card">
+                <div class="card-icon">📰</div>
+                <h3 class="card-title">Press & News Analysis</h3>
+                <p class="card-description">Curated analysis of competitor announcements, press releases, and industry news with strategic implications.</p>
+            </div>
+
+            <div class="access-card">
+                <div class="card-icon">💬</div>
+                <h3 class="card-title">Win/Loss Insights</h3>
+                <p class="card-description">Analysis of competitive deals, win/loss patterns, and customer feedback to improve our positioning.</p>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h3 class="activity-title">Recent Updates</h3>
+            <div class="activity-item">
+                <span>📊</span>
+                <div>
+                    <div>AWS CloudFront pricing update analysis</div>
+                    <div class="activity-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <span>🎯</span>
+                <div>
+                    <div>Updated Azure CDN battlecard with new features</div>
+                    <div class="activity-time">1 day ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <span>📈</span>
+                <div>
+                    <div>Gartner Magic Quadrant analysis published</div>
+                    <div class="activity-time">3 days ago</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="security-notice">
+            <div class="security-icon">⚠️</div>
+            <div class="security-content">
+                <h3>Confidential Information</h3>
+                <p>This portal contains sensitive competitive intelligence. Access is logged and monitored. Do not share content outside authorized personnel.</p>
+            </div>
+        </div>
     </div>
-  </div>
 </body>
 </html>

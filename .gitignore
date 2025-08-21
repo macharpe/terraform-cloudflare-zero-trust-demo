@@ -48,3 +48,6 @@ modules/warp-routing/output/*.json
 
 # irgnore Roadmap items
 security/aws-sg-cloudflared-tunnel-allow.tf
+
+# ignore HTML examples
+scripts/html/examples/

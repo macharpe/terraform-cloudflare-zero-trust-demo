@@ -1,430 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Macharpe Company Intranet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>DAZZLING E-BIKES Intranet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      --container-width: 1140px;
-      --gutter: 2rem;
-      --brand: #234ad1;
-      --brand2: #e63978;
-      --bg-light: #f8f9fb;
-      --bg-mid: #f4f6f8;
-      --font-dark: #161c2d;
-      --font-gray: #6d7580;
+    :root{
+      --brand: #F38020;
+      --brand-light: #FF9A4D;
+      --ink: #1e293b;
+      --muted: #64748b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --footer: #404041;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-1: 0 1px 3px rgba(0,0,0,.08);
+      --shadow-2: 0 2px 10px rgba(0,0,0,.12);
+      --border: #e5e7eb;
     }
-
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: var(--bg-light);
-      margin: 0;
-      color: var(--font-dark);
+      margin: 0; background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink); line-height: 1.6;
     }
 
     /* HEADER */
     header {
-      background: transparent;
-      width: 100vw;
-      margin-bottom: 1.6rem;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
+      color: #fff; box-shadow: var(--shadow-2);
     }
-    .header-content {
-      max-width: var(--container-width);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.3rem var(--gutter) 0.2rem var(--gutter);
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between; padding: 1rem 0;
     }
     .logo {
-      width: 46px;
-      height: 46px;
-      object-fit: contain;
-      margin: 0;
+      display: flex; align-items: flex-end; gap: .6rem; font-weight: 800; letter-spacing: .3px;
     }
-    nav {
-      display: flex;
-      gap: 2.1em;
+    /* New: clearer bike icon */
+    .logo svg { width: 42px; height: 42px; stroke: currentColor; }
+    nav { display: flex; gap: 1.4rem; align-items: center; }
+    nav a { color: #fff; text-decoration: none; font-weight: 600; }
+    nav a:hover { text-decoration: underline; }
+    .search-container {
+      position: relative; display: flex; align-items: center; margin-left: 1rem;
     }
-    nav a {
-      color: #e63978;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 1.02em;
-      transition: color 0.18s;
-      letter-spacing: 0.008em;
+    .search-input {
+      background: rgba(255, 255, 255, 0.25); border: 1px solid rgba(255, 255, 255, 0.5);
+      color: #fff; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 8px;
+      font-size: 0.9rem; width: 200px; outline: none; font-weight: 500;
     }
-    nav a:hover {
-      color: var(--brand);
-      text-decoration: underline;
+    .search-input::placeholder { color: rgba(255, 255, 255, 0.9); }
+    .search-input:focus {
+      background: rgba(255, 255, 255, 0.35); border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+    .search-icon {
+      position: absolute; right: 0.75rem; width: 16px; height: 16px; stroke: rgba(255, 255, 255, 0.9);
     }
 
-    /* HERO: center-aligned, side by side */
-    main {
-      max-width: var(--container-width);
-      margin: 0 auto;
-      padding: 0 var(--gutter);
-    }
+    /* HERO */
     .hero {
-      margin: 2.4rem 0 2.9rem 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 2.6rem;
+      display: grid; grid-template-columns: 1.2fr .9fr; gap: 2rem;
+      background: var(--card); border-radius: var(--radius-lg);
+      padding: 2rem; margin: 2rem auto 1rem; box-shadow: var(--shadow-1);
     }
-    .hero-description {
-      flex: 1 1 410px;
-      min-width: 320px;
+    .hero h1 { margin: 0 0 .4rem; font-size: clamp(1.8rem, 2.4vw, 2.4rem); }
+    .hero p { color: var(--muted); margin: 0; font-size: 1.05rem; }
+    .hero-img {
+      width: 100%; height: 320px; object-fit: cover; border-radius: var(--radius-md);
+      box-shadow: var(--shadow-1); background: #e5e7eb;
     }
-    .hero-title {
-      font-size: 2.4em;
-      font-weight: 700;
-      margin: 0 0 0.3em 0;
-      letter-spacing: -1px;
-    }
-    .hero-info {
-      color: var(--font-gray);
-      font-size: 1.07em;
-      margin-bottom: .5em;
-    }
-    .hero-image {
-      width: 370px;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 10px;
-      box-shadow: 0 2px 14px #e4eefb;
-      background: #eaeaea;
-    }
+
+    /* SECTION WRAPPER */
+    .section { background: var(--card); border-radius: var(--radius-lg); padding: 1.2rem; margin: 1rem auto 0; box-shadow: var(--shadow-1); }
+    .section h2 { margin: .4rem 0 1rem; font-size: 1.5rem; }
 
     /* NEWS */
-    .news-section-wrap {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      margin: 0 0 2.8rem 0;
-    }
-    .news-section {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 14px #eef2f8;
-      padding: 2.1rem 2rem;
-      max-width: 850px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 2.2rem;
-    }
-    .news-images {
-      display: grid;
-      grid-template-columns: 74px 74px;
-      grid-template-rows: 54px 54px;
-      gap: 7px;
-    }
-    .news-images img {
-      width: 74px;
-      height: 54px;
-      border-radius: 7px;
-      object-fit: cover;
-      background: #d8e7f2;
-      box-shadow: 0 1px 7px #e7e6e6;
-    }
-    .news-content {
-      flex: 1;
-    }
-    .news-title {
-      font-size: 1.14em;
-      font-weight: bold;
-      margin-bottom: 0.45em;
-      color: #161c2d;
-    }
-    .news-text {
-      font-size: .98em;
-      color: #62687a;
-      margin-bottom: 1.14em;
-      max-width: 330px;
-    }
-    .btn {
-      background: var(--brand);
-      color: #fff;
-      padding: 0.6em 1.3em;
-      text-decoration: none;
-      border-radius: 7px;
-      font-weight: 500;
-      font-size: .98em;
-      transition: background 0.2s;
-      display: inline-block;
-      border: none;
+    .news-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .news-card {
+      display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;
+      border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;
+      transition: transform 0.2s, box-shadow .2s;
       cursor: pointer;
     }
-    .btn:hover {
-      background: #304eea;
+    .news-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
     }
+    .news-thumb { width: 100%; height: 140px; object-fit: cover; border-radius: var(--radius-sm); background: #e5e7eb; }
+    .news-title { margin: 0 0 .25rem; font-size: 1.25rem; }
+    .btn {
+      display: inline-block; margin-top: .6rem; background: #161c2d; color: #fff; border: 0;
+      padding: .6rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+    }
+    .btn:hover { opacity: .92; }
 
-    /* DEPARTMENTS */
-    .departments-section {
-      margin: 1.8rem 0 2.4rem 0;
-      width: 100%;
-    }
-    .departments-title {
-      text-align: center;
-      font-size: 1.7em;
-      font-weight: bold;
-      margin-bottom: 1.6em;
-      letter-spacing: -1px;
-    }
+    /* DEPARTMENTS (redesigned to match reference) */
+    .departments { background: var(--card); }
     .departments-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.6rem;
-      width: 100%;
-      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
     }
     .department {
-      flex: 1 1 220px;
-      max-width: 275px;
-      background: #f6f7fb;
-      border-radius: 10px;
-      padding: 1.25rem 1.3rem;
-      text-align: center;
-      box-shadow: 0 2px 8px #eff1f7;
-      margin-bottom: 1.2rem;
-      min-width: 200px;
-      transition: box-shadow 0.16s;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: transform 0.2s, box-shadow .2s;
+      cursor: pointer;
     }
-    .department:hover { box-shadow: 0 8px 16px rgba(58,72,178,0.07);}
-    .department-title {
-      font-weight: 600;
-      font-size: 1.06em;
-      margin-bottom: 0.5em;
+    .department:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
     }
-    .department-info {
-      color: #8189a1;
-      font-size: .98em;
+    .department-icon {
+      width: 120px; height: 120px;
+      background: var(--brand);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
+    .department-icon img {
+      width: 120px; height: 120px;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+    .department-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .department-title { 
+      font-weight: 700; 
+      color: var(--ink); 
+      font-size: 1.25rem; 
+      margin: 0;
+    }
+    .department-info { 
+      color: var(--muted); 
+      font-size: 1rem; 
+      line-height: 1.4; 
+      margin: 0;
+    }
+
+    /* EVENTS */
+    .two-col { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
+    .event-item {
+      display: grid; grid-template-columns: 140px 1fr; gap: 1rem; align-items: center;
+      border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;
+      transition: transform 0.2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .event-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
+    }
+    .event-thumb { width: 140px; height: 100px; object-fit: cover; border-radius: 8px; background:#e5e7eb; }
+
+    /* RESOURCES */
+    .resource-card {
+      border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;
+      display: grid; grid-template-columns: 88px 1fr; gap: .9rem; align-items: center;
+      transition: transform 0.2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .resource-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
+    }
+    .resource-thumb { width: 88px; height: 88px; border-radius: 10px; object-fit: cover; background:#e5e7eb; }
+
+    /* SPOTLIGHT */
+    .spotlight {
+      display: grid; grid-template-columns: 220px 1fr; gap: 1rem; align-items: center;
+      border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;
+      transition: transform 0.2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .spotlight:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
+    }
+    .spotlight img { width: 220px; height: 160px; object-fit: cover; border-radius: 12px; }
 
     /* FOOTER */
     footer {
-      width: 100vw;
-      background: var(--bg-mid);
-      margin-top: 4.6em;
-      border-top: 1px solid #e4e8f0;
-      font-size: 1em;
-    }
-    .footer-main {
-      max-width: var(--container-width);
-      margin: 0 auto;
-      padding: 2.2rem var(--gutter) 1.2rem var(--gutter);
-      display: flex;
-      flex-direction: column;
-    }
-    .footer-top {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 3rem 1rem;
-      margin-bottom: 1.1rem;
-    }
-    .footer-links,
-    .footer-policies {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5em;
-      align-items: center;
-      margin-bottom: 0.4em;
-    }
-    .footer-links a,
-    .footer-policies a {
-      color: #4a4a67;
-      text-decoration: none;
-      transition: color 0.18s;
-      font-size: .98em;
-    }
-    .footer-links a:hover,
-    .footer-policies a:hover {
-      color: var(--brand);
-      text-decoration: underline;
-    }
-    .footer-social {
-      display: flex;
-      gap: 1.2em;
-      align-items: center;
-    }
-    .footer-social a img {
-      width: 22px;
-      height: 22px;
-      opacity: 0.7;
-      filter: grayscale(10%);
-      transition: opacity 0.18s, filter 0.18s;
-    }
-    .footer-social a img:hover {
-      opacity: 1;
-      filter: none;
-    }
-    .footer-divider {
-      border-top: 1px solid #e0e3e8;
-      margin: 0.6em 0 0.9em 0;
-      width: 100%;
-    }
-    .footer-copy {
-      color: #999;
-      font-size: 0.95em;
-      margin-top: 1.2em;
-      text-align: left;
+      margin-top: 2rem; background: var(--footer); color: #e5e7eb; padding: 1.4rem 0; font-size: .95rem;
+      text-align: center;
     }
 
-    @media (max-width: 1200px) {
-      .header-content, .footer-main, main {
-        max-width: 98vw;
-        padding-left: 1em;
-        padding-right: 1em;
-      }
-    }
-    @media (max-width: 950px) {
-      .hero {
-        flex-direction: column;
-        text-align: center;
-        gap: 1.9rem;
-      }
-      .news-section {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.6rem;
-        padding: 1.2rem 0.5rem;
-      }
-      .departments-list {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.7rem;
-      }
-      .footer-main {
-        padding: 1.4rem 0.5rem 1rem 0.5rem;
-      }
-      .footer-top {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.2rem;
-      }
-      .footer-links,
-      .footer-policies,
-      .footer-social {
-        justify-content: center;
-      }
+    /* Responsive */
+    @media (max-width: 1024px) { .two-col { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .news-card { grid-template-columns: 1fr; }
+      .container { padding: 0 1.25rem; }
+      .spotlight { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
+  <!-- Header -->
   <header>
-    <div class="header-content">
-      <img src="https://img.icons8.com/color/96/cloud--v1.png" alt="Company logo" class="logo">
-      <nav>
+    <div class="container header-inner">
+      <div class="logo" aria-label="Dazzling E-Bikes Intranet">
+        <!-- New recognizable bike icon (inline SVG) -->
+        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <circle cx="18" cy="46" r="10" stroke="currentColor" stroke-width="3"></circle>
+          <circle cx="48" cy="46" r="10" stroke="currentColor" stroke-width="3"></circle>
+          <path d="M24 46 L34 28 L46 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M30 18 h8" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+          <path d="M34 18 l-4 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+          <path d="M18 46 L26 38" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+          <path d="M48 46 L42 28" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+          <path d="M28 28 h-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+        </svg>
+        <span>DAZZLING E-BIKES Intranet</span>
+      </div>
+      <nav aria-label="Primary">
         <a href="#">Home</a>
         <a href="#">Resources</a>
         <a href="#">Projects</a>
         <a href="#">Confidential</a>
+        <div class="search-container">
+          <input type="search" class="search-input" placeholder="Search intranet..." aria-label="Search">
+          <svg class="search-icon" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/>
+          </svg>
+        </div>
       </nav>
     </div>
   </header>
-  <main>
-    <!-- HERO SECTION -->
-    <section class="hero">
-      <div class="hero-description">
-        <h1 class="hero-title">Macharpe Company Intranet</h1>
-        <div class="hero-info">
-          Information about the company for employees and contractors.
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <h1 id="hero-title">DAZZLING E-BIKES Intranet</h1>
+        <p>Information for employees and contractors.</p>
+        
+        <div style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <div style="text-align: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand);">150+</div>
+            <div style="font-size: 0.9rem; color: var(--muted);">Team Members</div>
+          </div>
+          <div style="text-align: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand);">25K+</div>
+            <div style="font-size: 0.9rem; color: var(--muted);">E-Bikes Sold</div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+          <p style="margin: 0; font-size: 0.95rem; color: var(--muted);">
+            <strong>Quick Access:</strong> Browse departments, check latest news, or access your employee resources using the navigation above.
+          </p>
         </div>
       </div>
-      <img class="hero-image" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80" alt="Office team meeting">
+      <!-- (kept) Wikimedia image -->
+      <img class="hero-img" alt="Rider commuting on an electric bicycle in the city"
+           src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/Smiling_Cyclist_in_Urban_Motion.png" />
     </section>
-    <!-- NEWS SECTION -->
-    <div class="news-section-wrap">
-      <section class="news-section">
-        <div class="news-images">
-          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="">
-          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="">
-          <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt="">
-          <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt="">
-        </div>
-        <div class="news-content">
-          <div class="news-title">Latest News</div>
-          <div class="news-text">
-            We are currently working through the integration of our new sister company. Keep an eye out for a company-wide meeting next week to learn about progress.
+
+    <!-- Latest News -->
+    <section class="section" aria-labelledby="news-title">
+      <h2 id="news-title">Latest News</h2>
+      <div class="news-grid">
+        <article class="news-card">
+          <img class="news-thumb" alt="Sleek e-bike on display at Eurobike"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/E-bike_model_x_launches.png" />
+          <div>
+            <h3 class="news-title">E-Bike Model X Launches 🚀</h3>
+            <p>We’ve released Model X, our high-efficiency commuter with extended range and fast-charge capabilities.</p>
+            <button class="btn" type="button">Learn More</button>
           </div>
-          <a href="#" class="btn">Learn More</a>
-        </div>
-      </section>
-    </div>
-    <!-- DEPARTMENTS -->
-    <section class="departments-section">
-      <div class="departments-title">Departments</div>
+        </article>
+
+        <article class="news-card">
+          <img class="news-thumb" alt="Group wellness ride on city streets"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/Celebrating_Victory_on_the_Hill.png" />
+          <div>
+            <h3 class="news-title">Employee Wellness Program 🌱</h3>
+            <p>We’ve launched a wellness program to promote work-life balance and health — join our weekly group rides and mobility sessions.</p>
+            <button class="btn" type="button">See Activities</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Departments (redesigned to match reference layout) -->
+    <section class="section departments" aria-labelledby="dept-title">
+      <h2 id="dept-title">Departments</h2>
       <div class="departments-list">
         <div class="department">
-          <div class="department-title">Executive</div>
-          <div class="department-info">
-            Learn about the leadership team and vision.
+          <div class="department-icon">
+            <img src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/product_icon.png" alt="Product icon" />
+          </div>
+          <div class="department-content">
+            <h3 class="department-title">Product</h3>
+            <p class="department-info">Discover our latest e-bike models and features.</p>
           </div>
         </div>
         <div class="department">
-          <div class="department-title">Human Resources</div>
-          <div class="department-info">
-            Access HR tools, benefits and employee resources.
+          <div class="department-icon">
+            <img src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/sales_marketing_icon.png" alt="Sales & Marketing icon" />
+          </div>
+          <div class="department-content">
+            <h3 class="department-title">Sales & Marketing</h3>
+            <p class="department-info">See sales materials, campaigns, and outreach tools.</p>
           </div>
         </div>
         <div class="department">
-          <div class="department-title">Product & Engineering</div>
-          <div class="department-info">
-            Discover our latest projects and development progress.
+          <div class="department-icon">
+            <img src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/engineering_icon.png" alt="Engineering icon" />
+          </div>
+          <div class="department-content">
+            <h3 class="department-title">Engineering</h3>
+            <p class="department-info">Learn about our development process and technologies.</p>
           </div>
         </div>
         <div class="department">
-          <div class="department-title">Sales & Marketing</div>
-          <div class="department-info">
-            See sales materials, campaigns, and outreach tools.
+          <div class="department-icon">
+            <img src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/human_ressources_icon.png" alt="Human Resources icon" />
           </div>
+          <div class="department-content">
+            <h3 class="department-title">Human Resources</h3>
+            <p class="department-info">Accessing tools, benefits, and employee resources.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="section" aria-labelledby="events-title">
+      <h2 id="events-title">Upcoming Events</h2>
+      <div class="two-col">
+        <div class="event-item">
+          <img class="event-thumb" alt="Busy hall at Eurobike dealer summit"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/dealer_summit.png" />
+          <div>
+            <strong>Dealer Summit — October 15</strong>
+            <div class="muted">Frankfurt — Product demos, partner sessions, and channel strategy.</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <img class="event-thumb" alt="Branded booth at Eurobike"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/brand_booth_refresh.png" />
+          <div>
+            <strong>Brand Booth Refresh — Nov 3</strong>
+            <div class="muted">Unveiling our updated retail fixture set and new collateral.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Hire -->
+    <section class="section" aria-labelledby="newhire-title">
+      <h2 id="newhire-title">New Hire</h2>
+      <div class="two-col">
+        <div class="resource-card">
+          <img class="resource-thumb" alt="Employee with bicycle at a bike-friendly workplace"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/onboarding_guide.png" />
+          <div>
+            <strong>Onboarding Guide</strong>
+            <div class="muted">Your first-week checklist, tools access, and team contacts.</div>
+          </div>
+        </div>
+        <div class="resource-card">
+          <img class="resource-thumb" alt="Close-up of e-bike battery pack"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/battery_care.png" />
+          <div>
+            <strong>Battery Care</strong>
+            <div class="muted">Charging best practices and storage safety for Li-ion packs.</div>
+          </div>
+        </div>
+        <div class="resource-card">
+          <img class="resource-thumb" alt="Branded e-bike booth signage"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/branding_kit.png" />
+          <div>
+            <strong>Branding Kit</strong>
+            <div class="muted">Logos, type, color tokens, slide templates, and booth specs.</div>
+          </div>
+        </div>
+        <div class="resource-card">
+          <img class="resource-thumb" alt="Mechanic working in a bicycle workshop"
+               src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/service_SOPs.png" />
+          <div>
+            <strong>Service SOPs</strong>
+            <div class="muted">Workshop procedures for diagnostics, repairs, and QA.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Employee Spotlight -->
+    <section class="section" aria-labelledby="spotlight-title">
+      <h2 id="spotlight-title">Employee Spotlight</h2>
+      <div class="spotlight">
+        <img alt="Portrait of a bicycle mechanic in a workshop"
+             src="https://pub-f9993b7b403a4716b2bcde55f612bfae.r2.dev/alex_r_spotlight.png" />
+        <div>
+          <h3 style="margin:0 0 .25rem">Alex R. — Senior E-Drive Technician</h3>
+          <p class="muted" style="margin:.25rem 0 .6rem">
+            Alex leads our e-drive diagnostics team and recently cut RMA turnaround by 22% with a new battery health workflow.
+          </p>
+          <button class="btn" type="button">Learn More</button>
         </div>
       </div>
     </section>
   </main>
-  <!-- FOOTER -->
+
+  <!-- Footer (credits removed as requested) -->
   <footer>
-    <div class="footer-main">
-      <div class="footer-top">
-        <div class="footer-links">
-          <a href="#">About Us</a>
-          <a href="#">Contact</a>
-          <a href="#">Careers</a>
-          <a href="#">Partners</a>
-          <a href="#">Newsroom</a>
-          <a href="#">Sitemap</a>
-        </div>
-        <div class="footer-social">
-          <a href="#" aria-label="Facebook"><img src="https://img.icons8.com/ios-filled/50/999999/facebook--v1.png" alt="Facebook"></a>
-          <a href="#" aria-label="X (Twitter)"><img src="https://img.icons8.com/ios-filled/50/999999/twitterx.png" alt="X"></a>
-          <a href="#" aria-label="LinkedIn"><img src="https://img.icons8.com/ios-filled/50/999999/linkedin.png" alt="LinkedIn"></a>
-          <a href="#" aria-label="YouTube"><img src="https://img.icons8.com/ios-filled/50/999999/youtube-play.png" alt="YouTube"></a>
-          <a href="#" aria-label="Instagram"><img src="https://img.icons8.com/ios-filled/50/999999/instagram-new.png" alt="Instagram"></a>
-        </div>
-      </div>
-      <div class="footer-policies">
-        <a href="#">Feedback</a>
-        <a href="#">Help</a>
-        <a href="#">Terms & Conditions</a>
-        <a href="#">Privacy</a>
-        <a href="#">Cookies</a>
-        <a href="#">Accessibility</a>
-        <a href="#">Trademarks</a>
-        <a href="#">Supply Chain Transparency</a>
-        <a href="#">Newsroom</a>
-        <a href="#">Sitemap</a>
-      </div>
-      <div class="footer-divider"></div>
-      <div class="footer-copy">
-        &copy; 2025 Macharpe Inc. All rights reserved.
-      </div>
-    </div>
+    &copy; 2025 DAZZLING E-BIKES. All rights reserved.
   </footer>
 </body>
 </html>
