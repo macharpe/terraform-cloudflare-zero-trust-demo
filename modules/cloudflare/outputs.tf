@@ -48,19 +48,19 @@ output "pubkey_short_lived_certificate" {
 output "gcp_tunnel_id" {
   description = "ID of the Cloudflare Zero Trust Tunnel to GCP"
   value       = cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_infrastructure"].id
-  sensitive   = "true"
+  sensitive   = false
 }
 
 output "gcp_windows_rdp_tunnel_id" {
   description = "ID of the Cloudflare Zero Trust Tunnel to GCP for Windows RDP"
   value       = cloudflare_zero_trust_tunnel_cloudflared.tunnels["gcp_windows_rdp"].id
-  sensitive   = "true"
+  sensitive   = false
 }
 
 output "aws_tunnel_id" {
   description = "ID of the Cloudflare Zero Trust Tunnel to AWS"
   value       = cloudflare_zero_trust_tunnel_cloudflared.tunnels["aws_browser_rendering"].id
-  sensitive   = "true"
+  sensitive   = false
 }
 
 #output "azure_tunnel_id" {
