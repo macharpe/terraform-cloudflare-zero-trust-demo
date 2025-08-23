@@ -63,6 +63,7 @@ output "gcp_vm_key" {
 output "gcp_vm_key_paths" {
   description = "Private key file paths for GCP VMs"
   value       = local.gcp_vm_key_paths
+  sensitive   = false
 }
 
 #======================================
@@ -86,16 +87,19 @@ output "aws_vnc_service_public_key" {
 output "aws_cloudflared_key_paths" {
   description = "Private key file paths for AWS Cloudflared instances"
   value       = local.aws_cloudflared_key_paths
+  sensitive   = false
 }
 
 output "aws_service_key_path" {
   description = "Private key file path for AWS service instance"
   value       = local_file.private_keys["aws_service"].filename
+  sensitive   = false
 }
 
 output "aws_vnc_key_path" {
   description = "Private key file path for AWS VNC instance"
   value       = local_file.private_keys["aws_vnc"].filename
+  sensitive   = false
 }
 
 #======================================
@@ -109,4 +113,5 @@ output "azure_ssh_public_key" {
 output "azure_key_paths" {
   description = "Private key file paths for Azure VMs"
   value       = local.azure_key_paths
+  sensitive   = false
 }
