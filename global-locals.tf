@@ -22,8 +22,8 @@ locals {
 
   # Common Cloudflare configuration
   global_cloudflare = {
-    admin_web_app_port     = var.cf_admin_web_app_port
-    sensitive_web_app_port = var.cf_sensitive_web_app_port
+    intranet_app_port    = var.cf_intranet_app_port
+    competition_app_port = var.cf_competition_app_port
   }
 
   # Common OKTA configuration for contractor access

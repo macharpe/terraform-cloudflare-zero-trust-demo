@@ -19,6 +19,10 @@ gcp_enable_oslogin             = "false"
 gcp_machine_size               = "e2-micro"
 gcp_windows_machine_size       = "e2-medium"
 
+# OS Image Configuration
+gcp_linux_image                = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
+gcp_windows_image              = "windows-server-2025-dc-v20250612"
+
 # Networking
 gcp_infra_cidr              = "10.156.70.0/24"
 gcp_warp_cidr               = "10.156.85.0/24"
@@ -61,8 +65,8 @@ cf_sensitive_web_app_name = "Competition App"
 cf_intranet_web_app_name  = "Intranet"
 
 # Application Ports
-cf_sensitive_web_app_port     = 8080
-cf_admin_web_app_port         = 8181
+cf_competition_app_port = 8080
+cf_intranet_app_port    = 8181
 cf_domain_controller_rdp_port = 3389
 
 # Identity Providers - Sensitive: manually retrieved from Cloudflare dashboard
@@ -130,7 +134,7 @@ okta_bob_user_linux_password = "bob"
 aws_region                     = "eu-central-1"
 aws_ec2_browser_ssh_name       = "cloudflare-zero-trust-demo-ssh-aws"
 aws_ec2_browser_vnc_name       = "cloudflare-zero-trust-demo-vnc-aws"
-aws_ec2_instance_config_ami_id = "ami-03250b0e01c28d196"
+aws_ec2_instance_config_ami_id = "ami-0e872aee57663ae2d" # Ubuntu 24.04 LTS
 aws_ec2_instance_config_type   = "t2.micro"
 
 aws_cloudflared_count          = 1
@@ -149,7 +153,7 @@ aws_public_cidr  = "172.16.84.0/24"
 #=====================================
 # Azure variables
 #=====================================
-azure_resource_group_location  = "germanywestcentral"
+azure_resource_group_region  = "germanywestcentral"
 azure_resource_group_name      = "cloudflare-ressource-group"
 
 # 4 users
@@ -167,6 +171,12 @@ azure_vm_admin_username        = "ubuntu"
 azure_vm_admin_password        = "********"
 azure_warp_vm_name             = "cloudflare-warp-connector-azure"
 azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
+
+# OS Image Configuration
+azure_image_publisher = "Canonical"
+azure_image_offer     = "ubuntu-24_04-lts"
+azure_image_sku       = "server"
+azure_image_version   = "latest"
 
 # Networking
 azure_subnet_cidr       = "192.168.71.0/24"

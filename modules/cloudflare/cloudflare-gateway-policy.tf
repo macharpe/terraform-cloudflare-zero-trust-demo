@@ -148,7 +148,7 @@ locals {
       action               = "block"
       precedence           = local.precedence.ip_access_block
       filters              = ["l4"]
-      traffic              = "(net.dst.ip == ${var.gcp_vm_internal_ip} and net.dst.port == ${var.cf_admin_web_app_port}) or (net.dst.ip == ${var.gcp_vm_internal_ip} and net.dst.port == ${var.cf_sensitive_web_app_port})"
+      traffic              = "(net.dst.ip == ${var.gcp_vm_internal_ip} and net.dst.port == ${var.cf_intranet_app_port}) or (net.dst.ip == ${var.gcp_vm_internal_ip} and net.dst.port == ${var.cf_competition_app_port})"
       block_reason         = "This website is blocked because you are trying to access an internal app via its IP address"
       notification_enabled = true
     }

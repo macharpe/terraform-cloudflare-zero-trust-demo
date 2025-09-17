@@ -2,8 +2,7 @@
 # Local Variables
 #==========================================================
 locals {
-  # Certificate data
-  gateway_ca_certificate = jsondecode(data.http.short_lived_cloudflare_ssh_ca.response_body)
+  # Certificate data - gateway_ca_certificate is defined in ssh-ca-management.tf
 
   # WARP connector tokens
   azure_warp_connector_token = jsondecode(data.http.cloudflare_warp_connector_token_azure.response_body).result
@@ -22,12 +21,12 @@ locals {
       public_hostnames = [
         {
           hostname = var.cf_subdomain_web
-          service  = "http://localhost:${var.cf_admin_web_app_port}"
+          service  = "http://localhost:${var.cf_intranet_app_port}"
           aud_tag  = "gcp_intranet_web_app"
         },
         {
           hostname = var.cf_subdomain_web_sensitive
-          service  = "http://localhost:${var.cf_sensitive_web_app_port}"
+          service  = "http://localhost:${var.cf_competition_app_port}"
           aud_tag  = "competition_web_app"
         }
       ]
@@ -62,10 +61,6 @@ locals {
 #==========================================================
 # Data Sources
 #==========================================================
-data "http" "short_lived_cloudflare_ssh_ca" {
-  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/access/gateway_ca"
-  request_headers = local.cloudflare_api_headers
-}
 
 data "http" "cloudflare_warp_connector_token_azure" {
   url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_azure_id}/token"
@@ -132,7 +127,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
     ingress = [
       {
         hostname = var.cf_subdomain_web
-        service  = "http://localhost:${var.cf_admin_web_app_port}"
+        service  = "http://localhost:${var.cf_intranet_app_port}"
         origin_request = {
           access = {
             aud_tag   = [cloudflare_zero_trust_access_application.gcp_intranet_web_app.aud]
@@ -143,7 +138,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
       },
       {
         hostname = var.cf_subdomain_web_sensitive
-        service  = "http://localhost:${var.cf_sensitive_web_app_port}"
+        service  = "http://localhost:${var.cf_competition_app_port}"
         origin_request = {
           access = {
             aud_tag   = [cloudflare_zero_trust_access_application.gcp_competition_web_app.aud]

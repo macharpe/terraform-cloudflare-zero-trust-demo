@@ -178,13 +178,13 @@ variable "cf_browser_rdp_app_name" {
 #======================================================
 # APPLICATION PORTS
 #======================================================
-variable "cf_admin_web_app_port" {
-  description = "Port for the Administration web App in Cloudflare"
+variable "cf_intranet_app_port" {
+  description = "Port for the Intranet web App in Cloudflare"
   type        = number
 }
 
-variable "cf_sensitive_web_app_port" {
-  description = "Port for the Sensitive web App in Cloudflare"
+variable "cf_competition_app_port" {
+  description = "Port for the Competition web App in Cloudflare"
   type        = number
 }
 

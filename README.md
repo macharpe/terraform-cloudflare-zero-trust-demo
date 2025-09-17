@@ -28,15 +28,15 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 
 ## 🔧 Optional Components
 
-This project includes optional components that can be enabled based on your specific requirements:
+This demo environment includes **two optional components** that can be enabled based on your specific requirements:
 
 ### Training Status Admin Portal
 
 An optional Cloudflare Access application that integrates with the **Training Compliance Gateway** for advanced training status tracking and compliance evaluation.
 
-- **File**: `modules/cloudflare/optional-cloudflare-apps.tf` 
+- **File**: `modules/cloudflare/optional-cloudflare-apps.tf`
 - **Requirements**: Requires the [Training Compliance Gateway](https://github.com/macharpe/cloudflare-access-training-evaluator) Cloudflare Worker to be deployed
-- **Features**: 
+- **Features**:
   - Training status tracking and compliance evaluation
   - **External validation use case**: Demonstrates how to require training completion before app access (perfect for compliance scenarios where users must pass training to access sensitive applications)
   - Integration with Competition App policy for conditional access
@@ -53,7 +53,7 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
    ```bash
    # Get the AUD value from Terraform output
    terraform output TRAINING_STATUS_ADMIN_PORTAL_AUD
-   
+
    # Set the worker secret (replace with your actual AUD value)
    echo "8a47b4391d556b42e9c7b0bba0d3896c7579bd0ffad37453b608bc489ed070fc" | wrangler secret put ACCESS_APP_AUD --name cloudflare-access-training-evaluator
    ```
@@ -62,13 +62,29 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
    ```bash
    wrangler deploy --name cloudflare-access-training-evaluator
    ```
-   
+
    > **Note**: The worker needs to be redeployed after setting the `ACCESS_APP_AUD` secret to ensure the new configuration is loaded properly.
 
 > **⚠️ Important Notes:**
 > - The Training Status Admin Portal app and policy will only function if the Training Compliance Gateway is deployed and running
 > - If you haven't deployed the Training Compliance Gateway, you must comment out the `require_external_evaluation` settings in the Competition App Policy (located in `modules/cloudflare/cloudflare-app-policies.tf`), otherwise the Competition App won't work or appear in the App Launcher
 > - Repository: [Training Compliance Gateway for Cloudflare Worker](https://github.com/macharpe/cloudflare-access-training-evaluator)
+
+### Access Denied Info Page
+
+An optional custom Access-denied-info-page that provides users with detailed information and guidance when access is denied to protected applications.
+
+- **File**: Access denied configurations are embedded within `modules/cloudflare/cloudflare-apps.tf`
+- **Requirements**: Requires the [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page) to be deployed on Cloudflare Pages
+- **Features**:
+  - Professional custom denial page with branding and guidance
+  - User-friendly explanations for access denial reasons
+  - Contact information and support resources
+  - Consistent experience across all protected applications
+
+> **⚠️ Important Notes:**
+> - If you don't want to use the custom Access denied page, you must remove the `custom_deny_url` and `custom_non_identity_deny_url` parameters from every access application in `modules/cloudflare/cloudflare-apps.tf`
+> - Repository: [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page)
 
 ## 🏗️ Architecture Overview
 
@@ -83,19 +99,20 @@ _Last Updated: 13th of August 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Project Files**: 44 files *(focused infrastructure codebase)*
-- **Core Code Files**: 42 files *(infrastructure and automation)*
+- **Total Project Files**: 51 files *(focused infrastructure codebase)*
+- **Core Code Files**: 51 files *(infrastructure and automation)*
 - **Module Directories**: 4 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 31 | 4,577 | Infrastructure as Code |
-| **Documentation (.md)** | 5 | 1,193 | Project documentation |
-| **Python (.py)** | 2 | 365 | WARP routing utilities |
-| **Scripts (.sh)** | 2 | 290 | Cleanup & maintenance |
-| **Templates (.tpl, .cmd)** | 2 | 292 | Cloud-init & startup scripts |
-| **Total Core Code** | 42 | **6,717** | **Production-ready infrastructure** |
+| **Terraform (.tf)** | 31 | 4,635 | Infrastructure as Code |
+| **Documentation (.md)** | 11 | ~1,400 | Project documentation |
+| **HTML (.html)** | 3 | ~500 | Demo applications |
+| **Python (.py)** | 2 | ~365 | WARP routing utilities |
+| **Scripts (.sh)** | 2 | ~290 | Cleanup & maintenance |
+| **Templates (.tpl, .cmd)** | 2 | ~300 | Cloud-init & startup scripts |
+| **Total Core Code** | 51 | **~7,490** | **Production-ready infrastructure** |
 
 <table>
 <tr>
@@ -105,7 +122,7 @@ _Last Updated: 13th of August 2025_
 - **166** total resources deployed
 - **31** Terraform files  
 - **4** custom modules
-- **6** script files total
+- **8** script & template files total
 - **Multi-provider** architecture
 
 </td>
@@ -437,6 +454,7 @@ Planned enhancements and features:
 - **Advanced Security Groups**: More granular network security configurations
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
+- **Post-Quantum Cryptography**: Implementation of [post-quantum algorithms](https://blog.cloudflare.com/post-quantum-zero-trust/) for future-proof encryption and Zero Trust communications
 
 ## 🤝 Contributing
 
@@ -456,19 +474,19 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
 | <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.4 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
 | <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.8.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.0 |
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 6.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
@@ -561,10 +579,14 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_default_tags"></a> [azure\_default\_tags](#input\_azure\_default\_tags) | default tags for Azure | `map(string)` | <pre>{<br/>  "Owner": "macharpe",<br/>  "environment": "dev",<br/>  "service": "cloudflare-zero-trust-demo"<br/>}</pre> | no |
 | <a name="input_azure_developer1_name"></a> [azure\_developer1\_name](#input\_azure\_developer1\_name) | User 1 in Azure AD | `string` | n/a | yes |
 | <a name="input_azure_developer2_name"></a> [azure\_developer2\_name](#input\_azure\_developer2\_name) | User 2 in Azure AD | `string` | n/a | yes |
+| <a name="input_azure_image_offer"></a> [azure\_image\_offer](#input\_azure\_image\_offer) | Azure VM image offer | `string` | `"ubuntu-24_04-lts"` | no |
+| <a name="input_azure_image_publisher"></a> [azure\_image\_publisher](#input\_azure\_image\_publisher) | Azure VM image publisher | `string` | `"Canonical"` | no |
+| <a name="input_azure_image_sku"></a> [azure\_image\_sku](#input\_azure\_image\_sku) | Azure VM image SKU | `string` | `"server"` | no |
+| <a name="input_azure_image_version"></a> [azure\_image\_version](#input\_azure\_image\_version) | Azure VM image version | `string` | `"latest"` | no |
 | <a name="input_azure_matthieu_user_object_id"></a> [azure\_matthieu\_user\_object\_id](#input\_azure\_matthieu\_user\_object\_id) | Object ID in Azure for user Matthieu | `string` | n/a | yes |
 | <a name="input_azure_public_dns_domain"></a> [azure\_public\_dns\_domain](#input\_azure\_public\_dns\_domain) | Azure Public DNS Domain | `string` | n/a | yes |
-| <a name="input_azure_resource_group_location"></a> [azure\_resource\_group\_location](#input\_azure\_resource\_group\_location) | Location for all resources | `string` | `"Germany West Central"` | no |
 | <a name="input_azure_resource_group_name"></a> [azure\_resource\_group\_name](#input\_azure\_resource\_group\_name) | Ressource Group Name | `string` | n/a | yes |
+| <a name="input_azure_resource_group_region"></a> [azure\_resource\_group\_region](#input\_azure\_resource\_group\_region) | Location for all resources | `string` | `"Germany West Central"` | no |
 | <a name="input_azure_sales1_name"></a> [azure\_sales1\_name](#input\_azure\_sales1\_name) | User 3 in Azure AD | `string` | n/a | yes |
 | <a name="input_azure_sales2_name"></a> [azure\_sales2\_name](#input\_azure\_sales2\_name) | User 4 in Azure AD | `string` | n/a | yes |
 | <a name="input_azure_subnet_cidr"></a> [azure\_subnet\_cidr](#input\_azure\_subnet\_cidr) | Azure address prefix, subnet for VM in Azure | `string` | n/a | yes |
@@ -578,13 +600,13 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
 | <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
-| <a name="input_cf_admin_web_app_port"></a> [cf\_admin\_web\_app\_port](#input\_cf\_admin\_web\_app\_port) | Port for the Administration web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to cloudflare application and aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_azure_identity_provider_id"></a> [cf\_azure\_identity\_provider\_id](#input\_cf\_azure\_identity\_provider\_id) | Azure Entra ID identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_browser_rdp_app_name"></a> [cf\_browser\_rdp\_app\_name](#input\_cf\_browser\_rdp\_app\_name) | Name of the RDP windows browser rendered App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_browser_ssh_app_name"></a> [cf\_browser\_ssh\_app\_name](#input\_cf\_browser\_ssh\_app\_name) | Name of the Browser Rendering SSH App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_browser_vnc_app_name"></a> [cf\_browser\_vnc\_app\_name](#input\_cf\_browser\_vnc\_app\_name) | Name of the Browser Rendering VNC App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_competition_app_port"></a> [cf\_competition\_app\_port](#input\_cf\_competition\_app\_port) | Port for the Competition web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_custom_cgnat_routes"></a> [cf\_custom\_cgnat\_routes](#input\_cf\_custom\_cgnat\_routes) | List of custom CGNAT routes to add to the device profile | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_cf_default_cgnat_routes"></a> [cf\_default\_cgnat\_routes](#input\_cf\_default\_cgnat\_routes) | default cgnat routes | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "address": "100.64.0.0/10",<br/>    "description": "Default CGNAT Range"<br/>  }<br/>]</pre> | no |
 | <a name="input_cf_device_os"></a> [cf\_device\_os](#input\_cf\_device\_os) | This is the OS you are running on your own client machine | `string` | n/a | yes |
@@ -592,6 +614,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_email_domain"></a> [cf\_email\_domain](#input\_cf\_email\_domain) | Email Domain used for email authentication in App policies | `string` | n/a | yes |
 | <a name="input_cf_gateway_posture_id"></a> [cf\_gateway\_posture\_id](#input\_cf\_gateway\_posture\_id) | Gateway posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_infra_app_name"></a> [cf\_infra\_app\_name](#input\_cf\_infra\_app\_name) | Name of the Infrastructure App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_intranet_app_port"></a> [cf\_intranet\_app\_port](#input\_cf\_intranet\_app\_port) | Port for the Intranet web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_intranet_web_app_name"></a> [cf\_intranet\_web\_app\_name](#input\_cf\_intranet\_web\_app\_name) | Name of the Intranet web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
@@ -599,7 +622,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_osx_version_posture_rule_id"></a> [cf\_osx\_version\_posture\_rule\_id](#input\_cf\_osx\_version\_posture\_rule\_id) | Rule ID for the posture check on latest version of macos | `string` | n/a | yes |
 | <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_sensitive_web_app_port"></a> [cf\_sensitive\_web\_app\_port](#input\_cf\_sensitive\_web\_app\_port) | Port for the Sensitive web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |
 | <a name="input_cf_subdomain_ssh"></a> [cf\_subdomain\_ssh](#input\_cf\_subdomain\_ssh) | Name of the subdomain for ssh public hostname of tunnel | `string` | n/a | yes |
 | <a name="input_cf_subdomain_training_status"></a> [cf\_subdomain\_training\_status](#input\_cf\_subdomain\_training\_status) | Name of the subdomain for training status admin portal (OPTIONAL: only needed if using optional-cloudflare-apps.tf) | `string` | n/a | yes |
@@ -624,6 +646,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_cloudflared_vm_name"></a> [gcp\_cloudflared\_vm\_name](#input\_gcp\_cloudflared\_vm\_name) | Name for the VM instance running cloudflared for infrastructure access demo | `string` | n/a | yes |
 | <a name="input_gcp_enable_oslogin"></a> [gcp\_enable\_oslogin](#input\_gcp\_enable\_oslogin) | Whether to enable OS Login | `bool` | `true` | no |
 | <a name="input_gcp_infra_cidr"></a> [gcp\_infra\_cidr](#input\_gcp\_infra\_cidr) | CIDR Range for GCP VMs running cloudflared | `string` | n/a | yes |
+| <a name="input_gcp_linux_image"></a> [gcp\_linux\_image](#input\_gcp\_linux\_image) | GCP Linux image for compute instances | `string` | `"ubuntu-os-cloud/ubuntu-2404-lts-amd64"` | no |
 | <a name="input_gcp_machine_size"></a> [gcp\_machine\_size](#input\_gcp\_machine\_size) | size of the compute engine instance | `string` | `"e2-micro"` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP project ID | `string` | n/a | yes |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region | `string` | `"europe-west3"` | no |
@@ -635,6 +658,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_warp_cidr"></a> [gcp\_warp\_cidr](#input\_gcp\_warp\_cidr) | CIDR Range for GCP VMs running warp | `string` | n/a | yes |
 | <a name="input_gcp_warp_connector_vm_name"></a> [gcp\_warp\_connector\_vm\_name](#input\_gcp\_warp\_connector\_vm\_name) | Name of the GCP VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_windows_admin_password"></a> [gcp\_windows\_admin\_password](#input\_gcp\_windows\_admin\_password) | Password for Windows Server admin user in GCP | `string` | n/a | yes |
+| <a name="input_gcp_windows_image"></a> [gcp\_windows\_image](#input\_gcp\_windows\_image) | GCP Windows image for compute instances | `string` | `"windows-server-2025-dc-v20250612"` | no |
 | <a name="input_gcp_windows_machine_size"></a> [gcp\_windows\_machine\_size](#input\_gcp\_windows\_machine\_size) | size of the compute engine instance for Windows specifically | `string` | `"e2-medium"` | no |
 | <a name="input_gcp_windows_rdp_cidr"></a> [gcp\_windows\_rdp\_cidr](#input\_gcp\_windows\_rdp\_cidr) | CIDR Range for GCP VMs running cloudflared, Windows and RDP Server | `string` | n/a | yes |
 | <a name="input_gcp_windows_rdp_vm_name"></a> [gcp\_windows\_rdp\_vm\_name](#input\_gcp\_windows\_rdp\_vm\_name) | Name for the VM instance running cloudflared and Windows RDP Server on GCP | `string` | n/a | yes |
