@@ -66,6 +66,18 @@ variable "gcp_windows_machine_size" {
   default     = "e2-medium"
 }
 
+variable "gcp_linux_image" {
+  description = "GCP Linux image for compute instances"
+  type        = string
+  default     = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
+}
+
+variable "gcp_windows_image" {
+  description = "GCP Windows image for compute instances"
+  type        = string
+  default     = "windows-server-2025-dc-v20250612"
+}
+
 # GCP VM Names
 variable "gcp_cloudflared_vm_name" {
   description = "Name for the VM instance running cloudflared for infrastructure access demo"
@@ -192,7 +204,7 @@ variable "azure_subscription_id" {
   type        = string
 }
 
-variable "azure_resource_group_location" {
+variable "azure_resource_group_region" {
   description = "Location for all resources"
   type        = string
   default     = "Germany West Central"
@@ -256,6 +268,30 @@ variable "azure_vm_size" {
   description = "Azure VM size"
   type        = string
   default     = "Standard_B1ls"
+}
+
+variable "azure_image_publisher" {
+  description = "Azure VM image publisher"
+  type        = string
+  default     = "Canonical"
+}
+
+variable "azure_image_offer" {
+  description = "Azure VM image offer"
+  type        = string
+  default     = "ubuntu-24_04-lts"
+}
+
+variable "azure_image_sku" {
+  description = "Azure VM image SKU"
+  type        = string
+  default     = "server"
+}
+
+variable "azure_image_version" {
+  description = "Azure VM image version"
+  type        = string
+  default     = "latest"
 }
 
 variable "azure_vm_admin_username" {
@@ -424,13 +460,13 @@ variable "cf_browser_rdp_app_name" {
 # CLOUDFLARE APPLICATION PORTS
 #======================================================
 
-variable "cf_admin_web_app_port" {
-  description = "Port for the Administration web App in Cloudflare"
+variable "cf_intranet_app_port" {
+  description = "Port for the Intranet web App in Cloudflare"
   type        = number
 }
 
-variable "cf_sensitive_web_app_port" {
-  description = "Port for the Sensitive web App in Cloudflare"
+variable "cf_competition_app_port" {
+  description = "Port for the Competition web App in Cloudflare"
   type        = number
 }
 

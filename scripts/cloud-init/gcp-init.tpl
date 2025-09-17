@@ -88,6 +88,12 @@ elif [[ "$ROLE" == "cloudflared" ]]; then
     # Modify /etc/ssh/sshd_config
     sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
     sed -i '/PubkeyAuthentication yes/a TrustedUserCAKeys \/etc\/ssh\/ca_cloudflare.pub' /etc/ssh/sshd_config
+    
+    # Add compatible KexAlgorithms to SSH config for better compatibility
+    echo "KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256" >> /etc/ssh/sshd_config
+    
+    # Restart SSH service to apply changes
+    systemctl restart ssh
 
     # Create directory for Web Servers
     cd /home/
@@ -99,27 +105,24 @@ elif [[ "$ROLE" == "cloudflared" ]]; then
     cat > /home/webserver1/index.html << 'EOF'
 ${intranet_html}
 EOF
-    python3 -m http.server ${admin_web_app_port} &
+    python3 -m http.server ${intranet_app_port} &
 
     # very basic webserver 2
     cd /home/webserver2/
     cat > /home/webserver2/index.html << 'EOF'
 ${competition_html}
 EOF
-    python3 -m http.server ${sensitive_web_app_port} &
-
-    # Restart SSH service
-    service ssh restart
+    python3 -m http.server ${competition_app_port} &
 
     # Wait for 60 seconds
     sleep 60
 
 else
     echo "Default VM setup, no special role"
-    
+
     # Configure SSH daemon for better compatibility
     echo "Configuring SSH daemon for compatibility..."
-    
+
     # Add compatible KexAlgorithms to SSH config
     echo "KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256" >> /etc/ssh/sshd_config
     
@@ -182,18 +185,18 @@ init_config:
 
 instances:
   - name: local_web_services
-    url: http://localhost:8080
+    url: http://localhost:${intranet_app_port}
     timeout: 5
     tags:
-      - service:admin_web_app
+      - service:intranet_web_app
       - cloud:gcp
       - role:${role}
     
   - name: local_web_services_sensitive
-    url: http://localhost:8081
+    url: http://localhost:${competition_app_port}
     timeout: 5
     tags:
-      - service:sensitive_web_app
+      - service:competition_web_app
       - cloud:gcp
       - role:${role}
 EOF

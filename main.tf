@@ -96,8 +96,8 @@ module "cloudflare" {
   cf_intranet_web_app_name      = var.cf_intranet_web_app_name
   cf_browser_rdp_app_name       = var.cf_browser_rdp_app_name
   cf_team_name                  = var.cf_team_name
-  cf_admin_web_app_port         = var.cf_admin_web_app_port
-  cf_sensitive_web_app_port     = var.cf_sensitive_web_app_port
+  cf_intranet_app_port          = var.cf_intranet_app_port
+  cf_competition_app_port       = var.cf_competition_app_port
   cf_domain_controller_rdp_port = var.cf_domain_controller_rdp_port
 
   # AWS

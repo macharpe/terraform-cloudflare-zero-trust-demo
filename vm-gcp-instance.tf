@@ -103,7 +103,7 @@ locals {
 
   # Common Linux boot disk configuration
   common_linux_boot_disk = {
-    image = "ubuntu-os-cloud/ubuntu-2204-lts"
+    image = var.gcp_linux_image
   }
 
   # Common metadata variables
@@ -191,7 +191,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
 
   boot_disk {
     initialize_params {
-      image = "windows-server-2025-dc-v20250612"
+      image = var.gcp_windows_image
       size  = 50
       type  = "pd-standard"
     }
@@ -230,8 +230,8 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
       user_name                 = var.gcp_windows_user_name
       admin_password            = var.gcp_windows_admin_password
       tunnel_secret_windows_gcp = module.cloudflare.gcp_windows_extracted_token
-      admin_web_app_port        = var.cf_admin_web_app_port
-      sensitive_web_app_port    = var.cf_sensitive_web_app_port
+      intranet_app_port         = var.cf_intranet_app_port
+      competition_app_port      = var.cf_competition_app_port
       datadog_api_key           = var.datadog_api_key
       datadog_region            = var.datadog_region
     })
@@ -346,6 +346,7 @@ resource "google_compute_firewall" "allow_ssh_from_my_ip" {
   source_ranges = [var.cf_warp_cgnat_cidr]
   target_tags   = ["infrastructure-access-instances", "warp-instances"]
 }
+
 
 # Allow PING only from my ip
 resource "google_compute_firewall" "allow_icmp_from_any" {

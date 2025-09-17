@@ -28,15 +28,15 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 
 ## 🔧 Optional Components
 
-This project includes optional components that can be enabled based on your specific requirements:
+This demo environment includes **two optional components** that can be enabled based on your specific requirements:
 
 ### Training Status Admin Portal
 
 An optional Cloudflare Access application that integrates with the **Training Compliance Gateway** for advanced training status tracking and compliance evaluation.
 
-- **File**: `modules/cloudflare/optional-cloudflare-apps.tf` 
+- **File**: `modules/cloudflare/optional-cloudflare-apps.tf`
 - **Requirements**: Requires the [Training Compliance Gateway](https://github.com/macharpe/cloudflare-access-training-evaluator) Cloudflare Worker to be deployed
-- **Features**: 
+- **Features**:
   - Training status tracking and compliance evaluation
   - **External validation use case**: Demonstrates how to require training completion before app access (perfect for compliance scenarios where users must pass training to access sensitive applications)
   - Integration with Competition App policy for conditional access
@@ -53,7 +53,7 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
    ```bash
    # Get the AUD value from Terraform output
    terraform output TRAINING_STATUS_ADMIN_PORTAL_AUD
-   
+
    # Set the worker secret (replace with your actual AUD value)
    echo "8a47b4391d556b42e9c7b0bba0d3896c7579bd0ffad37453b608bc489ed070fc" | wrangler secret put ACCESS_APP_AUD --name cloudflare-access-training-evaluator
    ```
@@ -62,13 +62,29 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
    ```bash
    wrangler deploy --name cloudflare-access-training-evaluator
    ```
-   
+
    > **Note**: The worker needs to be redeployed after setting the `ACCESS_APP_AUD` secret to ensure the new configuration is loaded properly.
 
 > **⚠️ Important Notes:**
 > - The Training Status Admin Portal app and policy will only function if the Training Compliance Gateway is deployed and running
 > - If you haven't deployed the Training Compliance Gateway, you must comment out the `require_external_evaluation` settings in the Competition App Policy (located in `modules/cloudflare/cloudflare-app-policies.tf`), otherwise the Competition App won't work or appear in the App Launcher
 > - Repository: [Training Compliance Gateway for Cloudflare Worker](https://github.com/macharpe/cloudflare-access-training-evaluator)
+
+### Access Denied Info Page
+
+An optional custom Access-denied-info-page that provides users with detailed information and guidance when access is denied to protected applications.
+
+- **File**: Access denied configurations are embedded within `modules/cloudflare/cloudflare-apps.tf`
+- **Requirements**: Requires the [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page) to be deployed on Cloudflare Pages
+- **Features**:
+  - Professional custom denial page with branding and guidance
+  - User-friendly explanations for access denial reasons
+  - Contact information and support resources
+  - Consistent experience across all protected applications
+
+> **⚠️ Important Notes:**
+> - If you don't want to use the custom Access denied page, you must remove the `custom_deny_url` and `custom_non_identity_deny_url` parameters from every access application in `modules/cloudflare/cloudflare-apps.tf`
+> - Repository: [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page)
 
 ## 🏗️ Architecture Overview
 
@@ -83,19 +99,20 @@ _Last Updated: 13th of August 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Project Files**: 44 files *(focused infrastructure codebase)*
-- **Core Code Files**: 42 files *(infrastructure and automation)*
+- **Total Project Files**: 51 files *(focused infrastructure codebase)*
+- **Core Code Files**: 51 files *(infrastructure and automation)*
 - **Module Directories**: 4 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 31 | 4,577 | Infrastructure as Code |
-| **Documentation (.md)** | 5 | 1,193 | Project documentation |
-| **Python (.py)** | 2 | 365 | WARP routing utilities |
-| **Scripts (.sh)** | 2 | 290 | Cleanup & maintenance |
-| **Templates (.tpl, .cmd)** | 2 | 292 | Cloud-init & startup scripts |
-| **Total Core Code** | 42 | **6,717** | **Production-ready infrastructure** |
+| **Terraform (.tf)** | 31 | 4,635 | Infrastructure as Code |
+| **Documentation (.md)** | 11 | ~1,400 | Project documentation |
+| **HTML (.html)** | 3 | ~500 | Demo applications |
+| **Python (.py)** | 2 | ~365 | WARP routing utilities |
+| **Scripts (.sh)** | 2 | ~290 | Cleanup & maintenance |
+| **Templates (.tpl, .cmd)** | 2 | ~300 | Cloud-init & startup scripts |
+| **Total Core Code** | 51 | **~7,490** | **Production-ready infrastructure** |
 
 <table>
 <tr>
@@ -105,7 +122,7 @@ _Last Updated: 13th of August 2025_
 - **166** total resources deployed
 - **31** Terraform files  
 - **4** custom modules
-- **6** script files total
+- **8** script & template files total
 - **Multi-provider** architecture
 
 </td>
@@ -437,6 +454,7 @@ Planned enhancements and features:
 - **Advanced Security Groups**: More granular network security configurations
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
+- **Post-Quantum Cryptography**: Implementation of [post-quantum algorithms](https://blog.cloudflare.com/post-quantum-zero-trust/) for future-proof encryption and Zero Trust communications
 
 ## 🤝 Contributing
 

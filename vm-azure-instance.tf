@@ -3,7 +3,7 @@
 #==========================================================
 resource "azurerm_resource_group" "cloudflare_rg" {
   name     = var.azure_resource_group_name
-  location = var.azure_resource_group_location
+  location = var.azure_resource_group_region
 
   tags = local.azure_common_tags
 }
@@ -122,16 +122,16 @@ locals {
   # Common OS disk configuration
   azure_common_os_disk = {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "StandardSSD_LRS"
     disk_size_gb         = 32
   }
 
   # Common source image configuration
   azure_common_source_image = {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
+    publisher = var.azure_image_publisher
+    offer     = var.azure_image_offer
+    sku       = var.azure_image_sku
+    version   = var.azure_image_version
   }
 
   # Common timeouts

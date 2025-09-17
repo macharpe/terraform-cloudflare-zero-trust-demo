@@ -14,11 +14,13 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_ssh_target" {
 
 # Creating the infrastructure Application
 resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
-  account_id = var.cloudflare_account_id
-  type       = "infrastructure"
-  name       = var.cf_infra_app_name
-  logo_url   = "https://upload.wikimedia.org/wikipedia/commons/0/01/Google-cloud-platform.svg"
-  tags       = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  account_id                   = var.cloudflare_account_id
+  type                         = "infrastructure"
+  name                         = var.cf_infra_app_name
+  logo_url                     = "https://upload.wikimedia.org/wikipedia/commons/0/01/Google-cloud-platform.svg"
+  tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  custom_deny_url              = "https://denied.macharpe.com/"
+  custom_non_identity_deny_url = "https://denied.macharpe.com/"
 
   target_criteria = [{
     port     = "22",
@@ -95,13 +97,15 @@ resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
 #======================================================
 # Creating the Self-hosted Application for Browser rendering SSH
 resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" {
-  account_id           = var.cloudflare_account_id
-  type                 = "ssh"
-  name                 = var.cf_browser_ssh_app_name
-  app_launcher_visible = true
-  logo_url             = "https://cdn.iconscout.com/icon/free/png-256/free-database-icon-download-in-svg-png-gif-file-formats--ui-elements-pack-user-interface-icons-444649.png"
-  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "0s"
+  account_id                   = var.cloudflare_account_id
+  type                         = "ssh"
+  name                         = var.cf_browser_ssh_app_name
+  app_launcher_visible         = true
+  logo_url                     = "https://cdn.iconscout.com/icon/free/png-256/free-database-icon-download-in-svg-png-gif-file-formats--ui-elements-pack-user-interface-icons-444649.png"
+  tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration             = "0s"
+  custom_deny_url              = "https://denied.macharpe.com/"
+  custom_non_identity_deny_url = "https://denied.macharpe.com/"
 
   destinations = [{
     type = "public"
@@ -127,13 +131,15 @@ resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" 
 #======================================================
 # Creating the Self-hosted Application for Browser rendering VNC
 resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" {
-  account_id           = var.cloudflare_account_id
-  type                 = "vnc"
-  name                 = var.cf_browser_vnc_app_name
-  app_launcher_visible = true
-  logo_url             = "https://blog.zwindler.fr/2015/07/vnc.png"
-  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "0s"
+  account_id                   = var.cloudflare_account_id
+  type                         = "vnc"
+  name                         = var.cf_browser_vnc_app_name
+  app_launcher_visible         = true
+  logo_url                     = "https://blog.zwindler.fr/2015/07/vnc.png"
+  tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration             = "0s"
+  custom_deny_url              = "https://denied.macharpe.com/"
+  custom_non_identity_deny_url = "https://denied.macharpe.com/"
 
   destinations = [{
     type = "public"
@@ -156,13 +162,15 @@ resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" 
 #======================================================
 # Creating the Self-hosted Application for Competition web application
 resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
-  account_id           = var.cloudflare_account_id
-  type                 = "self_hosted"
-  name                 = var.cf_sensitive_web_app_name
-  app_launcher_visible = true
-  logo_url             = "https://img.freepik.com/free-vector/trophy_78370-345.jpg"
-  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "0s"
+  account_id                   = var.cloudflare_account_id
+  type                         = "self_hosted"
+  name                         = var.cf_sensitive_web_app_name
+  app_launcher_visible         = true
+  logo_url                     = "https://img.freepik.com/free-vector/trophy_78370-345.jpg"
+  tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration             = "0s"
+  custom_deny_url              = "https://denied.macharpe.com/"
+  custom_non_identity_deny_url = "https://denied.macharpe.com/"
 
   destinations = [{
     type = "public"
@@ -186,13 +194,15 @@ resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
 #======================================================
 # Creating the Self-hosted Application for Administration web application
 resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
-  account_id           = var.cloudflare_account_id
-  type                 = "self_hosted"
-  name                 = var.cf_intranet_web_app_name
-  app_launcher_visible = true
-  logo_url             = "https://raw.githubusercontent.com/uditkumar489/Icon-pack/master/Entrepreneur/digital-marketing/svg/computer-1.svg"
-  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "0s"
+  account_id                   = var.cloudflare_account_id
+  type                         = "self_hosted"
+  name                         = var.cf_intranet_web_app_name
+  app_launcher_visible         = true
+  logo_url                     = "https://raw.githubusercontent.com/uditkumar489/Icon-pack/master/Entrepreneur/digital-marketing/svg/computer-1.svg"
+  tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration             = "0s"
+  custom_deny_url              = "https://denied.macharpe.com/"
+  custom_non_identity_deny_url = "https://denied.macharpe.com/"
 
   destinations = [{
     type = "public"
@@ -226,13 +236,15 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_rdp_target" {
 
 # Domain Controller Browser-Rendered RDP Application
 resource "cloudflare_zero_trust_access_application" "domain_controller" {
-  account_id           = var.cloudflare_account_id
-  type                 = "rdp"
-  name                 = "Domain Controller"
-  app_launcher_visible = true
-  logo_url             = "https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png"
-  tags                 = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
-  session_duration     = "0s"
+  account_id                   = var.cloudflare_account_id
+  type                         = "rdp"
+  name                         = "Domain Controller"
+  app_launcher_visible         = true
+  logo_url                     = "https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png"
+  tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
+  session_duration             = "0s"
+  custom_deny_url              = "https://denied.macharpe.com/"
+  custom_non_identity_deny_url = "https://denied.macharpe.com/"
 
   # Public hostname for browser rendering
   domain = var.cf_subdomain_rdp

@@ -19,6 +19,7 @@ logs/
 
 # Claude
 CLAUDE.md
+.Claude
 
 # Ignore Terraform working directory
 .terraform/
@@ -51,3 +52,7 @@ security/aws-sg-cloudflared-tunnel-allow.tf
 
 # ignore HTML examples
 scripts/html/examples/
+
+# Cloudflare Gateway SSH CA
+modules/cloudflare/out/ssh_ca_public_key.txt
+modules/cloudflare/out/ssh_ca_response.json
