@@ -8,22 +8,22 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 6.0" #7.2
+      version = "~> 7.0"
     }
 
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 5.8.0" #5.9
+      version = "~> 5.8.0"
     }
 
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 3.4" #3.5
+      version = "~> 3.4"
     }
 
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0" #4.44
+      version = "~> 4.0"
     }
 
     external = {
@@ -32,7 +32,7 @@ terraform {
 
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0" #6.13
+      version = "~> 6.0"
     }
   }
 }
