@@ -593,11 +593,11 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.13.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.44.0 |
-| <a name="provider_google"></a> [google](#provider\_google) | 7.3.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
 
