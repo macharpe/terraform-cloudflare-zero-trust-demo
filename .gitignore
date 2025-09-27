@@ -1,58 +1,93 @@
-# Ignore Terraform state files
+# ===========================
+# Terraform Infrastructure
+# ===========================
+
+# State files and metadata
 terraform.tfstate
 terraform.tfstate.backup
 .terraform.lock.hcl
 .terraform.tfstate.lock.info
+.terraform/
+tfstate/
+
+# Plan files
+*.tfplan
+
+# Backup files
 *.bak
 *.backup
 
-# Ignore Terraform plan files
-*.tfplan
+# ===========================
+# Sensitive Configuration
+# ===========================
 
-# Ignore sensitive files
+# Variable files (contain secrets)
 *.tfvars
 *.tfvars.json
 
-# Ignore logs and other unnecessary files
-logs/
-*.log
+# Backend configuration (sensitive S3 bucket names)
+backend.conf
+backend.hcl
+*.backend.conf
+*.backend.hcl
 
-# Claude
-CLAUDE.md
-.Claude
-
-# Ignore Terraform working directory
-.terraform/
-0-documentation/
-1-workspace-conf/
-
-# Skip SSH keys
-modules/keys/out/*
-
-# Ignore operating system files
-.DS_Store
-Thumbs.db
-
-# Ignore IDE configuration files
-.vscode/
-.idea/
-
-# Ignore other unnecessary directories
-node_modules/
-vendor/
-
-# Ignore environment variable file
+# Environment variables
 .envrc
 
-# Ignore warp_subnets_including* files
+# ===========================
+# Generated Output Files
+# ===========================
+
+# SSH keys
+modules/keys/out/*
+
+# WARP routing calculations
 modules/warp-routing/output/*.json
-
-# irgnore Roadmap items
-security/aws-sg-cloudflared-tunnel-allow.tf
-
-# ignore HTML examples
-scripts/html/examples/
 
 # Cloudflare Gateway SSH CA
 modules/cloudflare/out/ssh_ca_public_key.txt
 modules/cloudflare/out/ssh_ca_response.json
+
+# ===========================
+# Development & Documentation
+# ===========================
+
+# Documentation directories
+0-documentation/
+1-workspace-conf/
+
+# HTML examples
+scripts/html/examples/
+
+# Roadmap items
+security/aws-sg-cloudflared-tunnel-allow.tf
+
+# ===========================
+# System & IDE Files
+# ===========================
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE configuration
+.vscode/
+.idea/
+
+# Package managers
+node_modules/
+vendor/
+
+# ===========================
+# Logs & Temporary Files
+# ===========================
+
+# Log files
+logs/
+*.log
+
+# ===========================
+# Claude
+# ===========================
+.claude/
+CLAUDE.md

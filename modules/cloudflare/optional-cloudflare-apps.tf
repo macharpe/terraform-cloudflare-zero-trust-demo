@@ -59,7 +59,7 @@ resource "cloudflare_zero_trust_access_policy" "training_status_admin_policy" {
 #======================================================
 # Training Status Admin Portal App Terraform
 #======================================================
-resource "cloudflare_zero_trust_access_application" "training_status_admin_portal" {
+resource "cloudflare_zero_trust_access_application" "cf_app_training_portal" {
   account_id           = var.cloudflare_account_id
   type                 = "self_hosted"
   name                 = "Training Status Admin Portal"

@@ -40,7 +40,7 @@ resource "aws_key_pair" "aws_ec2_vnc_key_pair" {
 #==========================================================
 # Custom VPC and Subnets Configuration
 #==========================================================
-resource "aws_vpc" "aws_custom_vpc" {
+resource "aws_vpc" "aws_vpc_main" {
 
   cidr_block           = var.aws_vpc_cidr
   enable_dns_support   = true
@@ -52,8 +52,8 @@ resource "aws_vpc" "aws_custom_vpc" {
   }
 }
 
-resource "aws_subnet" "aws_private_subnet" {
-  vpc_id            = aws_vpc.aws_custom_vpc.id
+resource "aws_subnet" "aws_subnet_private" {
+  vpc_id            = aws_vpc.aws_vpc_main.id
   cidr_block        = var.aws_private_cidr
   availability_zone = "${var.aws_region}a"
 
@@ -63,8 +63,8 @@ resource "aws_subnet" "aws_private_subnet" {
   }
 }
 
-resource "aws_subnet" "aws_public_subnet" {
-  vpc_id                  = aws_vpc.aws_custom_vpc.id
+resource "aws_subnet" "aws_subnet_public" {
+  vpc_id                  = aws_vpc.aws_vpc_main.id
   cidr_block              = var.aws_public_cidr
   availability_zone       = "${var.aws_region}a"
   map_public_ip_on_launch = true # Required for public subnet
@@ -81,7 +81,7 @@ resource "aws_subnet" "aws_public_subnet" {
 #==========================================================
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.aws_custom_vpc.id
+  vpc_id = aws_vpc.aws_vpc_main.id
 
   tags = {
     Name        = "Internet Gateway for zero-trust demo"
@@ -102,7 +102,7 @@ resource "aws_eip" "nat_eip" {
 # NAT Gateway
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.aws_public_subnet.id # Requires public subnet
+  subnet_id     = aws_subnet.aws_subnet_public.id # Requires public subnet
   depends_on    = [aws_internet_gateway.igw]
 
   timeouts {
@@ -119,7 +119,7 @@ resource "aws_nat_gateway" "nat" {
 
 # Route Table for Private Subnet
 resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.aws_custom_vpc.id
+  vpc_id = aws_vpc.aws_vpc_main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
@@ -134,14 +134,14 @@ resource "aws_route_table" "private_rt" {
 
 # Association between private subnet and route table
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.aws_private_subnet.id
+  subnet_id      = aws_subnet.aws_subnet_private.id
   route_table_id = aws_route_table.private_rt.id
 }
 
 
 #Route Table for Public Subnet
 resource "aws_route_table" "public_rt" {
-  vpc_id = aws_vpc.aws_custom_vpc.id
+  vpc_id = aws_vpc.aws_vpc_main.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -156,7 +156,7 @@ resource "aws_route_table" "public_rt" {
 
 # Association between public subnet and route table
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.aws_public_subnet.id
+  subnet_id      = aws_subnet.aws_subnet_public.id
   route_table_id = aws_route_table.public_rt.id
 }
 
@@ -171,7 +171,7 @@ locals {
   aws_common_instance_config = {
     ami           = var.aws_ec2_instance_config_ami_id
     instance_type = var.aws_ec2_instance_config_type
-    subnet_id     = aws_subnet.aws_private_subnet.id
+    subnet_id     = aws_subnet.aws_subnet_private.id
   }
 
   # Common user data template variables
@@ -201,12 +201,12 @@ locals {
 #==========================================================
 # EC2 Instances: Cloudflared EC2 Instances
 #==========================================================
-resource "aws_instance" "cloudflared_aws" {
+resource "aws_instance" "aws_vm_cloudflared" {
   count                  = var.aws_cloudflared_count
   ami                    = local.aws_common_instance_config.ami
   instance_type          = local.aws_common_instance_config.instance_type
   subnet_id              = local.aws_common_instance_config.subnet_id
-  vpc_security_group_ids = [aws_security_group.aws_cloudflared_sg.id]
+  vpc_security_group_ids = [aws_security_group.aws_sg_cloudflared.id]
   key_name               = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
 
   instance_market_options {
@@ -239,11 +239,11 @@ resource "aws_instance" "cloudflared_aws" {
 #==========================================================
 # EC2 Instances: SERVICE Browser SSH EC2 Instances
 #==========================================================
-resource "aws_instance" "aws_ec2_service_instance" {
+resource "aws_instance" "aws_vm_service" {
   ami                    = local.aws_common_instance_config.ami
   instance_type          = local.aws_common_instance_config.instance_type
   subnet_id              = local.aws_common_instance_config.subnet_id
-  vpc_security_group_ids = [aws_security_group.aws_ssh_server_sg.id]
+  vpc_security_group_ids = [aws_security_group.aws_sg_ssh.id]
   key_name               = aws_key_pair.aws_ec2_service_key_pair.key_name
 
   instance_market_options {
@@ -275,11 +275,11 @@ resource "aws_instance" "aws_ec2_service_instance" {
 #==========================================================
 # EC2 Instance: VNC Browser Service
 #==========================================================
-resource "aws_instance" "aws_ec2_vnc_instance" {
+resource "aws_instance" "aws_vm_vnc" {
   ami                    = local.aws_common_instance_config.ami
   instance_type          = local.aws_common_instance_config.instance_type
   subnet_id              = local.aws_common_instance_config.subnet_id
-  vpc_security_group_ids = [aws_security_group.aws_vnc_server_sg.id]
+  vpc_security_group_ids = [aws_security_group.aws_sg_vnc.id]
   key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name
 
   instance_market_options {
@@ -313,10 +313,10 @@ resource "aws_instance" "aws_ec2_vnc_instance" {
 #==========================================================
 
 ### Security Group for Cloudflared EC2 Replicas ###
-resource "aws_security_group" "aws_cloudflared_sg" {
+resource "aws_security_group" "aws_sg_cloudflared" {
   name        = "cloudflared-replicas-sg"
   description = "Security group for cloudflared tunnel replicas"
-  vpc_id      = aws_vpc.aws_custom_vpc.id
+  vpc_id      = aws_vpc.aws_vpc_main.id
 
   ingress {
     description = "Allow SSH from my IP"
@@ -349,11 +349,11 @@ resource "aws_security_group" "aws_cloudflared_sg" {
 
 
 ### Security Group for Browser SSH EC2 ###
-resource "aws_security_group" "aws_ssh_server_sg" {
+resource "aws_security_group" "aws_sg_ssh" {
   name        = "browser-ssh-sg"
   description = "Allow SSH only from tunnel replicas"
-  vpc_id      = aws_vpc.aws_custom_vpc.id
-  depends_on  = [aws_security_group.aws_cloudflared_sg]
+  vpc_id      = aws_vpc.aws_vpc_main.id
+  depends_on  = [aws_security_group.aws_sg_cloudflared]
 
   # Allow SSH ingress from my IP
   ingress {
@@ -368,7 +368,7 @@ resource "aws_security_group" "aws_ssh_server_sg" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.aws_cloudflared_sg.id]
+    security_groups = [aws_security_group.aws_sg_cloudflared.id]
   }
 
   # Allow ICMP (ping)
@@ -396,11 +396,11 @@ resource "aws_security_group" "aws_ssh_server_sg" {
 }
 
 ### Security Group for Browser VNC EC2 ###
-resource "aws_security_group" "aws_vnc_server_sg" {
+resource "aws_security_group" "aws_sg_vnc" {
   name        = "browser-vnc-sg"
   description = "Security group for VNC browser service"
-  vpc_id      = aws_vpc.aws_custom_vpc.id
-  depends_on  = [aws_security_group.aws_cloudflared_sg]
+  vpc_id      = aws_vpc.aws_vpc_main.id
+  depends_on  = [aws_security_group.aws_sg_cloudflared]
 
   # Allow SSH ingress from WARP CGNAT range
   ingress {
@@ -417,7 +417,7 @@ resource "aws_security_group" "aws_vnc_server_sg" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.aws_cloudflared_sg.id]
+    security_groups = [aws_security_group.aws_sg_cloudflared.id]
   }
 
   # Allow VNC ingress from cloudflared instances
@@ -426,7 +426,7 @@ resource "aws_security_group" "aws_vnc_server_sg" {
     from_port       = 5901
     to_port         = 5901
     protocol        = "tcp"
-    security_groups = [aws_security_group.aws_cloudflared_sg.id]
+    security_groups = [aws_security_group.aws_sg_cloudflared.id]
   }
 
   # Allow ICMP (ping)

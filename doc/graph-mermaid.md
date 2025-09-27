@@ -1,5 +1,7 @@
 # Terraform Cloudflare Zero Trust Demo - Comprehensive Architecture
 
+**Last Updated:** September 27, 2025
+
 ```mermaid
 flowchart TB
   %% External Services
@@ -17,14 +19,14 @@ flowchart TB
     AzureADGroups --> AzureADUsers
   end
 
-  %% AWS Infrastructure
-  subgraph AWS ["Amazon Web Services"]
+  %% AWS Infrastructure (eu-central-1)
+  subgraph AWS ["Amazon Web Services (eu-central-1)"]
     direction TB
     subgraph AWSNetwork ["Network Infrastructure"]
-      aws_vpc["VPC: aws_custom_vpc"]
-      aws_igw["Internet Gateway: igw"]
-      aws_public_subnet["Public Subnet"]
-      aws_private_subnet["Private Subnet"]
+      aws_vpc["VPC: aws_vpc_main"]
+      aws_igw["Internet Gateway: aws_igw_main"]
+      aws_public_subnet["Public Subnet: aws_subnet_public"]
+      aws_private_subnet["Private Subnet: aws_subnet_private"]
       aws_nat_eip["Elastic IP: nat_eip"]
       aws_nat["NAT Gateway: nat"]
       aws_public_rt["Route Table: public_rt"]
@@ -40,18 +42,18 @@ flowchart TB
     end
     
     subgraph AWSCompute ["Compute Resources"]
-      aws_ssh_instance["EC2: SSH Service<br/>aws_ec2_service_instance"]
-      aws_vnc_instance["EC2: VNC Service<br/>aws_ec2_vnc_instance"]
-      aws_cloudflared_instances["EC2: Cloudflared Replicas<br/>cloudflared_aws[count]"]
+      aws_ssh_instance["EC2: SSH Service<br/>aws_vm_service"]
+      aws_vnc_instance["EC2: VNC Service + Progress Monitoring<br/>aws_vm_vnc<br/>• 8-phase installation tracking<br/>• Real-time progress bars<br/>• ETA calculations<br/>• vnc-status command"]
+      aws_cloudflared_instances["EC2: Cloudflared<br/>aws_vm_cloudflared"]
     end
     
     subgraph AWSSecurity ["Security"]
-      aws_ssh_sg["SG: aws_ssh_server_sg"]
-      aws_vnc_sg["SG: aws_vnc_server_sg"]
-      aws_cloudflared_sg["SG: aws_cloudflared_sg"]
-      aws_ssh_key["Key: aws_ec2_service_key_pair"]
-      aws_vnc_key["Key: aws_ec2_vnc_key_pair"]
-      aws_cloudflared_keys["Keys: aws_ec2_cloudflared_key_pair[count]"]
+      aws_ssh_sg["SG: aws_sg_ssh"]
+      aws_vnc_sg["SG: aws_sg_vnc"]
+      aws_cloudflared_sg["SG: aws_sg_cloudflared"]
+      aws_ssh_key["Key: aws_service_key_pair"]
+      aws_vnc_key["Key: aws_vnc_service_key_pair"]
+      aws_cloudflared_keys["Keys: aws_cloudflared_key_pair"]
     end
     
     aws_ssh_instance --> aws_ssh_sg
@@ -235,9 +237,10 @@ flowchart TB
   %% Monitoring Infrastructure
   subgraph Monitoring ["Monitoring & Observability"]
     direction TB
-    datadog_aws["Datadog: AWS Monitoring<br/>• Process monitoring<br/>• System metrics<br/>• VNC TCP checks"]
+    datadog_aws["Datadog: AWS Monitoring<br/>• Process monitoring<br/>• System metrics<br/>• VNC TCP checks<br/>• VNC progress tracking"]
     datadog_gcp["Datadog: GCP Monitoring<br/>• Cloudflared monitoring<br/>• WARP connector checks<br/>• Directory monitoring"]
     datadog_azure["Datadog: Azure Monitoring<br/>• WARP process monitoring<br/>• System performance<br/>• SSH configuration checks"]
+    backend_infra["Backend Infrastructure<br/>• S3 + DynamoDB State<br/>• Separate Project<br/>• Production Security<br/>• ~$0.50/year Cost"]
   end
 
   %% Cross-Service Connections
@@ -323,9 +326,9 @@ flowchart TB
 This comprehensive diagram represents a multi-cloud Zero Trust architecture using Cloudflare Zero Trust to secure access across AWS, GCP, and Azure environments. The architecture has been recently enhanced with improved access policies, monitoring capabilities, and modular template-based applications. Key components include:
 
 ### **Multi-Cloud Infrastructure**
-- **AWS**: SSH/VNC browser-rendered services with cloudflared replicas
-- **GCP**: Infrastructure access VMs, Windows RDP server, and WARP connectors
-- **Azure**: Linux VMs with WARP connector functionality
+- **AWS (eu-central-1)**: SSH/VNC browser-rendered services with comprehensive progress monitoring
+- **GCP (europe-west3)**: Infrastructure access VMs, Windows RDP server, and WARP connectors
+- **Azure (westeurope)**: Linux VMs with WARP connector functionality
 
 ### **Zero Trust Security**
 - **Identity Integration**: Okta SAML and Azure AD integration
@@ -347,6 +350,8 @@ This comprehensive diagram represents a multi-cloud Zero Trust architecture usin
 - **Enhanced Rule Groups**: Composite access groups (Employees, Sales Team, Administrators, Contractors Extended)
 - **Comprehensive Monitoring**: Datadog integration across AWS, GCP, and Azure with process and system monitoring
 - **Template-Based Web Apps**: Separate HTML templates for intranet and competition applications
+- **VNC Progress Monitoring**: Real-time installation tracking with 8-phase system, progress bars, and ETA calculations for AWS t3.micro instances
+- **Production Backend**: Separate S3 + DynamoDB infrastructure project for secure state management (~$0.50/year)
 
 ### **Lateral Movement Prevention**
 - **SSH Blocking**: Prevents unauthorized SSH connections between internal VMs (port 22)

@@ -14,6 +14,34 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 
 > **Note**: This is a work in progress 🚧. While functional, I intend to maintain and improve it continuously based on community feedback and evolving best practices.
 
+## 📑 Table of Contents
+
+- [🌟 Features](#-features)
+- [🔧 Integration with Cloudflare Workers (Optional)](#-integration-with-cloudflare-workers-optional)
+  - [Training Status Admin Portal](#training-status-admin-portal)
+  - [Access Denied Info Page](#access-denied-info-page)
+- [🏗️ Architecture Overview](#️-architecture-overview)
+- [📊 Project Statistics](#-project-statistics)
+- [📚 Background Reading](#-background-reading)
+- [📋 Prerequisites](#-prerequisites)
+- [🛠️ Step-by-Step Setup](#️-step-by-step-setup)
+  - [1. Clone and Initialize](#1-clone-and-initialize)
+  - [2. Configure Cloudflare API Token Permissions](#2-configure-cloudflare-api-token-permissions)
+  - [3. Configure Environment Variables](#3-configure-environment-variables)
+  - [4. Manual Cloudflare UI Setup](#4-manual-cloudflare-ui-setup)
+  - [5. Configure terraform.tfvars](#5-configure-terraformtfvars)
+  - [6. Configure Backend (First-Time Setup)](#6-configure-backend-first-time-setup)
+  - [7. Deploy Infrastructure](#7-deploy-infrastructure)
+  - [8. Post-Deployment Configuration](#8-post-deployment-configuration)
+  - [🎁 BONUS: VNC Installation Monitoring](#-bonus-vnc-installation-monitoring)
+  - [🎁 BONUS: Automated update of posture check rules macOS and iOS to latest version](#-bonus-automated-update-of-posture-check-rules-macos-and-ios-to-latest-version)
+- [🔧 Environment Management](#-environment-management)
+- [🧹 Cleanup and Destruction](#-cleanup-and-destruction)
+- [🚀 Roadmap](#-roadmap)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [📚 Terraform Documentation](#-terraform-documentation)
+
 ## 🌟 Features
 
 - **Multi-Cloud Architecture**: Seamless integration across AWS, Azure, and GCP
@@ -26,9 +54,9 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 - **Device Posture Checks**: OS version compliance and security validation
 - **Policy-Based Access**: Role-based access control with comprehensive policies
 
-## 🔧 Optional Components
+## 🔧 Integration with Cloudflare Workers (Optional)
 
-This demo environment includes **two optional components** that can be enabled based on your specific requirements:
+This demo environment includes **two optional components** that integrate with Cloudflare Workers and can be enabled based on your specific requirements:
 
 ### Training Status Admin Portal
 
@@ -90,7 +118,7 @@ An optional custom Access-denied-info-page that provides users with detailed inf
 
 This demo environment creates a sophisticated Zero Trust network spanning three major cloud providers, connected through Cloudflare's global network.
 
-_Last Updated: 13th of August 2025_
+_Last Updated: 27th of September 2025_
 
 ![Architecture Diagram](doc/Architecture-diagram.svg)
 
@@ -99,48 +127,53 @@ _Last Updated: 13th of August 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Project Files**: 51 files *(focused infrastructure codebase)*
-- **Core Code Files**: 51 files *(infrastructure and automation)*
+- **Total Deployed Resources**: 167 resources *(in Terraform state)*
+- **Resource Definitions**: 94 resources *(in .tf files)*
 - **Module Directories**: 4 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| **Terraform (.tf)** | 31 | 4,635 | Infrastructure as Code |
-| **Documentation (.md)** | 11 | ~1,400 | Project documentation |
-| **HTML (.html)** | 3 | ~500 | Demo applications |
-| **Python (.py)** | 2 | ~365 | WARP routing utilities |
-| **Scripts (.sh)** | 2 | ~290 | Cleanup & maintenance |
-| **Templates (.tpl, .cmd)** | 2 | ~300 | Cloud-init & startup scripts |
-| **Total Core Code** | 51 | **~7,490** | **Production-ready infrastructure** |
+| Terraform (.tf) | 32 | ~5000 | Infrastructure as Code |
+| Documentation (.md) | 7 | ~1500 | Project documentation |
+| Scripts (.sh) | 3 | ~300 | Cleanup & maintenance |
+| HTML (.html) | 3 | ~1100 | Demo applications |
+| Python (.py) | 2 | ~300 | WARP routing utilities |
+| Templates (.tfpl, .tpl, .cmd) | 2 | ~400 | Cloud-init & startup scripts |
+| **Total Core Code** | **49** | **~8600** | **Production-ready infrastructure** |
 
 <table>
 <tr>
-<td>
+<td valign="top">
 
-**📁 Infrastructure Resources** *(via terraform plan)*
-- **166** total resources deployed
-- **31** Terraform files  
+**📁 Infrastructure Resources** *(via terraform state)*
+
+- **167** total resources deployed
+- **94** resource definitions in code
+- **33** Terraform files
 - **4** custom modules
-- **8** script & template files total
 - **Multi-provider** architecture
 
 </td>
-<td>
+<td valign="top">
 
-**☁️ Cloud Distribution** *(from terraform plan)*
-- **63** Cloudflare resources (38%)
-- **20** Google Cloud resources (12%)
-- **19** AWS resources (11%)
-- **18** Azure resources (11%)
-- **47** supporting resources (28%)
+**☁️ Cloud Distribution** *(from terraform state)*
+
+- **74** Cloudflare resources (41%)
+- **47** Other module resources (26%)
+- **20** Google Cloud resources (11%)
+- **19** AWS resources (10%)
+- **18** Azure resources (10%)
+- **2** Null resources (1%)
+- **1** Data source
 
 </td>
 </tr>
 <tr>
-<td>
+<td valign="top">
 
 **🔧 Architecture Features**
+
 - **Multi-cloud** (AWS, Azure, GCP)
 - **Zero Trust** security model
 - **Identity integration** (Okta, Azure AD)
@@ -149,9 +182,10 @@ _Last Updated: 13th of August 2025_
 - **External validation** showcasing training compliance
 
 </td>
-<td>
+<td valign="top">
 
 **🚀 Automation & Quality**
+
 - **API token authentication** (modernized 2025)
 - **Role-based infrastructure** deployment
 - **Modular design** with 4 specialized modules
@@ -358,11 +392,25 @@ okta_contractors_group_id = "your_contractors_group_id"
 ```
 
 
-### 6. Deploy Infrastructure
+### 6. Configure Backend (First-Time Setup)
+
+**Backend Infrastructure Repository**: The backend infrastructure code is available at: [cloudflare-zero-trust-demo-backend](https://github.com/macharpe/cloudflare-zero-trust-demo-backend)
 
 ```bash
-# Initialize Terraform
-terraform init
+# Copy backend configuration template
+cp backend.conf.example backend.conf
+
+# Edit backend.conf with your actual AWS S3 values
+# Note: This file is gitignored for security
+```
+
+Edit `backend.conf` with your S3 bucket details from your separate backend infrastructure project. Follow the setup instructions in the [backend repository](https://github.com/macharpe/cloudflare-zero-trust-demo-backend) to deploy the S3 + DynamoDB infrastructure first.
+
+### 7. Deploy Infrastructure
+
+```bash
+# Initialize Terraform with backend configuration
+terraform init -backend-config=backend.conf
 
 # Review the deployment plan
 terraform plan
@@ -371,13 +419,101 @@ terraform plan
 terraform apply
 ```
 
-### 7. Post-Deployment Configuration
+> **⚠️ Important**: For subsequent operations (plan, apply, destroy), you don't need to specify the backend config again. Terraform remembers the backend configuration after the initial setup.
+
+### 8. Post-Deployment Configuration
 
 After Terraform completes successfully:
 
 1. **Assign SaaS App Policies**: Manually assign policies to SaaS applications (Okta, Meraki, etc.) in the Cloudflare dashboard
 2. **Test Connectivity**: Verify access to resources across all cloud providers
 3. **Configure User Access**: Set up user accounts and test Zero Trust policies
+
+### 🎁 BONUS: VNC Installation Monitoring
+
+The AWS t3.micro instance hosting the VNC desktop environment requires **15-20 minutes** to complete installation due to the extensive desktop packages (XFCE4, TightVNC, and related components). This extended installation time is normal and expected on t3.micro instances due to their limited resources.
+
+**Enhanced Progress Tracking** 🔄
+
+To address the concern of "hanging" installations, this project includes comprehensive progress monitoring:
+
+```bash
+# SSH into the VNC instance
+ssh ubuntu@<vnc-instance-ip> -i modules/keys/out/aws_vnc_service_key_pair
+
+# Quick status check with progress bar and ETA
+vnc-status
+
+# Watch progress in real-time
+tail -f /tmp/demo-progress.txt
+
+# Detailed installation log
+tail -f /tmp/vnc-setup.log
+
+# Full status information
+cat /tmp/vnc-progress.status
+```
+
+**Progress Indicators:**
+- 🔄 **8-phase tracking**: Package updates, XFCE4, VNC server setup, configuration, etc.
+- 📊 **Visual progress bars**: Real-time percentage completion with filled/empty indicators
+- ⏱️ **ETA calculations**: Time estimates based on t3.micro performance characteristics
+- 🕒 **Elapsed time display**: Shows installation duration and remaining time
+- 🟢 **Service status**: Indicates when VNC is fully operational and ready for browser access
+
+**What to Expect:**
+- **Phase 1-3** (0-25%): System updates and basic package installation (2-4 minutes)
+- **Phase 4-6** (25-75%): XFCE4 desktop environment installation (8-12 minutes)
+- **Phase 7-8** (75-100%): VNC configuration and service startup (2-4 minutes)
+
+The monitoring system resolves the previous issue where users couldn't determine if the installation was progressing or had failed.
+
+### 🎁 BONUS: Automated update of posture check rules macOS and iOS to latest version
+
+> ⚠️ **WARP SSL Inspection Considerations:**
+>
+> If you're running WARP client with SSL inspection enabled, you may encounter certificate validation errors when the script contacts Apple's API. To resolve this:
+>
+> **Option 1:** Add `gdmf.apple.com` to your WARP "Do Not Inspect" list:
+> - Go to Settings > Network > Do Not Inspect
+> - Add domain: `gdmf.apple.com`
+> - Description: "Apple macOS version API for posture script"
+>
+> **Option 2:** The script includes the `-k` flag as a fallback for SSL certificate bypassing
+
+This project includes automated scripts that keep your Cloudflare device posture rules up-to-date with the latest operating system versions from Apple.
+
+#### macOS Version Posture Script
+
+The `latest_osx_version_posture.sh` script automatically updates Cloudflare device posture rules with the latest macOS version. This script:
+
+- Fetches the current macOS version from Apple's API (gdmf.apple.com)
+- Reads the posture rule ID from terraform.tfvars
+- Updates the Cloudflare Zero Trust posture rule via API
+
+#### iOS Version Posture Script
+
+The `latest_ios_version_posture.sh` script automatically updates Cloudflare device posture rules with the latest iOS version. This script:
+
+- Fetches the current iOS version from Apple's API (gdmf.apple.com)
+- Reads the posture rule ID from terraform.tfvars
+- Updates the Cloudflare Zero Trust posture rule via API
+
+#### Usage
+
+```bash
+# Set required environment variables
+export CLOUDFLARE_ACCOUNT_ID="your_account_id"
+export CLOUDFLARE_API_TOKEN="your_api_token"
+
+# Run the macOS script
+./modules/cloudflare/scripts/latest_osx_version_posture.sh
+
+# Run the iOS script
+./modules/cloudflare/scripts/latest_ios_version_posture.sh
+```
+
+Both scripts automatically determine the latest available version and update your Zero Trust posture policies accordingly, ensuring your device compliance requirements stay current with Apple's releases.
 
 ## 🔧 Environment Management
 
@@ -406,34 +542,6 @@ This prevents the common SSH warning:
 
 The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up WARP connector device registrations.
 
-#### macOS Version Posture Script
-
-The `latest_osx_version_posture.sh` script automatically updates Cloudflare device posture rules with the latest macOS version. This script:
-
-- Fetches the current macOS version from Apple's API (`gdmf.apple.com`)
-- Reads the posture rule ID from `terraform.tfvars`
-- Updates the Cloudflare Zero Trust posture rule via API
-
-**WARP SSL Inspection Considerations**:
-
-If you're running WARP client with SSL inspection enabled, you may encounter certificate validation errors when the script contacts Apple's API. To resolve this:
-
-1. **Option 1**: Add `gdmf.apple.com` to your WARP "Do Not Inspect" list:
-   - Go to **Settings > Network > Do Not Inspect**
-   - Add domain: `gdmf.apple.com`
-   - Description: "Apple macOS version API for posture script"
-
-2. **Option 2**: The script includes the `-k` flag as a fallback for SSL certificate bypassing
-
-**Usage**:
-```bash
-# Set required environment variables
-export CLOUDFLARE_ACCOUNT_ID="your_account_id"
-export CLOUDFLARE_API_TOKEN="your_api_token"
-
-# Run the script
-./modules/cloudflare/scripts/latest_osx_version_posture.sh
-```
 
 ## 🧹 Cleanup and Destruction
 
@@ -454,6 +562,7 @@ Planned enhancements and features:
 - **Advanced Security Groups**: More granular network security configurations
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
+- **iOS Version Posture Script**: Automated script to update iOS version requirements in Cloudflare device posture checks, similar to the existing macOS version script (`latest_osx_version_posture.sh`)
 - **Post-Quantum Cryptography**: Implementation of [post-quantum algorithms](https://blog.cloudflare.com/post-quantum-zero-trust/) for future-proof encryption and Zero Trust communications
 
 ## 🤝 Contributing
@@ -504,9 +613,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | Name | Type |
 |------|------|
 | [aws_eip.nat_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
-| [aws_instance.aws_ec2_service_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
-| [aws_instance.aws_ec2_vnc_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
-| [aws_instance.cloudflared_aws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_instance.aws_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_instance.aws_vm_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_instance.aws_vm_vnc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_internet_gateway.igw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_key_pair.aws_ec2_cloudflared_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_key_pair.aws_ec2_service_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
@@ -516,45 +625,45 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | [aws_route_table.public_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
-| [aws_security_group.aws_cloudflared_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group.aws_ssh_server_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group.aws_vnc_server_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_subnet.aws_private_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.aws_public_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_vpc.aws_custom_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
-| [azurerm_linux_virtual_machine.cloudflare_zero_trust_demo_azure](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
+| [aws_security_group.aws_sg_cloudflared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.aws_sg_ssh](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.aws_sg_vnc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_subnet.aws_subnet_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.aws_subnet_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_vpc.aws_vpc_main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
+| [azurerm_linux_virtual_machine.azure_vm_linux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
 | [azurerm_nat_gateway.cloudflare_natgw](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway) | resource |
 | [azurerm_nat_gateway_public_ip_association.natgw_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway_public_ip_association) | resource |
 | [azurerm_network_interface.nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
 | [azurerm_network_interface_security_group_association.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
-| [azurerm_network_security_group.nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.azure_nsg_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_public_ip.nat_gateway_public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_resource_group.cloudflare_rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_route_table.cloudflare_route_table_warp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
-| [azurerm_subnet.cloudflare_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.azure_subnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.cloudflare_natgw_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
-| [azurerm_subnet_route_table_association.cloudflare_subnet_route_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
-| [azurerm_virtual_network.cloudflare_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [azurerm_subnet_route_table_association.azure_subnet_route_assoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_virtual_network.azure_vnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [google_compute_address.cloud_nat_ip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
-| [google_compute_firewall.allow_egress](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_firewall.allow_icmp_from_any](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_firewall.allow_ssh_from_my_ip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_firewall.default_ssh_deny](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_firewall.deny_egress_ssh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_instance.gcp_cloudflared_vm_instance](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.gcp_vm_instance](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.gcp_windows_rdp_server](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_network.gcp_custom_vpc](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
+| [google_compute_firewall.gcp_fw_egress_all](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.gcp_fw_egress_ssh_deny](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.gcp_fw_ingress_icmp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.gcp_fw_ingress_ssh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.gcp_fw_ingress_ssh_deny](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_instance.gcp_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
+| [google_compute_instance.gcp_vm_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
+| [google_compute_instance.gcp_vm_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
+| [google_compute_network.gcp_vpc_main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
 | [google_compute_route.default_route](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_aws_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_azure_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_warp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_router.cloud_router](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router) | resource |
 | [google_compute_router_nat.cloud_nat](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router_nat) | resource |
-| [google_compute_subnetwork.gcp_cloudflared_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
-| [google_compute_subnetwork.gcp_cloudflared_windows_rdp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
-| [google_compute_subnetwork.gcp_warp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
+| [google_compute_subnetwork.gcp_subnet_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
+| [google_compute_subnetwork.gcp_subnet_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
+| [google_compute_subnetwork.gcp_subnet_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [null_resource.cleanup_devices](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.cleanup_known_hosts](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [http_http.my_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
@@ -616,10 +725,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_infra_app_name"></a> [cf\_infra\_app\_name](#input\_cf\_infra\_app\_name) | Name of the Infrastructure App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_intranet_app_port"></a> [cf\_intranet\_app\_port](#input\_cf\_intranet\_app\_port) | Port for the Intranet web App in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_intranet_web_app_name"></a> [cf\_intranet\_web\_app\_name](#input\_cf\_intranet\_web\_app\_name) | Name of the Intranet web App in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_ios_posture_id"></a> [cf\_ios\_posture\_id](#input\_cf\_ios\_posture\_id) | Latest iOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_okta_identity_provider_id"></a> [cf\_okta\_identity\_provider\_id](#input\_cf\_okta\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_osx_version_posture_rule_id"></a> [cf\_osx\_version\_posture\_rule\_id](#input\_cf\_osx\_version\_posture\_rule\_id) | Rule ID for the posture check on latest version of macos | `string` | n/a | yes |
 | <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |

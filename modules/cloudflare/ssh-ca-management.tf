@@ -44,7 +44,7 @@ resource "null_resource" "cloudflare_ssh_ca_reset" {
 # Read the stored public key
 data "external" "ssh_ca_public_key" {
   depends_on = [null_resource.cloudflare_ssh_ca_reset]
-  
+
   program = ["sh", "-c", "cat ${path.module}/out/ssh_ca_public_key.txt 2>/dev/null | jq -R '{public_key: .}' || echo '{\"public_key\": \"\"}'"]
 }
 

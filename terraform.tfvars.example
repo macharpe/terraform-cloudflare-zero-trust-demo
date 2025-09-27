@@ -78,12 +78,10 @@ cf_azure_admin_rule_group_id  = "5f253130-a400-4215-********"
 # Device Posture - Sensitive: manually retrieved from Cloudflare dashboard
 cf_gateway_posture_id = "4d8d7499-38c3-4bf0-********"
 cf_macos_posture_id   = "6d64ff80-1308-4462-********"
+cf_ios_posture_id     = "56454654-1245-8564-********"
 cf_windows_posture_id = "67b05735-3b9b-4bcc-********"
 cf_linux_posture_id   = "ed5639c7-3305-4a91-********"
-
-# Device Profile
 cf_device_os                   = "mac"                              # Options: "linux", "windows", "mac"
-cf_osx_version_posture_rule_id = "6d64ff80-1308-4462-********" # Sensitive: manually retrieved
 
 # WARP CGNAT Routes
 cf_custom_cgnat_routes = [

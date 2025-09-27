@@ -9,7 +9,7 @@ locals {
     sales_team  = cloudflare_zero_trust_access_group.sales_team_rule_group.id
     admins      = cloudflare_zero_trust_access_group.admins_rule_group.id
     contractors = cloudflare_zero_trust_access_group.contractors_rule_group.id
-    
+
     # Individual SAML groups
     infrastructure_admin = cloudflare_zero_trust_access_group.saml_groups["infrastructure_admin"].id
     sales_engineering    = cloudflare_zero_trust_access_group.saml_groups["sales_engineering"].id
@@ -27,10 +27,10 @@ locals {
       purpose_justification = false
     }
     competition_web_app = {
-      name                            = "Competition App Policy"
-      include_groups                  = ["sales_team"]
-      require_posture                 = true
-      require_mfa                     = true
+      name            = "Competition App Policy"
+      include_groups  = ["sales_team"]
+      require_posture = true
+      require_mfa     = true
       # IMPORTANT: Comment out the next 3 lines if you haven't deployed the "Training Compliance Gateway"
       # Otherwise the Competition App won't work or show up in App Launcher
       # Repository: https://github.com/macharpe/cloudflare-access-training-evaluator

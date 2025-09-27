@@ -1,8 +1,14 @@
 terraform {
   required_version = ">= 1.12.0"
 
-  backend "local" {
-    path = "tfstate/terraform.tfstate"
+  #  backend "local" {
+  #   path = "tfstate/terraform.tfstate"
+  # }
+
+  backend "s3" {
+    # Backend configuration is provided via backend.conf (gitignored for security)
+    # Run: terraform init -backend-config=backend.conf
+    # See backend.conf.example for template
   }
 
   required_providers {
