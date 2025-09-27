@@ -244,16 +244,14 @@ Before setting up environment variables, ensure your Cloudflare API token has th
 
 **Account-Level Permissions:**
 - **Cloudflare One Connector: WARP** - Edit
-- **Cloudflare One Connector: cloudflared** - Edit  
+- **Cloudflare One Connector: cloudflared** - Edit
 - **Access: SSH Auditing** - Edit
 - **Cloudflare Tunnel** - Edit
 - **Access: Service Tokens** - Edit
 - **Zero Trust** - Edit
 - **Access: Organizations, Identity Providers, and Groups** - Edit
-- **Access: Apps and Policies** - Edit
-
-**Account Settings:**
 - **Account Settings** - Read
+- **Access: Apps and Policies** - Edit
 
 **Zone-Level Permissions:**
 - **Zone Settings** - Read
@@ -502,10 +500,6 @@ The `latest_ios_version_posture.sh` script automatically updates Cloudflare devi
 #### Usage
 
 ```bash
-# Set required environment variables
-export CLOUDFLARE_ACCOUNT_ID="your_account_id"
-export CLOUDFLARE_API_TOKEN="your_api_token"
-
 # Run the macOS script
 ./modules/cloudflare/scripts/latest_osx_version_posture.sh
 
@@ -562,7 +556,6 @@ Planned enhancements and features:
 - **Advanced Security Groups**: More granular network security configurations
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
-- **iOS Version Posture Script**: Automated script to update iOS version requirements in Cloudflare device posture checks, similar to the existing macOS version script (`latest_osx_version_posture.sh`)
 - **Post-Quantum Cryptography**: Implementation of [post-quantum algorithms](https://blog.cloudflare.com/post-quantum-zero-trust/) for future-proof encryption and Zero Trust communications
 
 ## 🤝 Contributing
