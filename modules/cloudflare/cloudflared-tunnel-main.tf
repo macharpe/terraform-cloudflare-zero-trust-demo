@@ -130,7 +130,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
         service  = "http://localhost:${var.cf_intranet_app_port}"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.gcp_intranet_web_app.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.cf_app_web_intranet.aud]
             required  = true
             team_name = var.cf_team_name
           }
@@ -141,7 +141,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "gcp_public_hostname"
         service  = "http://localhost:${var.cf_competition_app_port}"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.gcp_competition_web_app.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.cf_app_web_competition.aud]
             required  = true
             team_name = var.cf_team_name
           }
@@ -168,7 +168,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
         service  = "ssh://${var.aws_ec2_ssh_service_private_ip}:22"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.aws_ssh_browser_rendering.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.cf_app_ssh_browser.aud]
             required  = true
             team_name = var.cf_team_name
           }
@@ -179,7 +179,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "aws_public_hostname"
         service  = "tcp://${var.aws_ec2_vnc_service_private_ip}:5901"
         origin_request = {
           access = {
-            aud_tag   = [cloudflare_zero_trust_access_application.aws_vnc_browser_rendering.aud]
+            aud_tag   = [cloudflare_zero_trust_access_application.cf_app_vnc_browser.aud]
             required  = true
             team_name = var.cf_team_name
           }

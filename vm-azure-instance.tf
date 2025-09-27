@@ -12,7 +12,7 @@ resource "azurerm_resource_group" "cloudflare_rg" {
 #==========================================================
 # Network Interface
 #==========================================================
-resource "azurerm_virtual_network" "cloudflare_vnet" {
+resource "azurerm_virtual_network" "azure_vnet_main" {
   name                = "cloudflare-vnet"
   address_space       = [var.azure_vnet_cidr]
   location            = local.azure_common_config.location
@@ -21,10 +21,10 @@ resource "azurerm_virtual_network" "cloudflare_vnet" {
   tags = local.azure_common_tags
 }
 
-resource "azurerm_subnet" "cloudflare_subnet" {
+resource "azurerm_subnet" "azure_subnet_main" {
   name                 = "cloudflare-subnet"
   resource_group_name  = azurerm_resource_group.cloudflare_rg.name
-  virtual_network_name = azurerm_virtual_network.cloudflare_vnet.name
+  virtual_network_name = azurerm_virtual_network.azure_vnet_main.name
   address_prefixes     = [var.azure_subnet_cidr]
 }
 
@@ -52,7 +52,7 @@ resource "azurerm_network_interface" "nic" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.cloudflare_subnet.id
+    subnet_id                     = azurerm_subnet.azure_subnet_main.id
     private_ip_address_allocation = "Dynamic"
   }
 
@@ -94,7 +94,7 @@ resource "azurerm_nat_gateway_public_ip_association" "natgw_ip" {
 
 #Associate NAT Gateway with Subnet
 resource "azurerm_subnet_nat_gateway_association" "cloudflare_natgw_association" {
-  subnet_id      = azurerm_subnet.cloudflare_subnet.id
+  subnet_id      = azurerm_subnet.azure_subnet_main.id
   nat_gateway_id = azurerm_nat_gateway.cloudflare_natgw.id
 }
 
@@ -146,7 +146,7 @@ locals {
 #==========================================================
 # Azure Virtual Machine
 #==========================================================
-resource "azurerm_linux_virtual_machine" "cloudflare_zero_trust_demo_azure" {
+resource "azurerm_linux_virtual_machine" "azure_vm_linux" {
   count               = var.azure_vm_count
   name                = "${count.index == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${count.index}"
   resource_group_name = local.azure_common_config.resource_group_name
@@ -227,8 +227,8 @@ resource "azurerm_route_table" "cloudflare_route_table_warp" {
   tags = local.azure_common_tags
 }
 
-resource "azurerm_subnet_route_table_association" "cloudflare_subnet_route_association" {
-  subnet_id      = azurerm_subnet.cloudflare_subnet.id
+resource "azurerm_subnet_route_table_association" "azure_subnet_route_assoc" {
+  subnet_id      = azurerm_subnet.azure_subnet_main.id
   route_table_id = azurerm_route_table.cloudflare_route_table_warp.id
 
 
@@ -242,9 +242,9 @@ resource "azurerm_subnet_route_table_association" "cloudflare_subnet_route_assoc
 resource "azurerm_network_interface_security_group_association" "main" {
   count                     = var.azure_vm_count
   network_interface_id      = azurerm_network_interface.nic[count.index].id
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  network_security_group_id = azurerm_network_security_group.azure_nsg_main.id
 
-  depends_on = [azurerm_linux_virtual_machine.cloudflare_zero_trust_demo_azure] # Ensure NIC is destroyed before NSG association
+  depends_on = [azurerm_linux_virtual_machine.azure_vm_linux] # Ensure NIC is destroyed before NSG association
 }
 
 
@@ -253,7 +253,7 @@ resource "azurerm_network_interface_security_group_association" "main" {
 #==========================================================
 # Network Security Group
 #==========================================================
-resource "azurerm_network_security_group" "nsg" {
+resource "azurerm_network_security_group" "azure_nsg_main" {
   name                = "nsg-ssh-and-icmp-from-myIP-allowed"
   location            = local.azure_common_config.location
   resource_group_name = local.azure_common_config.resource_group_name
@@ -310,7 +310,7 @@ resource "azurerm_network_security_group" "nsg" {
 
   depends_on = [
     azurerm_network_interface.nic, # Ensure NICs are destroyed before NSG
-    azurerm_subnet_route_table_association.cloudflare_subnet_route_association,
+    azurerm_subnet_route_table_association.azure_subnet_route_assoc,
   ]
 
   tags = local.azure_common_tags

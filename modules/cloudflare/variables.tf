@@ -69,6 +69,12 @@ variable "cf_macos_posture_id" {
   sensitive   = true
 }
 
+variable "cf_ios_posture_id" {
+  description = "Latest iOS version posture ID in Cloudflare"
+  type        = string
+  sensitive   = true
+}
+
 variable "cf_windows_posture_id" {
   description = "Latest Windows version posture ID in Cloudflare"
   type        = string
@@ -86,10 +92,6 @@ variable "cf_device_os" {
   type        = string
 }
 
-variable "cf_osx_version_posture_rule_id" {
-  description = "Rule ID for the posture check on latest version of macos"
-  type        = string
-}
 
 #======================================================
 # TUNNEL CONFIGURATION

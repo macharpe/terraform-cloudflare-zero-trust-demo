@@ -12,8 +12,8 @@ output "GCP_COMPUTE_INSTANCES" {
   value = concat(
     [
       {
-        name        = google_compute_instance.gcp_cloudflared_vm_instance.name
-        internal_ip = google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip
+        name        = google_compute_instance.gcp_vm_cloudflared.name
+        internal_ip = google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip
         public_ip   = google_compute_address.cloud_nat_ip.address
         tunnel = {
           cf_tunnel_id     = module.cloudflare.gcp_tunnel_id
@@ -22,7 +22,7 @@ output "GCP_COMPUTE_INSTANCES" {
       }
     ],
     [
-      for idx, instance in google_compute_instance.gcp_vm_instance :
+      for idx, instance in google_compute_instance.gcp_vm_warp :
       {
         name        = instance.name
         internal_ip = instance.network_interface[0].network_ip
@@ -32,11 +32,11 @@ output "GCP_COMPUTE_INSTANCES" {
     ],
     [
       {
-        name                 = google_compute_instance.gcp_windows_rdp_server.name
+        name                 = google_compute_instance.gcp_vm_windows_rdp.name
         gcp_windows_username = var.gcp_windows_user_name
-        internal_ip          = google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip
+        internal_ip          = google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip
         public_ip            = google_compute_address.cloud_nat_ip.address
-        ssh                  = "ssh -o PubkeyAuthentication=no ${var.gcp_windows_user_name}@${google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip}"
+        ssh                  = "ssh -o PubkeyAuthentication=no ${var.gcp_windows_user_name}@${google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip}"
         tunnel = {
           cf_tunnel_id     = module.cloudflare.gcp_windows_rdp_tunnel_id
           cf_tunnel_status = module.cloudflare.gcp_windows_rdp_tunnel_status
@@ -51,7 +51,7 @@ output "GCP_COMPUTE_INSTANCES" {
 output "AWS_EC2_INSTANCES" {
   description = "AWS instance details"
   value = concat(
-    [for idx, instance in aws_instance.cloudflared_aws : {
+    [for idx, instance in aws_instance.aws_vm_cloudflared : {
       tunnel = {
         cf_tunnel_id     = module.cloudflare.aws_tunnel_id
         cf_tunnel_status = module.cloudflare.aws_tunnel_status
@@ -63,15 +63,15 @@ output "AWS_EC2_INSTANCES" {
     }],
     [{
       name          = var.aws_ec2_browser_ssh_name
-      internal_ip   = aws_instance.aws_ec2_service_instance.private_ip
+      internal_ip   = aws_instance.aws_vm_service.private_ip
       public_ip_nat = aws_eip.nat_eip.public_ip
-      ssh           = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_ec2_service_instance.private_ip} -i ${module.ssh_keys.aws_service_key_path}"
+      ssh           = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_vm_service.private_ip} -i ${module.ssh_keys.aws_service_key_path}"
     }],
     [{
       name          = var.aws_ec2_browser_vnc_name
-      internal_ip   = aws_instance.aws_ec2_vnc_instance.private_ip
+      internal_ip   = aws_instance.aws_vm_vnc.private_ip
       public_ip_nat = aws_eip.nat_eip.public_ip
-      ssh           = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_ec2_vnc_instance.private_ip} -i ${module.ssh_keys.aws_vnc_key_path}"
+      ssh           = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_vm_vnc.private_ip} -i ${module.ssh_keys.aws_vnc_key_path}"
     }]
   )
 }
@@ -87,7 +87,7 @@ output "AZURE_VMS" {
       ssh         = "ssh ${var.azure_vm_admin_username}@${tonumber(idx) == 0 ? "warp_ip" : azurerm_network_interface.nic[idx].private_ip_address} -i ${module.ssh_keys.azure_key_paths[idx]}"
     }
   }
-  depends_on = [azurerm_linux_virtual_machine.cloudflare_zero_trust_demo_azure]
+  depends_on = [azurerm_linux_virtual_machine.azure_vm_linux]
 }
 
 
@@ -96,7 +96,7 @@ output "SSH_FOR_INFRASTRUCTURE_ACCESS" {
   description = "SSH with Access for Infrastructure command"
   value = {
     for username in var.gcp_users :
-    username => "ssh ${username}@${google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip}"
+    username => "ssh ${username}@${google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip}"
   }
 }
 

@@ -1,0 +1,21 @@
+# Terraform Backend Configuration Template
+# Copy this file to backend.conf and update with your actual values
+# backend.conf is gitignored for security
+
+# S3 Backend Configuration
+bucket         = "YOUR_TERRAFORM_STATE_BUCKET_NAME"
+key            = "demo/terraform.tfstate"
+region         = "YOUR_AWS_REGION"
+dynamodb_table = "YOUR_DYNAMODB_TABLE_NAME"
+encrypt        = true
+
+# Instructions:
+# 1. Copy this file: cp backend.conf.example backend.conf
+# 2. Replace YOUR_* placeholders with actual values from your backend infrastructure
+# 3. Run: terraform init -backend-config=backend.conf
+# 4. Continue with normal workflow: terraform plan, terraform apply, etc.
+
+# Example values (replace with your actual infrastructure):
+# bucket         = "tf-state-cf-zero-trust-abc12345"
+# region         = "eu-central-1"
+# dynamodb_table = "tf-state-lock-cf-zero-trust"

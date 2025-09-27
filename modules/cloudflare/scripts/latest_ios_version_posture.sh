@@ -9,11 +9,11 @@ ACCOUNT_ID="${TF_VAR_cloudflare_account_id:-${CLOUDFLARE_ACCOUNT_ID}}"
 CLOUDFLARE_API_TOKEN="${TF_VAR_cloudflare_api_token:-${CLOUDFLARE_API_TOKEN}}"
 
 # Extract rule ID from terraform.tfvars
-RULE_ID=$(grep "cf_macos_posture_id" "$TERRAFORM_TFVARS" | sed 's/.*= *"\([^"]*\)".*/\1/')
+RULE_ID=$(grep "cf_ios_posture_id" "$TERRAFORM_TFVARS" | sed 's/.*= *"\([^"]*\)".*/\1/')
 
-# Fetch latest macOS version
+# Fetch latest iOS version
 # Note: Using -k flag due to WARP SSL inspection. Add gdmf.apple.com to WARP "Do Not Inspect" list to remove -k
-LATEST_VERSION=$(curl -s -k https://gdmf.apple.com/v2/pmv | jq -r '.PublicAssetSets.macOS[] | .ProductVersion' | sort -V | tail -n 1 | sed -E 's/^([0-9]+\.[0-9]+)$/\1.0/')
+LATEST_VERSION=$(curl -s -k https://gdmf.apple.com/v2/pmv | jq -r '.PublicAssetSets.iOS[] | .ProductVersion' | sort -V | tail -n 1 | sed -E 's/^([0-9]+\.[0-9]+)$/\1.0/')
 
 # Update Cloudflare Device Posture rule
 curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/devices/posture/$RULE_ID" \
@@ -26,14 +26,14 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/devices/p
       },
       \"match\": [
         {
-          \"platform\": \"mac\"
+          \"platform\": \"ios\"
         }
       ],
       \"schedule\": \"5m\",
       \"id\": \"$RULE_ID\",
       \"type\": \"os_version\",
-      \"description\": \"Check for latest macOS version\",
-      \"name\": \"macOS version Rule\",
+      \"description\": \"Check for latest iOS version\",
+      \"name\": \"iOS version Rule\",
       \"expiration\": null
     }"
 

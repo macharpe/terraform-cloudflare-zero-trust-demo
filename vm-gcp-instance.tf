@@ -1,37 +1,37 @@
 #==========================================================
 # GCP Network
 #==========================================================
-resource "google_compute_network" "gcp_custom_vpc" {
+resource "google_compute_network" "gcp_vpc_main" {
   name                    = "zero-trust-vpc"
   auto_create_subnetworks = false
 }
 
-resource "google_compute_subnetwork" "gcp_cloudflared_subnet" {
+resource "google_compute_subnetwork" "gcp_subnet_cloudflared" {
   name          = "zero-trust-cloudflared-subnet"
   ip_cidr_range = var.gcp_infra_cidr
   region        = var.gcp_region
-  network       = google_compute_network.gcp_custom_vpc.id
+  network       = google_compute_network.gcp_vpc_main.id
 }
 
-resource "google_compute_subnetwork" "gcp_warp_subnet" {
+resource "google_compute_subnetwork" "gcp_subnet_warp" {
   name          = "zero-trust-warp-subnet"
   ip_cidr_range = var.gcp_warp_cidr
   region        = var.gcp_region
-  network       = google_compute_network.gcp_custom_vpc.id
+  network       = google_compute_network.gcp_vpc_main.id
 }
 
-resource "google_compute_subnetwork" "gcp_cloudflared_windows_rdp_subnet" {
+resource "google_compute_subnetwork" "gcp_subnet_windows_rdp" {
   name          = "zero-trust-cloudflared-windows-rdp-subnet"
   ip_cidr_range = var.gcp_windows_rdp_cidr
   region        = var.gcp_region
-  network       = google_compute_network.gcp_custom_vpc.id
+  network       = google_compute_network.gcp_vpc_main.id
 }
 
 # Default route to internet gateway (REQUIRED)
 resource "google_compute_route" "default_route" {
   name             = "egress-internet"
   dest_range       = "0.0.0.0/0"
-  network          = google_compute_network.gcp_custom_vpc.name
+  network          = google_compute_network.gcp_vpc_main.name
   next_hop_gateway = "default-internet-gateway"
 }
 
@@ -49,7 +49,7 @@ resource "google_compute_address" "cloud_nat_ip" {
 # Create a Cloud Router in the same region as your subnets
 resource "google_compute_router" "cloud_router" {
   name    = "zero-trust-cloud-router"
-  network = google_compute_network.gcp_custom_vpc.id
+  network = google_compute_network.gcp_vpc_main.id
   region  = var.gcp_region
 }
 
@@ -68,17 +68,17 @@ resource "google_compute_router_nat" "cloud_nat" {
 
   # List the subnetworks to NAT, with all IP ranges included
   subnetwork {
-    name                    = google_compute_subnetwork.gcp_cloudflared_subnet.id
+    name                    = google_compute_subnetwork.gcp_subnet_cloudflared.id
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
 
   subnetwork {
-    name                    = google_compute_subnetwork.gcp_warp_subnet.id
+    name                    = google_compute_subnetwork.gcp_subnet_warp.id
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
 
   subnetwork {
-    name                    = google_compute_subnetwork.gcp_cloudflared_windows_rdp_subnet.id
+    name                    = google_compute_subnetwork.gcp_subnet_windows_rdp.id
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
 
@@ -98,7 +98,7 @@ locals {
   # Common GCP instance configuration
   common_gcp_config = {
     zone    = "${var.gcp_region}-a"
-    network = google_compute_network.gcp_custom_vpc.id
+    network = google_compute_network.gcp_vpc_main.id
   }
 
   # Common Linux boot disk configuration
@@ -138,7 +138,7 @@ locals {
 #==========================================================
 # GCP INSTANCE RUNNING CLOUDFLARED: Infrastructure Access
 #==========================================================
-resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
+resource "google_compute_instance" "gcp_vm_cloudflared" {
   name         = var.gcp_cloudflared_vm_name
   machine_type = var.gcp_machine_size
   zone         = local.common_gcp_config.zone
@@ -151,7 +151,7 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
 
   network_interface {
     network    = local.common_gcp_config.network
-    subnetwork = google_compute_subnetwork.gcp_cloudflared_subnet.id
+    subnetwork = google_compute_subnetwork.gcp_subnet_cloudflared.id
   }
 
   // Optional config to make instance ephemeral 
@@ -184,7 +184,7 @@ resource "google_compute_instance" "gcp_cloudflared_vm_instance" {
 #==========================================================
 # GCP INSTANCE RUNNING CLOUDFLARED: Windows RDP Server
 #==========================================================
-resource "google_compute_instance" "gcp_windows_rdp_server" {
+resource "google_compute_instance" "gcp_vm_windows_rdp" {
   name         = var.gcp_windows_rdp_vm_name
   machine_type = var.gcp_windows_machine_size
   zone         = local.common_gcp_config.zone
@@ -199,7 +199,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
 
   network_interface {
     network    = local.common_gcp_config.network
-    subnetwork = google_compute_subnetwork.gcp_cloudflared_windows_rdp_subnet.id
+    subnetwork = google_compute_subnetwork.gcp_subnet_windows_rdp.id
   }
 
   scheduling {
@@ -242,7 +242,7 @@ resource "google_compute_instance" "gcp_windows_rdp_server" {
 #==========================================================
 # GCP INSTANCES NOT RUNNING CLOUDFLARED
 #==========================================================
-resource "google_compute_instance" "gcp_vm_instance" {
+resource "google_compute_instance" "gcp_vm_warp" {
   count        = var.gcp_vm_count
   name         = count.index == 0 ? "${var.gcp_warp_connector_vm_name}-${count.index}" : "${var.gcp_vm_name}-${count.index}"
   machine_type = var.gcp_machine_size
@@ -256,7 +256,7 @@ resource "google_compute_instance" "gcp_vm_instance" {
 
   network_interface {
     network    = local.common_gcp_config.network
-    subnetwork = google_compute_subnetwork.gcp_warp_subnet.id
+    subnetwork = google_compute_subnetwork.gcp_subnet_warp.id
     #    access_config {}
   }
 
@@ -293,33 +293,33 @@ resource "google_compute_instance" "gcp_vm_instance" {
 #==========================================================
 resource "google_compute_route" "route_to_warp_subnet" {
   name       = "route-to-warp-subnet"
-  network    = google_compute_network.gcp_custom_vpc.name
+  network    = google_compute_network.gcp_vpc_main.name
   dest_range = var.cf_warp_cgnat_cidr
 
-  next_hop_instance      = google_compute_instance.gcp_vm_instance[0].self_link
-  next_hop_instance_zone = google_compute_instance.gcp_vm_instance[0].zone
+  next_hop_instance      = google_compute_instance.gcp_vm_warp[0].self_link
+  next_hop_instance_zone = google_compute_instance.gcp_vm_warp[0].zone
 
   priority = 1000
 }
 
 resource "google_compute_route" "route_to_azure_subnet" {
   name       = "route-to-azure-subnet"
-  network    = google_compute_network.gcp_custom_vpc.name
+  network    = google_compute_network.gcp_vpc_main.name
   dest_range = var.azure_subnet_cidr
 
-  next_hop_instance      = google_compute_instance.gcp_vm_instance[0].self_link
-  next_hop_instance_zone = google_compute_instance.gcp_vm_instance[0].zone
+  next_hop_instance      = google_compute_instance.gcp_vm_warp[0].self_link
+  next_hop_instance_zone = google_compute_instance.gcp_vm_warp[0].zone
 
   priority = 1000
 }
 
 resource "google_compute_route" "route_to_aws_subnet" {
   name       = "route-to-aws-subnet"
-  network    = google_compute_network.gcp_custom_vpc.name
+  network    = google_compute_network.gcp_vpc_main.name
   dest_range = var.aws_private_cidr
 
-  next_hop_instance      = google_compute_instance.gcp_vm_instance[0].self_link
-  next_hop_instance_zone = google_compute_instance.gcp_vm_instance[0].zone
+  next_hop_instance      = google_compute_instance.gcp_vm_warp[0].self_link
+  next_hop_instance_zone = google_compute_instance.gcp_vm_warp[0].zone
 
   priority = 1000
 }
@@ -331,9 +331,9 @@ resource "google_compute_route" "route_to_aws_subnet" {
 # Create a firewall rule to deny SSH from the internet
 
 # Allow SSH only from my ip
-resource "google_compute_firewall" "allow_ssh_from_my_ip" {
+resource "google_compute_firewall" "gcp_fw_ingress_ssh" {
   name    = "allow-ssh-from-my-ip"
-  network = google_compute_network.gcp_custom_vpc.name
+  network = google_compute_network.gcp_vpc_main.name
 
   direction = "INGRESS"
   priority  = 900
@@ -349,9 +349,9 @@ resource "google_compute_firewall" "allow_ssh_from_my_ip" {
 
 
 # Allow PING only from my ip
-resource "google_compute_firewall" "allow_icmp_from_any" {
+resource "google_compute_firewall" "gcp_fw_ingress_icmp" {
   name    = "allow-icmp-from-any"
-  network = google_compute_network.gcp_custom_vpc.name
+  network = google_compute_network.gcp_vpc_main.name
 
   direction = "INGRESS"
   priority  = 901
@@ -366,9 +366,9 @@ resource "google_compute_firewall" "allow_icmp_from_any" {
 
 
 # Delete default SSH rule first (if exists)
-resource "google_compute_firewall" "default_ssh_deny" {
+resource "google_compute_firewall" "gcp_fw_ingress_ssh_deny" {
   name    = "deny-all-external-ssh-zero-trust-vpc"
-  network = google_compute_network.gcp_custom_vpc.name
+  network = google_compute_network.gcp_vpc_main.name
 
   direction = "INGRESS"
   priority  = 1000
@@ -384,9 +384,9 @@ resource "google_compute_firewall" "default_ssh_deny" {
 
 
 # Block ALL outbound SSH to prevent lateral movement
-resource "google_compute_firewall" "deny_egress_ssh" {
+resource "google_compute_firewall" "gcp_fw_egress_ssh_deny" {
   name    = "deny-egress-ssh"
-  network = google_compute_network.gcp_custom_vpc.name
+  network = google_compute_network.gcp_vpc_main.name
 
   direction = "EGRESS"
   priority  = 800 # Must be higher priority than any allow rules for SSH egress
@@ -401,9 +401,9 @@ resource "google_compute_firewall" "deny_egress_ssh" {
   target_tags        = ["infrastructure-access-instances"]
 }
 
-resource "google_compute_firewall" "allow_egress" {
+resource "google_compute_firewall" "gcp_fw_egress_all" {
   name    = "allow-all-egress"
-  network = google_compute_network.gcp_custom_vpc.name
+  network = google_compute_network.gcp_vpc_main.name
 
   direction = "EGRESS"
   priority  = 900

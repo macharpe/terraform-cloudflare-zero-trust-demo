@@ -1,22 +1,46 @@
+# VSCode Extensions for Terraform Cloudflare Zero Trust Demo
+# Last Updated: September 27, 2025
+
+# Terraform and Infrastructure as Code
 4ops.terraform
+hashicorp.terraform
+run-at-scale.terraform-doc-snippets
+
+# Documentation and Diagrams
 bierner.markdown-mermaid
+pomdtr.excalidraw-editor
+esbenp.prettier-vscode
+
+# Templates and Configuration
 cdpautsch.tpl
 codelawd.env-intellisense
 editorconfig.editorconfig
-esbenp.prettier-vscode
+mkhl.direnv
+
+# Cloud Providers
+ms-azuretools.vscode-azureresourcegroups
+amazonwebservices.aws-toolkit-vscode
+googlecloudtools.cloudcode
+
+# Python Support (for WARP routing scripts)
+ms-python.debugpy
+ms-python.python
+ms-python.vscode-pylance
+
+# Shell and Scripting
+mads-hartmann.bash-ide-vscode
+timonwong.shellcheck
+
+# Git and GitHub Integration
 github.copilot
 github.copilot-chat
 github.remotehub
 github.vscode-github-actions
-hashicorp.terraform
-mads-hartmann.bash-ide-vscode
-mkhl.direnv
-ms-azuretools.vscode-azureresourcegroups
-ms-python.debugpy
-ms-python.python
-ms-python.vscode-pylance
 ms-vscode.azure-repos
 ms-vscode.remote-repositories
+
+# UI and Theme
 pkief.material-icon-theme
-pomdtr.excalidraw-editor
-run-at-scale.terraform-doc-snippets
+
+# JSON and YAML Support
+redhat.vscode-yaml

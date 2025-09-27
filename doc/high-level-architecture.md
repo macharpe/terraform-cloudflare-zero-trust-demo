@@ -1,5 +1,7 @@
 # High-Level Architecture - Cloudflare Zero Trust Multi-Cloud Demo
 
+**Last Updated:** September 27, 2025
+
 ## Simple Overview
 
 This ultra-simplified diagram shows the core architecture with just the essential components:
@@ -65,14 +67,14 @@ flowchart TB
     subgraph MultiCloud ["🌐 Multi-Cloud Infrastructure"]
         direction LR
         
-        subgraph AWS ["☁️ AWS (us-east-1)"]
-            AWSApps["📱 Applications<br/>• Browser SSH/VNC<br/>• Database Access<br/>• EC2 Instances"]
+        subgraph AWS ["☁️ AWS (eu-central-1)"]
+            AWSApps["📱 Applications<br/>• Browser SSH/VNC<br/>• VNC Progress Monitoring<br/>• Database Access<br/>• EC2 Instances"]
         end
-        
+
         subgraph GCP ["☁️ GCP (europe-west3)"]
             GCPApps["📱 Applications<br/>• Infrastructure Access<br/>• Windows RDP<br/>• Web Applications<br/>• WARP Connectors"]
         end
-        
+
         subgraph Azure ["☁️ Azure (westeurope)"]
             AzureApps["📱 Applications<br/>• Linux VMs<br/>• WARP Connectors<br/>• Cross-cloud Routing"]
         end
@@ -83,6 +85,7 @@ flowchart TB
         direction TB
         Datadog["📈 Datadog<br/>• Multi-cloud Monitoring<br/>• Process Monitoring<br/>• Performance Metrics"]
         Terraform["🏗️ Infrastructure as Code<br/>• Terraform<br/>• GitHub Actions<br/>• Automated Deployment"]
+        Backend["🗄️ Backend Infrastructure<br/>• S3 + DynamoDB<br/>• Separate State Management<br/>• Production-ready Security"]
     end
 
     %% Application Categories
@@ -166,9 +169,9 @@ flowchart TB
 - **Device-Centric Security**: Device posture checking before access
 
 ### 🌐 **Multi-Cloud Strategy**
-- **AWS**: Browser-rendered services (SSH, VNC, databases)
-- **GCP**: Infrastructure access, web applications, Windows services
-- **Azure**: Linux VMs with cross-cloud WARP connectivity
+- **AWS (eu-central-1)**: Browser-rendered services (SSH, VNC with progress monitoring, databases)
+- **GCP (europe-west3)**: Infrastructure access, web applications, Windows services
+- **Azure (westeurope)**: Linux VMs with cross-cloud WARP connectivity
 - **Seamless Integration**: WARP connectors enable secure inter-cloud communication
 
 ### 🔐 **Identity-First Approach**
@@ -183,8 +186,10 @@ flowchart TB
 
 ### 📊 **Observability & Automation**
 - **Centralized Monitoring**: Datadog across all cloud providers
-- **Infrastructure as Code**: Terraform-managed deployment
+- **Infrastructure as Code**: Terraform-managed deployment with separate backend infrastructure
 - **Automated Workflows**: GitHub Actions for CI/CD
+- **Progress Monitoring**: Real-time VNC installation tracking with ETAs and visual progress bars
+- **Production Backend**: S3 + DynamoDB state management (~$0.50/year)
 
 ## Benefits of This Architecture
 

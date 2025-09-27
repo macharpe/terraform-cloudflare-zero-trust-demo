@@ -57,9 +57,9 @@ module "cloudflare" {
   cf_tunnel_warp_connector_azure_id = var.cf_warp_tunnel_azure_id
   cf_tunnel_warp_connector_gcp_id   = var.cf_warp_tunnel_gcp_id
 
-  gcp_vm_internal_ip          = google_compute_instance.gcp_cloudflared_vm_instance.network_interface[0].network_ip
-  gcp_windows_vm_internal_ip  = google_compute_instance.gcp_windows_rdp_server.network_interface[0].network_ip
-  gcp_cloudflared_vm_instance = google_compute_instance.gcp_cloudflared_vm_instance
+  gcp_vm_internal_ip          = google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip
+  gcp_windows_vm_internal_ip  = google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip
+  gcp_cloudflared_vm_instance = google_compute_instance.gcp_vm_cloudflared
   gcp_infra_cidr              = var.gcp_infra_cidr
   gcp_warp_cidr               = var.gcp_warp_cidr
   gcp_windows_rdp_cidr        = var.gcp_windows_rdp_cidr
@@ -101,8 +101,8 @@ module "cloudflare" {
   cf_domain_controller_rdp_port = var.cf_domain_controller_rdp_port
 
   # AWS
-  aws_ec2_ssh_service_private_ip = aws_instance.aws_ec2_service_instance.private_ip
-  aws_ec2_vnc_service_private_ip = aws_instance.aws_ec2_vnc_instance.private_ip
+  aws_ec2_ssh_service_private_ip = aws_instance.aws_vm_service.private_ip
+  aws_ec2_vnc_service_private_ip = aws_instance.aws_vm_vnc.private_ip
   aws_private_cidr               = var.aws_private_cidr
   aws_public_cidr                = var.aws_public_cidr
 
@@ -114,6 +114,7 @@ module "cloudflare" {
   # Static definition
   cf_gateway_posture_id         = var.cf_gateway_posture_id
   cf_macos_posture_id           = var.cf_macos_posture_id
+  cf_ios_posture_id             = var.cf_ios_posture_id
   cf_windows_posture_id         = var.cf_windows_posture_id
   cf_linux_posture_id           = var.cf_linux_posture_id
   cf_okta_identity_provider_id  = var.cf_okta_identity_provider_id
@@ -122,11 +123,10 @@ module "cloudflare" {
   cf_azure_admin_rule_group_id  = var.cf_azure_admin_rule_group_id
 
   # Device Profile
-  cf_device_os                   = var.cf_device_os
-  cf_osx_version_posture_rule_id = var.cf_osx_version_posture_rule_id
-  cf_default_cgnat_routes        = var.cf_default_cgnat_routes
-  cf_custom_cgnat_routes         = var.cf_custom_cgnat_routes
-  cf_warp_cgnat_cidr             = var.cf_warp_cgnat_cidr
+  cf_device_os            = var.cf_device_os
+  cf_default_cgnat_routes = var.cf_default_cgnat_routes
+  cf_custom_cgnat_routes  = var.cf_custom_cgnat_routes
+  cf_warp_cgnat_cidr      = var.cf_warp_cgnat_cidr
 
   # Subnet generation
   cf_azure_json_subnet_generation = module.warp-routing.cf_azure_json_subnet_generation
@@ -153,8 +153,8 @@ module "azure-ad" {
 
 module "warp-routing" {
   source                      = "./modules/warp-routing"
-  gcp_cloudflared_vm_instance = google_compute_instance.gcp_cloudflared_vm_instance
-  gcp_vm_instance             = [google_compute_instance.gcp_vm_instance[0]]
+  gcp_cloudflared_vm_instance = google_compute_instance.gcp_vm_cloudflared
+  gcp_vm_instance             = [google_compute_instance.gcp_vm_warp[0]]
 
   azure_subnet_cidr    = var.azure_subnet_cidr
   gcp_infra_cidr       = var.gcp_infra_cidr

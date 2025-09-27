@@ -13,7 +13,7 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_ssh_target" {
 }
 
 # Creating the infrastructure Application
-resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
+resource "cloudflare_zero_trust_access_application" "cf_app_ssh_infra" {
   account_id                   = var.cloudflare_account_id
   type                         = "infrastructure"
   name                         = var.cf_infra_app_name
@@ -96,7 +96,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_ssh_infrastructure" {
 # SELF-HOSTED APP: DB Server
 #======================================================
 # Creating the Self-hosted Application for Browser rendering SSH
-resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" {
+resource "cloudflare_zero_trust_access_application" "cf_app_ssh_browser" {
   account_id                   = var.cloudflare_account_id
   type                         = "ssh"
   name                         = var.cf_browser_ssh_app_name
@@ -130,7 +130,7 @@ resource "cloudflare_zero_trust_access_application" "aws_ssh_browser_rendering" 
 # SELF-HOSTED APP: PostgresDB Admin
 #======================================================
 # Creating the Self-hosted Application for Browser rendering VNC
-resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" {
+resource "cloudflare_zero_trust_access_application" "cf_app_vnc_browser" {
   account_id                   = var.cloudflare_account_id
   type                         = "vnc"
   name                         = var.cf_browser_vnc_app_name
@@ -161,7 +161,7 @@ resource "cloudflare_zero_trust_access_application" "aws_vnc_browser_rendering" 
 # SELF-HOSTED APP: Competition App
 #======================================================
 # Creating the Self-hosted Application for Competition web application
-resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
+resource "cloudflare_zero_trust_access_application" "cf_app_web_competition" {
   account_id                   = var.cloudflare_account_id
   type                         = "self_hosted"
   name                         = var.cf_sensitive_web_app_name
@@ -193,7 +193,7 @@ resource "cloudflare_zero_trust_access_application" "gcp_competition_web_app" {
 # SELF-HOSTED APP: Macharpe Intranet
 #======================================================
 # Creating the Self-hosted Application for Administration web application
-resource "cloudflare_zero_trust_access_application" "gcp_intranet_web_app" {
+resource "cloudflare_zero_trust_access_application" "cf_app_web_intranet" {
   account_id                   = var.cloudflare_account_id
   type                         = "self_hosted"
   name                         = var.cf_intranet_web_app_name
@@ -235,7 +235,7 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_rdp_target" {
 }
 
 # Domain Controller Browser-Rendered RDP Application
-resource "cloudflare_zero_trust_access_application" "domain_controller" {
+resource "cloudflare_zero_trust_access_application" "cf_app_rdp_domain" {
   account_id                   = var.cloudflare_account_id
   type                         = "rdp"
   name                         = "Domain Controller"
