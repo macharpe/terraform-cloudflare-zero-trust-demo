@@ -69,7 +69,7 @@ variable "gcp_windows_machine_size" {
 variable "gcp_linux_image" {
   description = "GCP Linux image for compute instances"
   type        = string
-  default     = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
+  default     = "ubuntu-os-cloud/ubuntu-2204-lts-amd64"
 }
 
 variable "gcp_windows_image" {
@@ -279,7 +279,7 @@ variable "azure_image_publisher" {
 variable "azure_image_offer" {
   description = "Azure VM image offer"
   type        = string
-  default     = "ubuntu-24_04-lts"
+  default     = "ubuntu-22_04-lts"
 }
 
 variable "azure_image_sku" {

@@ -254,5 +254,5 @@ output "training_status_admin_portal_aud" {
     Documentation: https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/
     Related: Required for Workers accessing the training admin portal
   EOT
-  value = cloudflare_zero_trust_access_application.cf_app_training_portal.aud
+  value       = cloudflare_zero_trust_access_application.cf_app_training_portal.aud
 }

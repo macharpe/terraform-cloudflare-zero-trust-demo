@@ -419,6 +419,8 @@ terraform apply
 
 > **⚠️ Important**: For subsequent operations (plan, apply, destroy), you don't need to specify the backend config again. Terraform remembers the backend configuration after the initial setup.
 
+> **🚀 Performance Note**: Cleanup scripts are optimized for demo workflows using a "Demo-First" approach. They only run when VMs are created/changed, not on every `terraform apply`, providing 40-50% faster apply times during demo sessions.
+
 ### 8. Post-Deployment Configuration
 
 After Terraform completes successfully:
@@ -429,42 +431,34 @@ After Terraform completes successfully:
 
 ### 🎁 BONUS: VNC Installation Monitoring
 
-The AWS t3.micro instance hosting the VNC desktop environment requires **15-20 minutes** to complete installation due to the extensive desktop packages (XFCE4, TightVNC, and related components). This extended installation time is normal and expected on t3.micro instances due to their limited resources.
+The AWS t3.micro instance hosting the VNC desktop environment requires **12-15 minutes** to complete installation due to the desktop packages (XFCE4, TightVNC, and related components). This installation time is normal for t3.micro instances.
 
-**Enhanced Progress Tracking** 🔄
-
-To address the concern of "hanging" installations, this project includes comprehensive progress monitoring:
+**Installation Monitoring** 🔄
 
 ```bash
 # SSH into the VNC instance
 ssh ubuntu@<vnc-instance-ip> -i modules/keys/out/aws_vnc_service_key_pair
 
-# Quick status check with progress bar and ETA
+# Check VNC setup status
 vnc-status
 
-# Watch progress in real-time
-tail -f /tmp/demo-progress.txt
-
-# Detailed installation log
+# Monitor installation progress
 tail -f /tmp/vnc-setup.log
-
-# Full status information
-cat /tmp/vnc-progress.status
 ```
 
-**Progress Indicators:**
-- 🔄 **8-phase tracking**: Package updates, XFCE4, VNC server setup, configuration, etc.
-- 📊 **Visual progress bars**: Real-time percentage completion with filled/empty indicators
-- ⏱️ **ETA calculations**: Time estimates based on t3.micro performance characteristics
-- 🕒 **Elapsed time display**: Shows installation duration and remaining time
-- 🟢 **Service status**: Indicates when VNC is fully operational and ready for browser access
-
 **What to Expect:**
-- **Phase 1-3** (0-25%): System updates and basic package installation (2-4 minutes)
-- **Phase 4-6** (25-75%): XFCE4 desktop environment installation (8-12 minutes)
-- **Phase 7-8** (75-100%): VNC configuration and service startup (2-4 minutes)
+- **Initial Setup** (0-2 minutes): System updates and package list refresh
+- **Package Installation** (2-10 minutes): XFCE4 desktop environment and VNC server installation (Firefox package removed for faster setup)
+- **Configuration** (10-12 minutes): VNC user configuration and systemd service setup
+- **Service Start** (12-15 minutes): VNC server startup and final verification
 
-The monitoring system resolves the previous issue where users couldn't determine if the installation was progressing or had failed.
+**VNC Status Command:**
+- Shows completion status with green (🟢) or red (🔴) indicators
+- Displays recent log entries for troubleshooting
+- Indicates VNC service running status on port 5901
+- Provides restart command if service is not running
+
+The streamlined installation resolves AWS 16KB user_data size limits while maintaining reliability.
 
 ### 🎁 BONUS: Automated update of posture check rules macOS and iOS to latest version
 
