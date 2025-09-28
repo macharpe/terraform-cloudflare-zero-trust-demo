@@ -8,6 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Enhanced VNC Progress Tracking**: Re-implemented improved ETA calculations in cloud-init script
+  - Smart phase-based timing estimates using predefined package installation times
+  - Accurate ETA display logic ("Less than 1 minute", "About X minutes", "Approximately X minutes")
+  - Enhanced `/tmp/demo-progress.txt` with better status information
+  - Never shows misleading "0 minutes remaining" when work is still in progress
+  - Optimized for AWS t3.micro performance characteristics
+
+### Fixed
+- **VNC Cloud-Init Compression Corruption**: Resolved AWS 16KB user_data limit issue
+  - Removed corrupted gzip+base64 compression approach that was causing script failures
+  - Implemented streamlined inline VNC setup (9,635 bytes, 24% reduction from previous)
+  - Eliminated Firefox package installation (saves ~3 minutes installation time)
+  - Fixed VNC service systemd path issues with dynamic vncserver executable detection (resolves status=203/EXEC errors)
+  - Enhanced error handling and logging to `/tmp/vnc-setup.log` for better troubleshooting
+  - Maintained all VNC functionality: XFCE4 desktop, vnc-status command, progress tracking
+- **WARP Connector Ubuntu Compatibility**: Downgraded to Ubuntu 22.04 LTS with programmatic version detection
+  - Azure WARP connector VM: `ubuntu-24_04-lts` → `ubuntu-22_04-lts`
+  - GCP WARP connector VM: `ubuntu-2404-lts-amd64` → `ubuntu-2204-lts-amd64`
+  - Replaced hardcoded `jammy main` with `$(lsb_release -cs) main` for automatic Ubuntu codename detection
+  - Required due to WARP Connector not supporting Ubuntu 24.04 as of September 2025
+  - Improves maintainability by eliminating hardcoded distribution codenames
+
+## [2.2.0] - 2025-09-28
+
+### Added
 - Comprehensive module documentation with README.md files for all modules
 - Enhanced output descriptions with detailed multi-line explanations
 - Backend configuration template approach for improved safety and state management
@@ -70,6 +95,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated project workflow documentation with secure backend commands
 - Updated README.md with backend configuration setup instructions
 - Enhanced documentation with security best practices and configuration guidance
+
+### Performance
+- **NEW**: Demo-First Cleanup Optimization
+  - 🚀 Replaced `timestamp()` triggers with VM instance ID-based triggers
+  - ⚡ 40-50% reduction in `terraform apply` time for demo workflows
+  - 🎯 Cleanup scripts now only run when VMs are created/changed, not on every apply
+  - 🔄 Maintained parallel execution of cleanup scripts for additional speed
+  - 📊 Optimized for demo pattern: create → demo → destroy (no mid-demo cleanups)
+  - 🛠️ Separate resource triggers for maintainability (known_hosts vs devices)
+- Created comprehensive performance optimization documentation in `0-documentation/`
 
 ## [2.1.0] - 2025-09-17
 

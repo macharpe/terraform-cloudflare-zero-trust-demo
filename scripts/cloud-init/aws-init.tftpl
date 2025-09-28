@@ -32,305 +32,24 @@ users:
 
 %{ if role == "vnc" ~}
 write_files:
-  - path: /tmp/setup-vnc-complete.sh
-    content: |
-      #!/bin/bash
-
-      # Create log and status files with proper permissions
-      touch /tmp/vnc-setup.log /tmp/vnc-progress.status
-      chmod 666 /tmp/vnc-setup.log /tmp/vnc-progress.status
-
-      # Progress tracking variables
-      TOTAL_PHASES=8
-      CURRENT_PHASE=0
-      START_TIME=$(date +%s)
-
-      # Package timing estimates (in seconds) for t3.micro
-      declare -A PACKAGE_TIMES=(
-        ["update"]=60
-        ["xfce4"]=300
-        ["xfce4-goodies"]=240
-        ["tightvncserver"]=45
-        ["dbus-x11"]=30
-        ["thunar"]=60
-        ["firefox"]=180
-        ["config"]=90
-      )
-
-      # Progress tracking functions
-      update_progress() {
-        local phase="$1"
-        local message="$2"
-        local current_time=$(date +%s)
-        local elapsed=$((current_time - START_TIME))
-        local progress_percent=$(( (CURRENT_PHASE * 100) / TOTAL_PHASES ))
-
-        # Calculate ETA based on remaining phases
-        local remaining_phases=$((TOTAL_PHASES - CURRENT_PHASE))
-        local avg_time_per_phase=$((elapsed / (CURRENT_PHASE + 1)))
-        local eta_seconds=$((remaining_phases * avg_time_per_phase))
-        local eta_minutes=$((eta_seconds / 60))
-
-        # Create progress bar
-        local bar_length=30
-        local filled_length=$((progress_percent * bar_length / 100))
-        local bar=$(printf "%*s" $filled_length | tr ' ' '█')
-        local empty=$(printf "%*s" $((bar_length - filled_length)) | tr ' ' '░')
-
-        # Write to status file
-        {
-          echo "=== VNC Setup Progress ==="
-          echo "Status: $message"
-          echo "Progress: [$bar$empty] $progress_percent%"
-          echo "Phase: $CURRENT_PHASE/$TOTAL_PHASES"
-          echo "Elapsed: $(($elapsed / 60))m $(($elapsed % 60))s"
-          echo "ETA: $eta_minutes minutes remaining"
-          echo "Current: $phase"
-          echo "Time: $(date '+%H:%M:%S')"
-          echo ""
-          echo "Quick check: tail -f /tmp/vnc-setup.log"
-          echo "Full status: cat /tmp/vnc-progress.status"
-        } > /tmp/vnc-progress.status
-
-        # Also log to main log
-        echo "[$progress_percent%] $message (Phase $CURRENT_PHASE/$TOTAL_PHASES)" >> /tmp/vnc-setup.log
-      }
-
-      echo "=== Starting Complete VNC Setup ===" >> /tmp/vnc-setup.log
-      update_progress "Initialization" "VNC setup started"
-
-      # Install packages with retry logic and progress tracking
-      CURRENT_PHASE=1
-      update_progress "Package Update" "Updating package lists..."
-
-      for i in {1..3}; do
-          if apt-get update -qq; then
-              echo "Package update completed successfully" >> /tmp/vnc-setup.log
-              break
-          else
-              echo "Package update attempt $i failed, retrying..." >> /tmp/vnc-setup.log
-              sleep 10
-          fi
-      done
-
-      # Install VNC and desktop packages with detailed progress
-      PACKAGES="xfce4 xfce4-goodies tightvncserver dbus-x11 thunar firefox"
-
-      for package in $PACKAGES; do
-          CURRENT_PHASE=$((CURRENT_PHASE + 1))
-          update_progress "$package" "Installing $package (this may take several minutes)..."
-
-          # Use apt-get with progress and detailed output
-          echo "=== Starting $package installation at $(date) ===" >> /tmp/vnc-setup.log
-
-          if DEBIAN_FRONTEND=noninteractive apt-get install -y "$package" >> /tmp/vnc-setup.log 2>&1; then
-              echo "$package installed successfully at $(date)" >> /tmp/vnc-setup.log
-              # Brief status update
-              update_progress "$package" "$package installation completed ✓"
-              sleep 2  # Brief pause to show completion
-          else
-              echo "WARNING: $package installation failed at $(date)" >> /tmp/vnc-setup.log
-              update_progress "$package" "WARNING: $package installation failed ✗"
-              # Continue with other packages even if one fails
-          fi
-      done
-
-      # Create ubuntu user files
-      CURRENT_PHASE=$((CURRENT_PHASE + 1))
-      update_progress "Configuration" "Creating user configuration files..."
-      echo "Creating user files..." >> /tmp/vnc-setup.log
-
-      # Create .bashrc with green prompt
-      {
-        echo "case \$- in *i*) ;; *) return;; esac"
-        echo "HISTCONTROL=ignoreboth"
-        echo "shopt -s histappend"
-        echo "HISTSIZE=1000"
-        echo "HISTFILESIZE=2000"
-        echo "shopt -s checkwinsize"
-        echo ""
-        echo "force_color_prompt=yes"
-        echo "if [ -n \"\$force_color_prompt\" ]; then"
-        echo "    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then"
-        echo "        color_prompt=yes"
-        echo "    fi"
-        echo "fi"
-        echo ""
-        echo "if [ \"\$color_prompt\" = yes ]; then"
-        echo "    PS1='\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ '"
-        echo "else"
-        echo "    PS1='\\u@\\h:\\w\\$ '"
-        echo "fi"
-        echo "unset color_prompt force_color_prompt"
-        echo ""
-        echo "if [ -x /usr/bin/dircolors ]; then"
-        echo "    eval \"\$(dircolors -b)\""
-        echo "    alias ls='ls --color=auto'"
-        echo "    alias grep='grep --color=auto'"
-        echo "fi"
-        echo ""
-        echo "alias ll='ls -alF'"
-        echo "alias la='ls -A'"
-        echo "alias l='ls -CF'"
-      } > /home/ubuntu/.bashrc
-
-      # Create VNC directory and startup script
-      mkdir -p /home/ubuntu/.vnc
-      {
-        echo "#!/bin/bash"
-        echo "export \$(dbus-launch)"
-        echo "export XDG_CURRENT_DESKTOP=XFCE"
-        echo "export XDG_SESSION_DESKTOP=xfce"
-        echo "pkill -f xfce"
-        echo "xfce4-panel &"
-        echo "xfce4-desktop &"
-        echo "xfwm4 &"
-        echo "thunar &"
-        echo "xfce4-terminal &"
-      } > /home/ubuntu/.vnc/xstartup
-
-      # Fix ownership and permissions
-      chown ubuntu:ubuntu /home/ubuntu/.bashrc
-      chown -R ubuntu:ubuntu /home/ubuntu/.vnc
-      chmod +x /home/ubuntu/.vnc/xstartup
-      chmod 644 /home/ubuntu/.bashrc
-
-      # Find VNC binaries
-      VNCSERVER=$(which vncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1)
-      VNCPASSWD=$(which vncpasswd 2>/dev/null || find /usr -name "vncpasswd" 2>/dev/null | head -1)
-
-      echo "VNC Server found at: $VNCSERVER" >> /tmp/vnc-setup.log
-      echo "VNC Passwd found at: $VNCPASSWD" >> /tmp/vnc-setup.log
-
-      if [ -z "$VNCSERVER" ] || [ -z "$VNCPASSWD" ]; then
-          echo "ERROR: VNC binaries not found!" >> /tmp/vnc-setup.log
-          exit 1
-      fi
-
-      # Set VNC password as ubuntu user
-      echo "Setting VNC password..." >> /tmp/vnc-setup.log
-      sudo -u ubuntu bash << VNCSUDO
-      mkdir -p ~/.vnc
-      echo "${vnc_password}" | $VNCPASSWD -f > ~/.vnc/passwd
-      chmod 600 ~/.vnc/passwd
-      VNCSUDO
-
-      # Create systemd service BEFORE starting VNC
-      echo "Creating systemd service..." >> /tmp/vnc-setup.log
-      cat > /etc/systemd/system/vncserver@.service << SERVICEEND
-      [Unit]
-      Description=TightVNC server
-      After=syslog.target network.target
-
-      [Service]
-      Type=forking
-      User=ubuntu
-      Group=ubuntu
-      WorkingDirectory=/home/ubuntu
-      PIDFile=/home/ubuntu/.vnc/%H:%i.pid
-      ExecStartPre=-$VNCSERVER -kill :%i > /dev/null 2>&1
-      ExecStart=$VNCSERVER -depth 24 -geometry 1280x720 :%i
-      ExecStop=$VNCSERVER -kill :%i
-
-      [Install]
-      WantedBy=multi-user.target
-      SERVICEEND
-
-      # Reload systemd and enable service
-      systemctl daemon-reload
-      systemctl enable vncserver@1.service
-
-      # Start VNC through systemd (not manually)
-      CURRENT_PHASE=$((CURRENT_PHASE + 1))
-      update_progress "VNC Service" "Starting VNC server..."
-      echo "Starting VNC service..." >> /tmp/vnc-setup.log
-
-      systemctl start vncserver@1.service
-
-      # Wait a moment for service to start
-      sleep 5
-
-      # Check if VNC is running
-      if systemctl is-active --quiet vncserver@1.service; then
-          echo "VNC service started successfully!" >> /tmp/vnc-setup.log
-          update_progress "Complete" "VNC setup completed successfully! ✓"
-      else
-          echo "VNC service failed to start, trying manual start..." >> /tmp/vnc-setup.log
-          update_progress "Fallback" "Primary start failed, trying manual start..."
-          sudo -u ubuntu $VNCSERVER :1 -geometry 1280x720 -depth 24 >> /tmp/vnc-setup.log 2>&1
-
-          # Check again after manual start
-          if systemctl is-active --quiet vncserver@1.service || pgrep Xtightvnc > /dev/null; then
-              update_progress "Complete" "VNC setup completed via manual start ✓"
-          else
-              update_progress "Failed" "VNC setup failed - see logs for details ✗"
-          fi
-      fi
-
-      # Final status check and completion
-      echo "=== Final Status Check ===" >> /tmp/vnc-setup.log
-      ss -tlnp | grep 5901 >> /tmp/vnc-setup.log 2>&1 && echo "✓ VNC listening on port 5901" >> /tmp/vnc-setup.log || echo "✗ Port 5901 not listening" >> /tmp/vnc-setup.log
-      systemctl status vncserver@1.service >> /tmp/vnc-setup.log 2>&1
-
-      # Create final completion status
-      if systemctl is-active --quiet vncserver@1.service || pgrep Xtightvnc > /dev/null; then
-          {
-            echo "=== VNC Setup Complete! ==="
-            echo "Status: SUCCESS ✓"
-            echo "Progress: [██████████████████████████████] 100%"
-            echo "Total Time: $(( ($(date +%s) - START_TIME) / 60 ))m $(( ($(date +%s) - START_TIME) % 60 ))s"
-            echo "VNC Port: 5901"
-            echo "VNC Password: ubuntu"
-            echo ""
-            echo "Ready to connect!"
-            echo "Connect via: tcp://localhost:5901"
-            echo ""
-            echo "Logs: tail -f /tmp/vnc-setup.log"
-          } > /tmp/vnc-progress.status
-      else
-          {
-            echo "=== VNC Setup Failed ==="
-            echo "Status: FAILED ✗"
-            echo "Check logs: cat /tmp/vnc-setup.log"
-            echo "Troubleshooting: systemctl status vncserver@1.service"
-          } > /tmp/vnc-progress.status
-      fi
-
-      echo "=== VNC Setup Complete ===" >> /tmp/vnc-setup.log
-    permissions: "0755"
   - path: /usr/local/bin/vnc-status
     content: |
       #!/bin/bash
       # Quick VNC status monitoring command
-
-      if [ -f /tmp/vnc-progress.status ]; then
+      if [ -f /tmp/vnc-setup.log ]; then
           echo "=== VNC Setup Status ==="
-          cat /tmp/vnc-progress.status
+          echo "🟢 VNC setup completed"
+          echo "Recent logs:"
+          tail -5 /tmp/vnc-setup.log 2>/dev/null
           echo ""
-
-          # Show real-time info if still in progress
           if systemctl is-active --quiet vncserver@1.service 2>/dev/null; then
-              echo "🟢 VNC is running"
-          elif pgrep -f "apt-get install" >/dev/null 2>&1; then
-              echo "🟡 Still installing packages..."
-              echo "Recent activity:"
-              tail -3 /tmp/vnc-setup.log 2>/dev/null || echo "No logs available yet"
-          elif [ -f /tmp/setup-vnc-complete.sh ] && pgrep -f "setup-vnc-complete" >/dev/null 2>&1; then
-              echo "🟡 VNC setup in progress..."
-              echo "Recent activity:"
-              tail -3 /tmp/vnc-setup.log 2>/dev/null || echo "Setup starting..."
+              echo "🟢 VNC is running on port 5901"
           else
-              echo "🔴 VNC not running"
+              echo "🔴 VNC service not running"
+              echo "Run: sudo systemctl start vncserver@1.service"
           fi
-
-          echo ""
-          echo "Commands:"
-          echo "  🔍 Watch logs: tail -f /tmp/vnc-setup.log"
-          echo "  📊 Full status: cat /tmp/vnc-progress.status"
-          echo "  🔧 Service status: systemctl status vncserver@1.service"
       else
-          echo "VNC setup has not started yet or status file not found"
-          echo "Check if cloud-init is still running: systemctl status cloud-final"
+          echo "VNC setup not started yet"
       fi
     permissions: "0755"
 %{ endif ~}
@@ -341,7 +60,7 @@ runcmd:
 
   # Set hostname
   - hostnamectl set-hostname ${hostname}
-  
+
   # Set timezone
   - timedatectl set-timezone Europe/Paris
 
@@ -358,24 +77,24 @@ runcmd:
   # Install cloudflared
   - |
     echo "Installing cloudflared..."
-    
+
     # Setup cloudflared repository
     sudo mkdir -p --mode=0755 /usr/share/keyrings
     curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
     echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-    
+
     # Install cloudflared
     sudo apt-get update
     sudo apt-get install -y cloudflared
-    
+
     # Install cloudflared service with token
     sudo cloudflared service install ${tunnel_secret_aws}
-    
+
     # Explicitly restart cloudflared service (following GCP pattern)
     echo "Starting cloudflared service..."
     systemctl restart cloudflared
     sleep 10
-    
+
     # Check service status
     if systemctl is-active --quiet cloudflared; then
         echo "Cloudflared service is running successfully"
@@ -389,14 +108,118 @@ runcmd:
         sleep 10
         systemctl status cloudflared --no-pager
     fi
-    
+
     echo "Cloudflared setup completed"
 %{ endif ~}
 
 %{ if role == "vnc" ~}
-  # Run the complete VNC setup
-  - /tmp/setup-vnc-complete.sh
-  
+  # Install VNC packages and setup (optimized for AWS 16KB limit)
+  - |
+    echo "=== VNC Setup Started ===" > /tmp/vnc-setup.log
+    echo "Installing VNC packages..." >> /tmp/vnc-setup.log
+
+    # Install packages
+    DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tightvncserver dbus-x11 thunar >> /tmp/vnc-setup.log 2>&1
+
+    # Create ubuntu user configuration
+    echo "Creating user configuration..." >> /tmp/vnc-setup.log
+
+    # Create .bashrc with green prompt
+    cat > /home/ubuntu/.bashrc << 'BASHRC_EOF'
+    case $- in *i*) ;; *) return;; esac
+    HISTCONTROL=ignoreboth
+    shopt -s histappend
+    HISTSIZE=1000
+    HISTFILESIZE=2000
+    shopt -s checkwinsize
+    force_color_prompt=yes
+    if [ -n "$force_color_prompt" ]; then
+        if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+            color_prompt=yes
+        fi
+    fi
+    if [ "$color_prompt" = yes ]; then
+        PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    else
+        PS1='\u@\h:\w\$ '
+    fi
+    unset color_prompt force_color_prompt
+    if [ -x /usr/bin/dircolors ]; then
+        eval "$(dircolors -b)"
+        alias ls='ls --color=auto'
+        alias grep='grep --color=auto'
+    fi
+    alias ll='ls -alF'
+    alias la='ls -A'
+    alias l='ls -CF'
+    BASHRC_EOF
+
+    # Create VNC directory and startup script
+    mkdir -p /home/ubuntu/.vnc
+    cat > /home/ubuntu/.vnc/xstartup << 'XSTARTUP_EOF'
+    #!/bin/bash
+    export $(dbus-launch)
+    export XDG_CURRENT_DESKTOP=XFCE
+    export XDG_SESSION_DESKTOP=xfce
+    pkill -f xfce
+    xfce4-panel &
+    xfce4-desktop &
+    xfwm4 &
+    thunar &
+    xfce4-terminal &
+    XSTARTUP_EOF
+
+    # Fix ownership and permissions
+    chown ubuntu:ubuntu /home/ubuntu/.bashrc
+    chown -R ubuntu:ubuntu /home/ubuntu/.vnc
+    chmod +x /home/ubuntu/.vnc/xstartup
+    chmod 644 /home/ubuntu/.bashrc
+
+    # Set VNC password
+    sudo -u ubuntu bash << 'VNCSUDO'
+    mkdir -p ~/.vnc
+    echo "${vnc_password}" | vncpasswd -f > ~/.vnc/passwd
+    chmod 600 ~/.vnc/passwd
+    VNCSUDO
+
+    # Find VNC binaries and create systemd service
+    VNCSERVER=$(which vncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1)
+    echo "VNC Server found at: $VNCSERVER" >> /tmp/vnc-setup.log
+
+    if [ -z "$VNCSERVER" ]; then
+        echo "ERROR: VNC server binary not found!" >> /tmp/vnc-setup.log
+        exit 1
+    fi
+
+    cat > /etc/systemd/system/vncserver@.service << SERVICEEND
+    [Unit]
+    Description=TightVNC server
+    After=syslog.target network.target
+
+    [Service]
+    Type=forking
+    User=ubuntu
+    Group=ubuntu
+    WorkingDirectory=/home/ubuntu
+    PIDFile=/home/ubuntu/.vnc/%H:%i.pid
+    ExecStartPre=-$VNCSERVER -kill :%i > /dev/null 2>&1
+    ExecStart=$VNCSERVER -depth 24 -geometry 1280x720 :%i
+    ExecStop=$VNCSERVER -kill :%i
+
+    [Install]
+    WantedBy=multi-user.target
+    SERVICEEND
+
+    # Enable and start VNC service
+    systemctl daemon-reload
+    systemctl enable vncserver@1.service
+    systemctl start vncserver@1.service
+
+    # Log completion
+    echo "VNC setup completed at $(date)" >> /tmp/vnc-setup.log
+    echo "VNC service status:" >> /tmp/vnc-setup.log
+    systemctl status vncserver@1.service >> /tmp/vnc-setup.log 2>&1
+
   # Create info file
   - |
     cat > /home/ubuntu/VNC_INFO.txt << 'INFOEND'

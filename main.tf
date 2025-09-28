@@ -1,10 +1,19 @@
 #==========================================
-# Cleanup scripts before the demo
+# Cleanup scripts - Demo-optimized (only on VM creation)
 #==========================================
-# Known Host cleanup in ~/.ssh/known_hosts
+
+# Known Hosts cleanup - for SSH access management
 resource "null_resource" "cleanup_known_hosts" {
+  # Demo-First: Only trigger when VMs are created/recreated
   triggers = {
-    always_run = timestamp()
+    # Track VM instance IDs - cleanup only needed when VMs change
+    aws_service_vm  = aws_instance.aws_vm_service.id
+    aws_vnc_vm      = aws_instance.aws_vm_vnc.id
+    aws_cloudflared = join(",", aws_instance.aws_vm_cloudflared[*].id)
+    gcp_cloudflared = google_compute_instance.gcp_vm_cloudflared.instance_id
+    gcp_windows_rdp = google_compute_instance.gcp_vm_windows_rdp.instance_id
+    gcp_warp        = join(",", google_compute_instance.gcp_vm_warp[*].instance_id)
+    azure_linux_vms = join(",", azurerm_linux_virtual_machine.azure_vm_linux[*].id)
   }
 
   provisioner "local-exec" {
@@ -12,8 +21,23 @@ resource "null_resource" "cleanup_known_hosts" {
   }
 }
 
-# Cleanup device in Cloudflare Dashboard
+# Cloudflare Device cleanup - for WARP connector management
 resource "null_resource" "cleanup_devices" {
+  # Demo-First: Only trigger when WARP-related infrastructure changes
+  triggers = {
+    # Track WARP connector VMs specifically
+    gcp_warp_vms    = join(",", google_compute_instance.gcp_vm_warp[*].instance_id)
+    azure_linux_vms = join(",", azurerm_linux_virtual_machine.azure_vm_linux[*].id)
+
+    # Also track Cloudflare configuration changes
+    cloudflare_config = md5(jsonencode([
+      var.cloudflare_account_id,
+      var.cloudflare_api_token,
+      var.cf_warp_tunnel_azure_id,
+      var.cf_warp_tunnel_gcp_id
+    ]))
+  }
+
   provisioner "local-exec" {
     command = "chmod u+x ${path.root}/scripts/cleanup/cloudflare_devices_cleanup.sh && ${path.root}/scripts/cleanup/cloudflare_devices_cleanup.sh"
     environment = {
