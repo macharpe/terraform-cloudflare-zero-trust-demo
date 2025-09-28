@@ -675,7 +675,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_default_tags"></a> [azure\_default\_tags](#input\_azure\_default\_tags) | default tags for Azure | `map(string)` | <pre>{<br/>  "Owner": "macharpe",<br/>  "environment": "dev",<br/>  "service": "cloudflare-zero-trust-demo"<br/>}</pre> | no |
 | <a name="input_azure_developer1_name"></a> [azure\_developer1\_name](#input\_azure\_developer1\_name) | User 1 in Azure AD | `string` | n/a | yes |
 | <a name="input_azure_developer2_name"></a> [azure\_developer2\_name](#input\_azure\_developer2\_name) | User 2 in Azure AD | `string` | n/a | yes |
-| <a name="input_azure_image_offer"></a> [azure\_image\_offer](#input\_azure\_image\_offer) | Azure VM image offer | `string` | `"ubuntu-24_04-lts"` | no |
+| <a name="input_azure_image_offer"></a> [azure\_image\_offer](#input\_azure\_image\_offer) | Azure VM image offer | `string` | `"ubuntu-22_04-lts"` | no |
 | <a name="input_azure_image_publisher"></a> [azure\_image\_publisher](#input\_azure\_image\_publisher) | Azure VM image publisher | `string` | `"Canonical"` | no |
 | <a name="input_azure_image_sku"></a> [azure\_image\_sku](#input\_azure\_image\_sku) | Azure VM image SKU | `string` | `"server"` | no |
 | <a name="input_azure_image_version"></a> [azure\_image\_version](#input\_azure\_image\_version) | Azure VM image version | `string` | `"latest"` | no |
@@ -742,7 +742,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_cloudflared_vm_name"></a> [gcp\_cloudflared\_vm\_name](#input\_gcp\_cloudflared\_vm\_name) | Name for the VM instance running cloudflared for infrastructure access demo | `string` | n/a | yes |
 | <a name="input_gcp_enable_oslogin"></a> [gcp\_enable\_oslogin](#input\_gcp\_enable\_oslogin) | Whether to enable OS Login | `bool` | `true` | no |
 | <a name="input_gcp_infra_cidr"></a> [gcp\_infra\_cidr](#input\_gcp\_infra\_cidr) | CIDR Range for GCP VMs running cloudflared | `string` | n/a | yes |
-| <a name="input_gcp_linux_image"></a> [gcp\_linux\_image](#input\_gcp\_linux\_image) | GCP Linux image for compute instances | `string` | `"ubuntu-os-cloud/ubuntu-2404-lts-amd64"` | no |
+| <a name="input_gcp_linux_image"></a> [gcp\_linux\_image](#input\_gcp\_linux\_image) | GCP Linux image for compute instances | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts-amd64"` | no |
 | <a name="input_gcp_machine_size"></a> [gcp\_machine\_size](#input\_gcp\_machine\_size) | size of the compute engine instance | `string` | `"e2-micro"` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP project ID | `string` | n/a | yes |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region | `string` | `"europe-west3"` | no |
