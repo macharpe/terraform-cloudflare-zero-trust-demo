@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2025-09-29
+
+### Added
+
+- **TFLint Validation System**: Comprehensive multi-cloud linting with AWS, Azure, GCP provider plugins
+  - Root and module validation covering all 4 project modules (cloudflare, azure, keys, warp-routing)
+  - Provider-specific rules with version constraints and security checks
+  - Naming convention enforcement (snake_case standards)
+  - Documentation requirements for all variables and outputs
+- **GitHub Actions Integration**: Automated TFLint validation workflow (`.github/workflows/tflint.yml`)
+  - Multi-module validation with parallel execution and plugin caching
+  - Security scanning integration with Trivy
+  - Detailed reporting with validation summaries and error handling
+  - Smart exit code handling (warnings don't fail builds, errors do)
+- **Pre-commit Hooks**: Local development validation (`.pre-commit-config.yaml`)
+  - Terraform formatting, validation, and TFLint analysis
+  - Security scanning with Checkov integration
+  - JSON/YAML validation and general code quality checks
+- **Comprehensive Documentation**: Complete setup and troubleshooting guide (`docs/TFLINT_SETUP.md`)
+  - Installation instructions for all platforms
+  - Usage examples and best practices
+  - Troubleshooting guide with common issues and solutions
+  - Team onboarding procedures
+
+### Changed
+
+- **Project Structure**: Standardized documentation folder (`doc/` → `docs/`)
+  - Updated all README.md image paths and references
+  - Follows standard open-source project conventions
+  - Improved GitHub Pages compatibility
+- **Code Quality Standards**: Enhanced `/git:gsave` command with TFLint integration
+  - Automatic validation before every commit
+  - Configurable validation options (--skip-tflint, etc.)
+  - Enhanced error handling and recovery
+- **Terraform Configuration**: Applied centralized timeout system across all VM resources
+  - Cloud-specific optimizations for AWS, Azure, and GCP
+  - Consistent formatting with `terraform fmt -recursive`
+
+### Fixed
+
+- **Gitignore Cleanup**: Removed unused patterns for S3 backend setup
+  - Removed local state file patterns (`tfstate/`, `.terraform.tfstate.lock.info`)
+  - Removed non-existent directory patterns (`logs/`, `node_modules/`, `vendor/`)
+  - Cleaned up references to non-existent files
+- **TFLint Configuration**: Resolved plugin compatibility issues
+  - Updated deprecated `module` attribute to `call_module_type`
+  - Commented out unavailable rules to prevent failures
+  - Optimized for current plugin versions (AWS v0.31.0, Azure v0.26.0, Google v0.29.0)
+
 ## [2.2.1] - 2025-09-29
 
 ### Fixed
