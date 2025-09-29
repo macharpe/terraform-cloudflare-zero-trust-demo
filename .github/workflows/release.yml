@@ -76,7 +76,7 @@ jobs:
 
       - name: 🚀 Create GitHub Release
         if: steps.version.outputs.create_release == 'true'
-        uses: ncipollo/action-gh-release@v2
+        uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
@@ -84,6 +84,7 @@ jobs:
           draft: false
           prerelease: false
           generateReleaseNotes: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: ✅ Release Summary
         if: steps.version.outputs.create_release == 'true'
