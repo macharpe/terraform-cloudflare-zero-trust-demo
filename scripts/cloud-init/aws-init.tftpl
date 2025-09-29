@@ -118,8 +118,11 @@ runcmd:
     echo "=== VNC Setup Started ===" > /tmp/vnc-setup.log
     echo "Installing VNC packages..." >> /tmp/vnc-setup.log
 
-    # Install packages
-    DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tightvncserver dbus-x11 thunar >> /tmp/vnc-setup.log 2>&1
+    # Update package lists first
+    apt-get update >> /tmp/vnc-setup.log 2>&1
+
+    # Install packages (using tigervnc-standalone-server instead of tightvncserver)
+    DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tigervnc-standalone-server dbus-x11 xfce4-file-manager >> /tmp/vnc-setup.log 2>&1
 
     # Create ubuntu user configuration
     echo "Creating user configuration..." >> /tmp/vnc-setup.log
@@ -165,7 +168,7 @@ runcmd:
     xfce4-panel &
     xfce4-desktop &
     xfwm4 &
-    thunar &
+    xfce4-file-manager &
     xfce4-terminal &
     XSTARTUP_EOF
 
@@ -183,17 +186,20 @@ runcmd:
     VNCSUDO
 
     # Find VNC binaries and create systemd service
-    VNCSERVER=$(which vncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1)
+    # Try multiple possible VNC server locations for tigervnc
+    VNCSERVER=$(which vncserver 2>/dev/null || which tigervncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1 || find /usr -name "tigervncserver" 2>/dev/null | head -1)
     echo "VNC Server found at: $VNCSERVER" >> /tmp/vnc-setup.log
 
     if [ -z "$VNCSERVER" ]; then
         echo "ERROR: VNC server binary not found!" >> /tmp/vnc-setup.log
+        echo "Available VNC packages:" >> /tmp/vnc-setup.log
+        dpkg -l | grep vnc >> /tmp/vnc-setup.log 2>&1
         exit 1
     fi
 
     cat > /etc/systemd/system/vncserver@.service << SERVICEEND
     [Unit]
-    Description=TightVNC server
+    Description=TigerVNC server
     After=syslog.target network.target
 
     [Service]
