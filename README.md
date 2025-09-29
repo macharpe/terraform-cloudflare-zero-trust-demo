@@ -102,7 +102,6 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
 
 An optional custom Access-denied-info-page that provides users with detailed information and guidance when access is denied to protected applications.
 
-- **File**: Access denied configurations are embedded within `modules/cloudflare/cloudflare-apps.tf`
 - **Requirements**: Requires the [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page) to be deployed on Cloudflare Pages
 - **Features**:
   - Professional custom denial page with branding and guidance
