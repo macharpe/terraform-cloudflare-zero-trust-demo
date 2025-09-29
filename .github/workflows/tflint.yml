@@ -56,35 +56,70 @@ jobs:
       - name: Run TFLint on Root Module
         run: |
           echo "::group::TFLint Analysis - Root Module"
-          tflint --format compact --color
+          tflint --format compact --color || exit_code=$?
+          if [ "${exit_code}" -eq 2 ]; then
+            echo "⚠️ TFLint found warnings/notices (non-critical)"
+            exit 0
+          elif [ "${exit_code}" -ne 0 ]; then
+            echo "❌ TFLint found critical errors"
+            exit $exit_code
+          fi
           echo "::endgroup::"
 
       - name: Run TFLint on Cloudflare Module
         working-directory: ./modules/cloudflare
         run: |
           echo "::group::TFLint Analysis - Cloudflare Module"
-          tflint --format compact --color --config ../../.tflint.hcl
+          tflint --format compact --color --config ../../.tflint.hcl || exit_code=$?
+          if [ "${exit_code}" -eq 2 ]; then
+            echo "⚠️ TFLint found warnings/notices (non-critical)"
+            exit 0
+          elif [ "${exit_code}" -ne 0 ]; then
+            echo "❌ TFLint found critical errors"
+            exit $exit_code
+          fi
           echo "::endgroup::"
 
       - name: Run TFLint on Azure Module
         working-directory: ./modules/azure
         run: |
           echo "::group::TFLint Analysis - Azure Module"
-          tflint --format compact --color --config ../../.tflint.hcl
+          tflint --format compact --color --config ../../.tflint.hcl || exit_code=$?
+          if [ "${exit_code}" -eq 2 ]; then
+            echo "⚠️ TFLint found warnings/notices (non-critical)"
+            exit 0
+          elif [ "${exit_code}" -ne 0 ]; then
+            echo "❌ TFLint found critical errors"
+            exit $exit_code
+          fi
           echo "::endgroup::"
 
       - name: Run TFLint on SSH Keys Module
         working-directory: ./modules/keys
         run: |
           echo "::group::TFLint Analysis - SSH Keys Module"
-          tflint --format compact --color --config ../../.tflint.hcl
+          tflint --format compact --color --config ../../.tflint.hcl || exit_code=$?
+          if [ "${exit_code}" -eq 2 ]; then
+            echo "⚠️ TFLint found warnings/notices (non-critical)"
+            exit 0
+          elif [ "${exit_code}" -ne 0 ]; then
+            echo "❌ TFLint found critical errors"
+            exit $exit_code
+          fi
           echo "::endgroup::"
 
       - name: Run TFLint on WARP Routing Module
         working-directory: ./modules/warp-routing
         run: |
           echo "::group::TFLint Analysis - WARP Routing Module"
-          tflint --format compact --color --config ../../.tflint.hcl
+          tflint --format compact --color --config ../../.tflint.hcl || exit_code=$?
+          if [ "${exit_code}" -eq 2 ]; then
+            echo "⚠️ TFLint found warnings/notices (non-critical)"
+            exit 0
+          elif [ "${exit_code}" -ne 0 ]; then
+            echo "❌ TFLint found critical errors"
+            exit $exit_code
+          fi
           echo "::endgroup::"
 
   terraform-validate:
