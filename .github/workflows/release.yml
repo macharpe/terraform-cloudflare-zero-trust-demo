@@ -1,0 +1,103 @@
+name: 🚀 Automated Release
+
+on:
+  push:
+    branches: [main]
+    paths: ['CHANGELOG.md']
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  release:
+    name: 📦 Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛒 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Check for new version in CHANGELOG
+        id: version
+        run: |
+          # Extract the latest version from CHANGELOG.md
+          NEW_VERSION=$(sed -n 's/^## \[\([0-9]*\.[0-9]*\.[0-9]*\)\] - .*/\1/p' CHANGELOG.md | head -n 1)
+
+          if [ -z "$NEW_VERSION" ]; then
+            echo "No version found in CHANGELOG.md"
+            exit 1
+          fi
+
+          # Check if this version tag already exists
+          if git tag -l | grep -q "^v$NEW_VERSION$"; then
+            echo "Version v$NEW_VERSION already exists as a tag"
+            echo "create_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "New version detected: v$NEW_VERSION"
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "create_release=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📝 Extract release notes
+        if: steps.version.outputs.create_release == 'true'
+        id: extract_notes
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Extract release notes between version headers
+          awk "/^## \[$VERSION\]/{flag=1;next}/^## \[/{flag=0}flag" CHANGELOG.md > release_notes.tmp
+
+          # Remove empty lines at the beginning and end
+          sed -i '/./,$!d' release_notes.tmp
+          sed -i -e :a -e '/^\s*$/N;ba' -e 's/\n\s*$//' release_notes.tmp
+
+          # Prepare release notes with proper formatting
+          {
+            cat release_notes.tmp
+            echo ""
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/v$(echo "$VERSION" | awk -F. '{printf "%d.%d.%d", $1, $2, $3-1}')...v$VERSION"
+          } > final_release_notes.md
+
+          # Debug output
+          echo "Release notes content:"
+          cat final_release_notes.md
+
+      - name: 🏷️ Create and push tag
+        if: steps.version.outputs.create_release == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: 🚀 Create GitHub Release
+        if: steps.version.outputs.create_release == 'true'
+        uses: ncipollo/action-gh-release@v2
+        with:
+          tag: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          bodyFile: final_release_notes.md
+          draft: false
+          prerelease: false
+          generateReleaseNotes: false
+
+      - name: ✅ Release Summary
+        if: steps.version.outputs.create_release == 'true'
+        run: |
+          echo "## 🎉 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: v${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release URL**: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: CHANGELOG.md update" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: ℹ️ No Release Created
+        if: steps.version.outputs.create_release == 'false'
+        run: |
+          echo "## ℹ️ No New Release" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No new version detected in CHANGELOG.md or version already exists as a tag." >> $GITHUB_STEP_SUMMARY
