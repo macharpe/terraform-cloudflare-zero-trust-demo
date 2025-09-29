@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Macharpe Company Intranet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #F38020 0%, #FF9A4D 100%);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .logo::before {
+      content: "☁️";
+      margin-right: 0.5rem;
+    }
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    nav a:hover { text-decoration: underline; }
+
+    /* HERO */
+    .hero {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2rem;
+      justify-content: center;
+      text-align: center;
+    }
+    .hero > div {
+      flex: 1 1 300px;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    .hero-info {
+      color: #475569;
+      font-size: 1.05rem;
+    }
+    .hero img {
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      object-fit: cover;
+    }
+
+    /* SEARCH */
+    .search {
+      max-width: 1000px;
+      margin: 1.5rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: center;
+    }
+    .search input {
+      width: 100%;
+      max-width: 600px;
+      padding: 0.8rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    /* SECTION COMMON */
+    section {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #1e293b;
+      text-align: left;
+    }
+
+    /* NEWS */
+    .btn {
+      background: #F38020;
+      color: white;
+      border: none;
+      padding: 0.6em 1.2em;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn:hover { background: #d96810; }
+
+    /* QUICK LINKS */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .link-card {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s;
+    }
+    .link-card:hover { transform: translateY(-2px); }
+    .link-card a {
+      text-decoration: none;
+      color: #F38020;
+      font-weight: 600;
+    }
+
+    /* DEPARTMENTS */
+    .departments-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px, 1fr));
+      gap: 1.5rem;
+      justify-items: center;
+      text-align: center;
+    }
+    .department {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      max-width: 280px;
+    }
+    .department:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+    .department img {
+      width: 140px;
+      height: 140px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .department-title {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1.2rem;
+    }
+    .department-info { 
+      color: #64748b; 
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    /* EVENTS */
+    .events-list {
+      list-style: none;
+      padding: 0;
+    }
+    .events-list li {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 1rem;
+    }
+
+    /* RESOURCES */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .resource-card {
+      background: #f8fafc;
+      padding: 1.2rem;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-weight: 600;
+      color: #334155;
+      font-size: 1.1rem;
+    }
+    .resource-card img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    /* SPOTLIGHT */
+    .spotlight {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+    }
+    .spotlight img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+    .spotlight div {
+      flex: 1;
+      font-size: 1.1rem;
+      color: #334155;
+    }
+    .spotlight strong {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1.25rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #404041;
+      padding: 2rem;
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">Macharpe Intranet</div>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Resources</a>
+        <a href="#">Projects</a>
+        <a href="#">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>Welcome to Macharpe Company Intranet</h1>
+      <p class="hero-info">Your central hub for company news, tools, and resources.</p>
+    </div>
+    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=720&q=80" alt="Team Meeting" />
+  </section>
+
+  <section class="search">
+    <input type="text" placeholder="🔎 Search the intranet..." />
+  </section>
+
+  <section class="news">
+    <h2>Latest News</h2>
+    <p>We are currently working through the integration of our new sister company. Keep an eye out for a company-wide meeting next week to learn about progress.</p>
+    <button class="btn">Learn More</button>
+  </section>
+
+  <section class="quick-links">
+    <h2>Quick Links</h2>
+    <div class="links-grid">
+      <div class="link-card"><a href="#">HR Portal</a></div>
+      <div class="link-card"><a href="#">IT Helpdesk</a></div>
+      <div class="link-card"><a href="#">Payroll</a></div>
+      <div class="link-card"><a href="#">Compliance</a></div>
+      <div class="link-card"><a href="#">Travel Policy</a></div>
+    </div>
+  </section>
+
+  <section class="departments">
+    <h2>Departments</h2>
+    <div class="departments-list">
+      <div class="department">
+        <img src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?ixlib=rb-4.0.3&auto=format&fit=crop&w=160&q=80" alt="Executive Team" />
+        <div class="department-content">
+          <div class="department-title">Executive</div>
+          <div class="department-info">Learn about the leadership team and vision.</div>
+        </div>
+      </div>
+      <div class="department">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=160&q=80" alt="Human Resources" />
+        <div class="department-content">
+          <div class="department-title">Human Resources</div>
+          <div class="department-info">Access HR tools, benefits and employee resources.</div>
+        </div>
+      </div>
+      <div class="department">
+        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=160&q=80" alt="Product & Engineering" />
+        <div class="department-content">
+          <div class="department-title">Product & Engineering</div>
+          <div class="department-info">Discover our latest projects and development progress.</div>
+        </div>
+      </div>
+      <div class="department">
+        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=160&q=80" alt="Sales & Marketing" />
+        <div class="department-content">
+          <div class="department-title">Sales & Marketing</div>
+          <div class="department-info">See sales materials, campaigns, and outreach tools.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="events">
+    <h2>Upcoming Events</h2>
+    <ul class="events-list">
+      <li><strong>Aug 25:</strong> All-Hands Company Meeting</li>
+      <li><strong>Sep 5:</strong> Security Awareness Training</li>
+      <li><strong>Sep 12:</strong> HR Policy Refresh Webinar</li>
+    </ul>
+  </section>
+
+  <section class="resources">
+    <h2>Featured Resources</h2>
+    <div class="resources-grid">
+      <div class="resource-card">
+        <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Onboarding Guide Icon" />
+        Onboarding Guide
+      </div>
+      <div class="resource-card">
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Security Icon" />
+        Security Best Practices
+      </div>
+      <div class="resource-card">
+        <img src="https://images.unsplash.com/photo-1504386106331-3e4e71712b38?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Remote Work Icon" />
+        Remote Work Guidelines
+      </div>
+      <div class="resource-card">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Travel Icon" />
+        Travel & Expense Policy
+      </div>
+    </div>
+  </section>
+
+  <section class="spotlight">
+    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Employee Spotlight Jane Doe" />
+    <div>
+      <h2>Employee Spotlight</h2>
+      <p><strong>Jane Doe</strong>, from Engineering, is recognized for her outstanding work on the cloud migration project. Great job Jane!</p>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 Macharpe Inc. All rights reserved.
+  </footer>
+</body>
+</html>

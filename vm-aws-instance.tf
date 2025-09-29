@@ -106,9 +106,9 @@ resource "aws_nat_gateway" "nat" {
   depends_on    = [aws_internet_gateway.igw]
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_aws_timeouts.network.create
+    update = local.final_aws_timeouts.network.update
+    delete = local.final_aws_timeouts.network.delete
   }
 
   tags = {
@@ -219,9 +219,9 @@ resource "aws_instance" "aws_vm_cloudflared" {
   }
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_aws_timeouts.vm_cloudflared.create
+    update = local.final_aws_timeouts.vm_cloudflared.update
+    delete = local.final_aws_timeouts.vm_cloudflared.delete
   }
 
   user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
@@ -256,9 +256,9 @@ resource "aws_instance" "aws_vm_service" {
   }
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_aws_timeouts.vm.create
+    update = local.final_aws_timeouts.vm.update
+    delete = local.final_aws_timeouts.vm.delete
   }
 
   user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {
@@ -292,9 +292,9 @@ resource "aws_instance" "aws_vm_vnc" {
   }
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_aws_timeouts.vm_vnc.create
+    update = local.final_aws_timeouts.vm_vnc.update
+    delete = local.final_aws_timeouts.vm_vnc.delete
   }
 
   user_data = templatefile("${path.module}/scripts/cloud-init/aws-init.tftpl", merge(local.aws_common_user_data_vars, {

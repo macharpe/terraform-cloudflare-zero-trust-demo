@@ -6,9 +6,7 @@
 terraform.tfstate
 terraform.tfstate.backup
 .terraform.lock.hcl
-.terraform.tfstate.lock.info
 .terraform/
-tfstate/
 
 # Plan files
 *.tfplan
@@ -16,6 +14,10 @@ tfstate/
 # Backup files
 *.bak
 *.backup
+
+# TFLint cache and configuration
+.tflint.d/
+.tflint.hcl.local
 
 # ===========================
 # Sensitive Configuration
@@ -56,11 +58,7 @@ modules/cloudflare/out/ssh_ca_response.json
 0-documentation/
 1-workspace-conf/
 
-# HTML examples
-scripts/html/examples/
 
-# Roadmap items
-security/aws-sg-cloudflared-tunnel-allow.tf
 
 # ===========================
 # System & IDE Files
@@ -74,17 +72,28 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Package managers
-node_modules/
-vendor/
 
 # ===========================
 # Logs & Temporary Files
 # ===========================
 
 # Log files
-logs/
 *.log
+
+# ===========================
+# Code Quality Tools
+# ===========================
+
+# Pre-commit
+.pre-commit-cache/
+
+# temporary
+.pre-commit-config.yaml
+
+# Security scanning
+.secrets.baseline
+checkov-results.json
+trivy-results.sarif
 
 # ===========================
 # Claude
