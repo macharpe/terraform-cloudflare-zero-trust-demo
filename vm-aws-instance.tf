@@ -185,6 +185,7 @@ locals {
   # Common tags
   aws_common_tags = {
     Environment = var.cf_aws_tag
+    Service     = "cloudflare-zero-trust-demo"
   }
 
   # Spot instance configuration

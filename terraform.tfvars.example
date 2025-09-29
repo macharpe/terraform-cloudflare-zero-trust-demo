@@ -20,7 +20,7 @@ gcp_machine_size               = "e2-micro"
 gcp_windows_machine_size       = "e2-medium"
 
 # OS Image Configuration
-gcp_linux_image                = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
+gcp_linux_image                = "ubuntu-os-cloud/ubuntu-2204-lts-amd64"
 gcp_windows_image              = "windows-server-2025-dc-v20250612"
 
 # Networking
@@ -172,7 +172,7 @@ azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
 
 # OS Image Configuration
 azure_image_publisher = "Canonical"
-azure_image_offer     = "ubuntu-24_04-lts"
+azure_image_offer     = "ubuntu-22_04-lts"
 azure_image_sku       = "server"
 azure_image_version   = "latest"
 
@@ -193,6 +193,7 @@ datadog_region = "datadoghq.eu"
 
 
 #=====================================
-# AWS and Cloudflare Tag
+# Tags
 #=====================================
-cf_aws_tag = "ZeroTrustDemo"
+cf_aws_tag        = "Dev"  # Must be: Dev, Stage, or Prod (for Infracost compliance)
+cf_cloudflare_tag = "ZeroTrustDemo"

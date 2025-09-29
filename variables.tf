@@ -219,8 +219,8 @@ variable "azure_default_tags" {
   description = "default tags for Azure"
   type        = map(string)
   default = {
-    environment = "dev"
-    service     = "cloudflare-zero-trust-demo"
+    Environment = "Dev"
+    Service     = "cloudflare-zero-trust-demo"
     Owner       = "macharpe"
   }
 }
@@ -674,6 +674,11 @@ variable "cf_warp_tunnel_gcp_id" {
 #======================================================
 
 variable "cf_aws_tag" {
-  description = "tag to be assigned to cloudflare application and aws environment"
+  description = "tag to be assigned to aws environment"
+  type        = string
+}
+
+variable "cf_cloudflare_tag" {
+  description = "tag name to be assigned to cloudflare zero trust access applications"
   type        = string
 }

@@ -369,7 +369,12 @@ variable "cf_aws_json_subnet_generation" {
 # TAGS
 #======================================================
 variable "cf_aws_tag" {
-  description = "tag to be assigned to cloudflare application and aws environment"
+  description = "tag to be assigned to aws environment"
+  type        = string
+}
+
+variable "cf_cloudflare_tag" {
+  description = "tag name to be assigned to cloudflare zero trust access applications"
   type        = string
 }
 

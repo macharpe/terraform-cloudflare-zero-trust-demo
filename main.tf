@@ -157,8 +157,9 @@ module "cloudflare" {
   cf_gcp_json_subnet_generation   = module.warp-routing.cf_gcp_json_subnet_generation
   cf_aws_json_subnet_generation   = module.warp-routing.cf_aws_json_subnet_generation
 
-  # Tag
-  cf_aws_tag = var.cf_aws_tag
+  # Tags
+  cf_aws_tag        = var.cf_aws_tag
+  cf_cloudflare_tag = var.cf_cloudflare_tag
 
   # variable name defined in module == var.variable name defined in variables in main folder
 }
