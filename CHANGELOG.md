@@ -7,15 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- **Enhanced VNC Progress Tracking**: Re-implemented improved ETA calculations in cloud-init script
-  - Smart phase-based timing estimates using predefined package installation times
-  - Accurate ETA display logic ("Less than 1 minute", "About X minutes", "Approximately X minutes")
-  - Enhanced `/tmp/demo-progress.txt` with better status information
-  - Never shows misleading "0 minutes remaining" when work is still in progress
-  - Optimized for AWS t3.micro performance characteristics
+## [2.2.1] - 2025-09-29
 
 ### Fixed
+
 - **VNC Cloud-Init Compression Corruption**: Resolved AWS 16KB user_data limit issue
   - Removed corrupted gzip+base64 compression approach that was causing script failures
   - Implemented streamlined inline VNC setup (9,635 bytes, 24% reduction from previous)
