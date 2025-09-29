@@ -161,9 +161,9 @@ resource "google_compute_instance" "gcp_vm_cloudflared" {
   }
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_gcp_timeouts.vm_cloudflared.create
+    update = local.final_gcp_timeouts.vm_cloudflared.update
+    delete = local.final_gcp_timeouts.vm_cloudflared.delete
   }
 
   tags = ["infrastructure-access-instances"]
@@ -210,9 +210,9 @@ resource "google_compute_instance" "gcp_vm_windows_rdp" {
   }
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_gcp_timeouts.vm_windows.create
+    update = local.final_gcp_timeouts.vm_windows.update
+    delete = local.final_gcp_timeouts.vm_windows.delete
   }
 
   service_account {
@@ -268,9 +268,9 @@ resource "google_compute_instance" "gcp_vm_warp" {
   }
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = local.final_gcp_timeouts.vm_warp.create
+    update = local.final_gcp_timeouts.vm_warp.update
+    delete = local.final_gcp_timeouts.vm_warp.delete
   }
 
   tags = ["warp-instances"]

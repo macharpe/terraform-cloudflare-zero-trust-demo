@@ -134,12 +134,8 @@ locals {
     version   = var.azure_image_version
   }
 
-  # Common timeouts
-  azure_common_timeouts = {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
-  }
+  # Common timeouts (using global timeout system)
+  azure_common_timeouts = local.final_azure_timeouts.vm
 
 }
 

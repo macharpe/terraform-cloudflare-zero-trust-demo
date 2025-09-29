@@ -119,7 +119,7 @@ This demo environment creates a sophisticated Zero Trust network spanning three 
 
 _Last Updated: 27th of September 2025_
 
-![Architecture Diagram](doc/Architecture-diagram.svg)
+![Architecture Diagram](docs/Architecture-diagram.svg)
 
 *The architecture demonstrates how Cloudflare Zero Trust creates secure, identity-aware connections between resources across multiple cloud providers without traditional VPN complexity.*
 
@@ -310,14 +310,14 @@ This includes:
    - Select **Warp Connector** (not cloudflared)
    - Create two tunnels as shown below:
 
-   <img src="doc/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
+   <img src="docs/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
 
 2. **Configure Private Routes**:
    - **Azure WARP Connector**: Add route for `azure_address_prefixes` variable (e.g., 192.168.71.0/24)
    - **GCP WARP Connector**: Add route for `gcp_ip_cidr_warp` variable (e.g., 10.156.85.0/24)
 
-   <img src="doc/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
-   <img src="doc/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
+   <img src="docs/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
+   <img src="docs/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
 
 3. **Retrieve Tunnel IDs**: Copy the tunnel IDs and add them to your `terraform.tfvars`:
    ```hcl
@@ -332,22 +332,22 @@ Create two enrollment policies in **Settings > WARP Client**:
 1. **Employee Enrollment Policy**:
    - Allow users in any Okta group to enroll devices
    
-   <img src="doc/images/employee_enrollment_policy.png" alt="Employee Enrollment Policy" width="400" />
+   <img src="docs/images/employee_enrollment_policy.png" alt="Employee Enrollment Policy" width="400" />
 
 2. **Contractor Enrollment Policy**:
    - Allow users with `@passfwd` email domain OR in "Contractors" Okta group
    
-   <img src="doc/images/contractors_enrollment_policy.png" alt="Contractors Enrollment Policy" width="480" />
+   <img src="docs/images/contractors_enrollment_policy.png" alt="Contractors Enrollment Policy" width="480" />
 
 **Final Device Enrollment Permissions**:
 
-<img src="doc/images/device_enrollment_permissions.png" alt="Device Enrollment Permissions" width="600" />
+<img src="docs/images/device_enrollment_permissions.png" alt="Device Enrollment Permissions" width="600" />
 
 #### WARP Client Checks Configuration
 
 Configure device posture checks as shown:
 
-<img src="doc/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
+<img src="docs/images/warp_client_checks.png" alt="WARP Client Checks" width="600" />
 
 
 ### 5. Configure terraform.tfvars
