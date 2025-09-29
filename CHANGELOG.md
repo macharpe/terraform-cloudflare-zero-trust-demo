@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [2.3.1] - 2025-09-29
+
+### Changed
+
+- **Tag Architecture Refactoring**: Separated AWS and Cloudflare tagging systems for better resource management
+  - Split `cf_aws_tag` into dedicated `cf_aws_tag` (AWS resources) and `cf_cloudflare_tag` (Cloudflare Zero Trust resources)
+  - AWS resources now use standardized Environment/Service format for Infracost compliance
+  - Enhanced tag consistency across multi-cloud infrastructure
+
+### Fixed
+
+- **VNC Infrastructure Upgrade**: Enhanced VNC installation reliability and compatibility
+  - Upgraded from TightVNC to TigerVNC with improved systemd integration
+  - Added robust VNC server detection with multiple binary path fallbacks
+  - Improved error handling and service reliability
+- **Ubuntu Compatibility**: Maintained Ubuntu 22.04 LTS for WARP Connector compatibility
+  - Standardized Ubuntu version across Azure and GCP WARP connector VMs
+  - Ensures continued compatibility with Cloudflare WARP Connector requirements
+
 ## [2.3.0] - 2025-09-29
 
 ### Added
