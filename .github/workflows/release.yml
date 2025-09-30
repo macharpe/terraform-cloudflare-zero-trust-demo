@@ -51,9 +51,9 @@ jobs:
           # Extract release notes between version headers
           awk "/^## \[$VERSION\]/{flag=1;next}/^## \[/{flag=0}flag" CHANGELOG.md > release_notes.tmp
 
-          # Remove empty lines at the beginning and end
-          sed -i '/./,$!d' release_notes.tmp
-          sed -i -e :a -e '/^\s*$/N;ba' -e 's/\n\s*$//' release_notes.tmp
+          # Remove empty lines at the beginning and end (using Perl to avoid sed infinite loop)
+          perl -0777 -pe 's/^\s+//; s/\s+$/\n/' release_notes.tmp > release_notes_trimmed.tmp
+          mv release_notes_trimmed.tmp release_notes.tmp
 
           # Prepare release notes with proper formatting
           {
