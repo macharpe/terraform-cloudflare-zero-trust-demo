@@ -45,6 +45,11 @@ write_files:
               echo "✅ VNC setup completed"
               COMPLETED_TIME=$(grep "VNC setup completed at" /tmp/vnc-setup.log | tail -1)
               echo "   $COMPLETED_TIME"
+              # Show elapsed time if available
+              if grep -q "Setup Duration:" /tmp/vnc-setup.log 2>/dev/null; then
+                  DURATION=$(grep "Setup Duration:" /tmp/vnc-setup.log | tail -1)
+                  echo "   $DURATION"
+              fi
           else
               # Show installation progress
               if [ -f /tmp/vnc-progress.pct ]; then
@@ -180,6 +185,7 @@ runcmd:
   # Install VNC packages and setup (optimized for AWS 16KB limit)
   - |
     echo "=== VNC Setup Started ===" > /tmp/vnc-setup.log
+    START_TIME=$(date +%s)
 
     # Progress tracking function
     update_progress() {
@@ -299,6 +305,14 @@ runcmd:
 
     # Log completion
     echo "VNC setup completed at $(date)" >> /tmp/vnc-setup.log
+
+    # Calculate and log elapsed time
+    END_TIME=$(date +%s)
+    ELAPSED=$((END_TIME - START_TIME))
+    MINUTES=$((ELAPSED / 60))
+    SECONDS=$((ELAPSED % 60))
+    echo "⏱️  Setup Duration: $${MINUTES}m $${SECONDS}s" | tee -a /tmp/vnc-setup.log /tmp/vnc-progress.txt
+
     echo "100" > /tmp/vnc-progress.pct
     echo "[100%] VNC installation completed successfully!" | tee -a /tmp/vnc-progress.txt
     echo "VNC service status:" >> /tmp/vnc-setup.log
