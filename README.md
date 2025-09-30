@@ -697,7 +697,8 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_aws_ec2_browser_vnc_name"></a> [aws\_ec2\_browser\_vnc\_name](#input\_aws\_ec2\_browser\_vnc\_name) | Name of the EC2 instance browser rendered VNC | `string` | n/a | yes |
 | <a name="input_aws_ec2_cloudflared_name"></a> [aws\_ec2\_cloudflared\_name](#input\_aws\_ec2\_cloudflared\_name) | name of cloudflared replica | `string` | n/a | yes |
 | <a name="input_aws_ec2_instance_config_ami_id"></a> [aws\_ec2\_instance\_config\_ami\_id](#input\_aws\_ec2\_instance\_config\_ami\_id) | AMI ID representing the VM type and ID to be used | `string` | `"ami-086ecbd485d8bb032"` | no |
-| <a name="input_aws_ec2_instance_config_type"></a> [aws\_ec2\_instance\_config\_type](#input\_aws\_ec2\_instance\_config\_type) | type of EC2 instance | `string` | `"t3.micro"` | no |
+| <a name="input_aws_ec2_instance_config_type"></a> [aws\_ec2\_instance\_config\_type](#input\_aws\_ec2\_instance\_config\_type) | type of EC2 instance for SSH and cloudflared instances | `string` | `"t3.micro"` | no |
+| <a name="input_aws_ec2_vnc_instance_type"></a> [aws\_ec2\_vnc\_instance\_type](#input\_aws\_ec2\_vnc\_instance\_type) | type of EC2 instance specifically for VNC desktop VM (t3.small recommended for better desktop performance) | `string` | `"t3.micro"` | no |
 | <a name="input_aws_private_cidr"></a> [aws\_private\_cidr](#input\_aws\_private\_cidr) | AWS private subnet, subnet for VMs in AWS | `string` | n/a | yes |
 | <a name="input_aws_public_cidr"></a> [aws\_public\_cidr](#input\_aws\_public\_cidr) | AWS public subnet | `string` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region | `string` | `"eu-central-1"` | no |
@@ -728,6 +729,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where WARP Connector is NOT installed | `string` | n/a | yes |
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
+| <a name="input_azure_warp_connector_image_offer"></a> [azure\_warp\_connector\_image\_offer](#input\_azure\_warp\_connector\_image\_offer) | Azure WARP connector VM image offer (Ubuntu 22.04 for compatibility) | `string` | `"0001-com-ubuntu-server-jammy"` | no |
+| <a name="input_azure_warp_connector_image_publisher"></a> [azure\_warp\_connector\_image\_publisher](#input\_azure\_warp\_connector\_image\_publisher) | Azure WARP connector VM image publisher | `string` | `"Canonical"` | no |
+| <a name="input_azure_warp_connector_image_sku"></a> [azure\_warp\_connector\_image\_sku](#input\_azure\_warp\_connector\_image\_sku) | Azure WARP connector VM image SKU | `string` | `"22_04-lts-gen2"` | no |
+| <a name="input_azure_warp_connector_image_version"></a> [azure\_warp\_connector\_image\_version](#input\_azure\_warp\_connector\_image\_version) | Azure WARP connector VM image version | `string` | `"latest"` | no |
 | <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
@@ -786,6 +791,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_vm_default_user"></a> [gcp\_vm\_default\_user](#input\_gcp\_vm\_default\_user) | default vm user for GCP VM | `string` | n/a | yes |
 | <a name="input_gcp_vm_name"></a> [gcp\_vm\_name](#input\_gcp\_vm\_name) | Name for the VM instance NOT running cloudflared | `string` | n/a | yes |
 | <a name="input_gcp_warp_cidr"></a> [gcp\_warp\_cidr](#input\_gcp\_warp\_cidr) | CIDR Range for GCP VMs running warp | `string` | n/a | yes |
+| <a name="input_gcp_warp_connector_image"></a> [gcp\_warp\_connector\_image](#input\_gcp\_warp\_connector\_image) | GCP image specifically for WARP connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
 | <a name="input_gcp_warp_connector_vm_name"></a> [gcp\_warp\_connector\_vm\_name](#input\_gcp\_warp\_connector\_vm\_name) | Name of the GCP VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_windows_admin_password"></a> [gcp\_windows\_admin\_password](#input\_gcp\_windows\_admin\_password) | Password for Windows Server admin user in GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_image"></a> [gcp\_windows\_image](#input\_gcp\_windows\_image) | GCP Windows image for compute instances | `string` | `"windows-server-2025-dc-v20250612"` | no |
