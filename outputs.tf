@@ -1,5 +1,5 @@
 # My IP
-output "MY_IP" {
+output "my_ip" {
   description = "This is your Public IP"
   value = {
     IPv4 = data.http.my_ip.response_body
@@ -7,7 +7,7 @@ output "MY_IP" {
 }
 
 # GCP
-output "GCP_COMPUTE_INSTANCES" {
+output "gcp_compute_instances" {
   description = "GCP instance details"
   value = concat(
     [
@@ -48,7 +48,7 @@ output "GCP_COMPUTE_INSTANCES" {
 
 
 # AWS
-output "AWS_EC2_INSTANCES" {
+output "aws_ec2_instances" {
   description = "AWS instance details"
   value = concat(
     [for idx, instance in aws_instance.aws_vm_cloudflared : {
@@ -76,7 +76,7 @@ output "AWS_EC2_INSTANCES" {
   )
 }
 
-output "AZURE_VMS" {
+output "azure_vms" {
   description = "Azure instance details"
   value = {
     for idx in toset(range(var.azure_vm_count)) :
@@ -92,7 +92,7 @@ output "AZURE_VMS" {
 
 
 # SSH COMMAND
-output "SSH_FOR_INFRASTRUCTURE_ACCESS" {
+output "ssh_for_infrastructure_access" {
   description = "SSH with Access for Infrastructure command"
   value = {
     for username in var.gcp_users :
@@ -101,7 +101,7 @@ output "SSH_FOR_INFRASTRUCTURE_ACCESS" {
 }
 
 # Training Status Admin Portal Application Audience (AUD) Tag
-output "TRAINING_STATUS_ADMIN_PORTAL_AUD" {
+output "training_status_admin_portal_aud" {
   description = "Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS_APP_AUD in your worker"
   value       = module.cloudflare.training_status_admin_portal_aud
 }

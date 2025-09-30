@@ -1,12 +1,3 @@
-variable "gcp_cloudflared_vm_instance" {
-  type = any
-}
-
-variable "gcp_vm_instance" {
-  type = list(any)
-}
-
-
 # Networking
 variable "azure_subnet_cidr" {
   description = "azure subnet prefixes"

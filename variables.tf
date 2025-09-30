@@ -306,31 +306,6 @@ variable "azure_image_version" {
   default     = "latest"
 }
 
-# Azure WARP Connector specific image configuration (Ubuntu 22.04 for compatibility)
-variable "azure_warp_connector_image_publisher" {
-  description = "Azure WARP connector VM image publisher"
-  type        = string
-  default     = "Canonical"
-}
-
-variable "azure_warp_connector_image_offer" {
-  description = "Azure WARP connector VM image offer (Ubuntu 22.04 for compatibility)"
-  type        = string
-  default     = "0001-com-ubuntu-server-jammy"
-}
-
-variable "azure_warp_connector_image_sku" {
-  description = "Azure WARP connector VM image SKU"
-  type        = string
-  default     = "22_04-lts-gen2"
-}
-
-variable "azure_warp_connector_image_version" {
-  description = "Azure WARP connector VM image version"
-  type        = string
-  default     = "latest"
-}
-
 variable "azure_vm_admin_username" {
   description = "Administrator username"
   type        = string

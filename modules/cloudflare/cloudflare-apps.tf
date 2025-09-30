@@ -238,7 +238,7 @@ resource "cloudflare_zero_trust_access_infrastructure_target" "gcp_rdp_target" {
 resource "cloudflare_zero_trust_access_application" "cf_app_rdp_domain" {
   account_id                   = var.cloudflare_account_id
   type                         = "rdp"
-  name                         = "Domain Controller"
+  name                         = var.cf_browser_rdp_app_name
   app_launcher_visible         = true
   logo_url                     = "https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]

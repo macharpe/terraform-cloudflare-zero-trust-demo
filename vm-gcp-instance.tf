@@ -154,7 +154,7 @@ resource "google_compute_instance" "gcp_vm_cloudflared" {
     subnetwork = google_compute_subnetwork.gcp_subnet_cloudflared.id
   }
 
-  // Optional config to make instance ephemeral 
+  # Optional config to make instance ephemeral 
   scheduling {
     preemptible       = local.preemptible_scheduling.preemptible
     automatic_restart = local.preemptible_scheduling.automatic_restart
@@ -250,7 +250,8 @@ resource "google_compute_instance" "gcp_vm_warp" {
 
   boot_disk {
     initialize_params {
-      image = local.common_linux_boot_disk.image
+      # Use Ubuntu 22.04 for WARP connector (index 0), Ubuntu 24.04 for others
+      image = count.index == 0 ? var.gcp_warp_connector_image : local.common_linux_boot_disk.image
     }
   }
 

@@ -608,6 +608,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
 | <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.8.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.4 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4.0 |
 
 ## Providers
 
@@ -616,17 +620,17 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | n/a |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_http"></a> [http](#provider\_http) | ~> 3.4 |
+| <a name="provider_null"></a> [null](#provider\_null) | ~> 3.2 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azure-ad"></a> [azure-ad](#module\_azure-ad) | ./modules/azure | n/a |
+| <a name="module_azure_ad"></a> [azure\_ad](#module\_azure\_ad) | ./modules/azure | n/a |
 | <a name="module_cloudflare"></a> [cloudflare](#module\_cloudflare) | ./modules/cloudflare | n/a |
 | <a name="module_ssh_keys"></a> [ssh\_keys](#module\_ssh\_keys) | ./modules/keys | n/a |
-| <a name="module_warp-routing"></a> [warp-routing](#module\_warp-routing) | ./modules/warp-routing | n/a |
+| <a name="module_warp_routing"></a> [warp\_routing](#module\_warp\_routing) | ./modules/warp-routing | n/a |
 
 ## Resources
 
@@ -729,10 +733,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where WARP Connector is NOT installed | `string` | n/a | yes |
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
-| <a name="input_azure_warp_connector_image_offer"></a> [azure\_warp\_connector\_image\_offer](#input\_azure\_warp\_connector\_image\_offer) | Azure WARP connector VM image offer (Ubuntu 22.04 for compatibility) | `string` | `"0001-com-ubuntu-server-jammy"` | no |
-| <a name="input_azure_warp_connector_image_publisher"></a> [azure\_warp\_connector\_image\_publisher](#input\_azure\_warp\_connector\_image\_publisher) | Azure WARP connector VM image publisher | `string` | `"Canonical"` | no |
-| <a name="input_azure_warp_connector_image_sku"></a> [azure\_warp\_connector\_image\_sku](#input\_azure\_warp\_connector\_image\_sku) | Azure WARP connector VM image SKU | `string` | `"22_04-lts-gen2"` | no |
-| <a name="input_azure_warp_connector_image_version"></a> [azure\_warp\_connector\_image\_version](#input\_azure\_warp\_connector\_image\_version) | Azure WARP connector VM image version | `string` | `"latest"` | no |
 | <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
@@ -812,10 +812,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 
 | Name | Description |
 |------|-------------|
-| <a name="output_AWS_EC2_INSTANCES"></a> [AWS\_EC2\_INSTANCES](#output\_AWS\_EC2\_INSTANCES) | AWS instance details |
-| <a name="output_AZURE_VMS"></a> [AZURE\_VMS](#output\_AZURE\_VMS) | Azure instance details |
-| <a name="output_GCP_COMPUTE_INSTANCES"></a> [GCP\_COMPUTE\_INSTANCES](#output\_GCP\_COMPUTE\_INSTANCES) | GCP instance details |
-| <a name="output_MY_IP"></a> [MY\_IP](#output\_MY\_IP) | This is your Public IP |
-| <a name="output_SSH_FOR_INFRASTRUCTURE_ACCESS"></a> [SSH\_FOR\_INFRASTRUCTURE\_ACCESS](#output\_SSH\_FOR\_INFRASTRUCTURE\_ACCESS) | SSH with Access for Infrastructure command |
-| <a name="output_TRAINING_STATUS_ADMIN_PORTAL_AUD"></a> [TRAINING\_STATUS\_ADMIN\_PORTAL\_AUD](#output\_TRAINING\_STATUS\_ADMIN\_PORTAL\_AUD) | Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS\_APP\_AUD in your worker |
+| <a name="output_aws_ec2_instances"></a> [aws\_ec2\_instances](#output\_aws\_ec2\_instances) | AWS instance details |
+| <a name="output_azure_vms"></a> [azure\_vms](#output\_azure\_vms) | Azure instance details |
+| <a name="output_gcp_compute_instances"></a> [gcp\_compute\_instances](#output\_gcp\_compute\_instances) | GCP instance details |
+| <a name="output_my_ip"></a> [my\_ip](#output\_my\_ip) | This is your Public IP |
+| <a name="output_ssh_for_infrastructure_access"></a> [ssh\_for\_infrastructure\_access](#output\_ssh\_for\_infrastructure\_access) | SSH with Access for Infrastructure command |
+| <a name="output_training_status_admin_portal_aud"></a> [training\_status\_admin\_portal\_aud](#output\_training\_status\_admin\_portal\_aud) | Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS\_APP\_AUD in your worker |
 <!-- END_TF_DOCS -->

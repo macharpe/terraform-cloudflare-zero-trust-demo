@@ -69,12 +69,6 @@ variable "cf_macos_posture_id" {
   sensitive   = true
 }
 
-variable "cf_ios_posture_id" {
-  description = "Latest iOS version posture ID in Cloudflare"
-  type        = string
-  sensitive   = true
-}
-
 variable "cf_windows_posture_id" {
   description = "Latest Windows version posture ID in Cloudflare"
   type        = string
@@ -262,11 +256,6 @@ variable "gcp_windows_vm_internal_ip" {
   type        = string
 }
 
-variable "gcp_cloudflared_vm_instance" {
-  description = "GCP Cloudflared VM instance object"
-  type        = any
-}
-
 variable "gcp_infra_cidr" {
   description = "CIDR Range for GCP VMs"
   type        = string
@@ -297,11 +286,6 @@ variable "aws_ec2_vnc_service_private_ip" {
 
 variable "aws_private_cidr" {
   description = "AWS private subnet, subnet for VMs in AWS"
-  type        = string
-}
-
-variable "aws_public_cidr" {
-  description = "AWS public subnet"
   type        = string
 }
 
@@ -368,11 +352,6 @@ variable "cf_aws_json_subnet_generation" {
 #======================================================
 # TAGS
 #======================================================
-variable "cf_aws_tag" {
-  description = "tag to be assigned to aws environment"
-  type        = string
-}
-
 variable "cf_cloudflare_tag" {
   description = "tag name to be assigned to cloudflare zero trust access applications"
   type        = string

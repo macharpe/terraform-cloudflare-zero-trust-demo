@@ -85,12 +85,6 @@ azure_image_offer     = "ubuntu-24_04-lts"
 azure_image_sku       = "server"
 azure_image_version   = "latest"
 
-# Azure WARP Connector Image (Ubuntu 22.04 for compatibility)
-azure_warp_connector_image_publisher = "Canonical"
-azure_warp_connector_image_offer     = "0001-com-ubuntu-server-jammy"
-azure_warp_connector_image_sku       = "22_04-lts-gen2"
-azure_warp_connector_image_version   = "latest"
-
 # Networking
 azure_subnet_cidr       = "192.168.71.0/24"
 azure_vnet_cidr         = "192.168.0.0/16"
