@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Independent VNC Instance Type Configuration**: Added dedicated instance type variable for AWS VNC VM
+  - New `aws_ec2_vnc_instance_type` variable allows separate instance sizing for VNC desktop workloads
+  - Enables cost optimization: use t3.micro for SSH/cloudflared VMs while upgrading VNC to t3.small for better performance
+  - Documented cost/performance tradeoffs: t3.micro ($7.59/month, ~10-12 min setup) vs t3.small ($15.18/month, ~5-7 min setup)
+  - Updated terraform.tfvars and terraform.tfvars.example with inline comparison comments
+- **Separate OS Image Configuration for WARP Connectors**: Introduced dedicated image variables for WARP connector VMs
+  - Added `gcp_warp_connector_image` variable for GCP WARP connector (defaults to Ubuntu 22.04)
+  - Added `azure_warp_connector_image_*` variables for Azure WARP connector (defaults to Ubuntu 22.04)
+  - Enables running Ubuntu 22.04 for WARP compatibility while other VMs use Ubuntu 24.04
+
+### Changed
+
+- **Terraform Configuration Organization**: Reorganized variable files for better readability
+  - Grouped cloud provider resources at top of terraform.tfvars and terraform.tfvars.example (GCP → AWS → Azure)
+  - Cloudflare, Okta, Datadog, and tag configurations follow cloud provider sections
+  - Improved navigation and logical structure for multi-cloud configuration
+- **Cloud-Init Script Improvements**: Enhanced package management and OS detection
+  - AWS VNC script now enables universe repository for Ubuntu 24.04 compatibility
+  - Upgraded from deprecated `tightvncserver` to `tigervnc-standalone-server` for Ubuntu 24.04
+  - Enhanced VNC status monitoring with comprehensive service checks and troubleshooting tips
+  - Auto-detect Ubuntu version in WARP scripts using `$(lsb_release -cs)` instead of hardcoded versions
+- **VNC Status Monitoring Enhancements**: Improved vnc-status command functionality
+  - Fixed port detection logic with multi-method fallback (`lsof`, `ss`, `netstat`)
+  - Added vnc-status command to PATH with automatic tab completion support
+  - Enhanced service status display showing both systemd service state and port listening status
+  - Active VNC process monitoring with detailed connection information
+  - Comprehensive troubleshooting guidance when service issues occur
+- **VNC Installation Progress Tracking**: Real-time percentage-based installation monitoring
+  - Added 8-step progress tracking (12.5% increments) for VNC installation process
+  - Enhanced vnc-status script displays current installation percentage and step
+  - Progress files `/tmp/vnc-progress.pct` and `/tmp/vnc-progress.txt` for monitoring
+  - Improved user experience with clear installation feedback and problem identification
+
+### Fixed
+
+- **Ubuntu 24.04 VNC Installation**: Resolved package availability issues
+  - Fixed missing universe repository in Ubuntu 24.04 cloud images
+  - Updated VNC package names for Ubuntu 24.04 compatibility
+  - Enhanced VNC binary detection to support both TightVNC and TigerVNC paths
+- **Cloud Provider Image Reference Errors**: Corrected OS image naming inconsistencies
+  - Fixed GCP Ubuntu 22.04 image reference from `ubuntu-2204-lts-amd64` to `ubuntu-2204-lts`
+  - Fixed Azure Ubuntu 22.04 image reference to use correct offer `0001-com-ubuntu-server-jammy` and SKU `22_04-lts-gen2`
+  - Resolved "PlatformImageNotFound" and "Could not find image or family" deployment errors
 
 ## [2.3.1] - 2025-09-29
 

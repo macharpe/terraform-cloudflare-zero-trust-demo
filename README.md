@@ -430,7 +430,9 @@ After Terraform completes successfully:
 
 ### 🎁 BONUS: VNC Installation Monitoring
 
-The AWS t3.micro instance hosting the VNC desktop environment requires **12-15 minutes** to complete installation due to the desktop packages (XFCE4, TightVNC, and related components). This installation time is normal for t3.micro instances.
+The AWS VNC instance hosting the XFCE4 desktop environment requires **10-15 minutes** to complete installation depending on instance type:
+- **t3.micro** (2 vCPU, 1GB RAM): ~10-12 minutes setup time, $7.59/month
+- **t3.small** (2 vCPU, 2GB RAM): ~5-7 minutes setup time, $15.18/month (recommended for demos)
 
 **Installation Monitoring** 🔄
 
@@ -438,26 +440,58 @@ The AWS t3.micro instance hosting the VNC desktop environment requires **12-15 m
 # SSH into the VNC instance
 ssh ubuntu@<vnc-instance-ip> -i modules/keys/out/aws_vnc_service_key_pair
 
-# Check VNC setup status
+# Quick status check with vnc-status command (automatically in PATH)
 vnc-status
 
-# Monitor installation progress
+# Alternative: Monitor detailed installation progress
 tail -f /tmp/vnc-setup.log
+
+# Or watch real-time progress updates
+tail -f /tmp/vnc-progress.txt
 ```
 
 **What to Expect:**
-- **Initial Setup** (0-2 minutes): System updates and package list refresh
-- **Package Installation** (2-10 minutes): XFCE4 desktop environment and VNC server installation (Firefox package removed for faster setup)
-- **Configuration** (10-12 minutes): VNC user configuration and systemd service setup
-- **Service Start** (12-15 minutes): VNC server startup and final verification
+- **Phase 1-2** (0-2 minutes): Repository configuration and package updates
+- **Phase 3-4** (2-8 minutes): VNC and XFCE4 desktop installation (TigerVNC for Ubuntu 24.04)
+- **Phase 5-6** (8-10 minutes): User configuration and VNC authentication setup
+- **Phase 7-8** (10-12 minutes): Systemd service configuration and VNC server startup
 
-**VNC Status Command:**
-- Shows completion status with green (🟢) or red (🔴) indicators
-- Displays recent log entries for troubleshooting
-- Indicates VNC service running status on port 5901
-- Provides restart command if service is not running
+**vnc-status Command Output:**
 
-The streamlined installation resolves AWS 16KB user_data size limits while maintaining reliability.
+```bash
+=== VNC Server Status ===
+✅ VNC setup completed
+   VNC setup completed at Tue Sep 30 09:38:29 CEST 2025
+
+=== Service Status ===
+🟢 VNC service: Running
+🟢 Port 5901: Listening
+
+=== Connection Info ===
+📍 Hostname: cloudflare-zero-trust-demo-vnc-aws
+🔐 VNC Port: 5901
+🔑 Password: Set in ~/.vnc/passwd
+
+=== Active Sessions ===
+📊 Active VNC processes: 2
+   /usr/bin/perl
+   /usr/bin/Xtigervnc
+```
+
+**Features:**
+- ✅ Real-time installation progress with 8-phase tracking and percentage completion
+- ✅ Comprehensive service status monitoring (systemd service + port listening check)
+- ✅ Automatic port detection using `lsof`, `ss`, and `netstat` fallbacks
+- ✅ Active VNC process monitoring and connection information
+- ✅ Built-in troubleshooting tips if service fails to start
+- ✅ Command available in PATH with tab completion support
+
+**Instance Type Configuration:**
+
+The project supports independent instance type sizing for optimal cost/performance balance:
+- Configure `aws_ec2_vnc_instance_type` separately from other AWS instances
+- See [terraform.tfvars](terraform.tfvars) for detailed cost/performance comparison
+- Recommendation: Use `t3.small` for demo environments for faster setup and better desktop responsiveness
 
 ### 🎁 BONUS: Automated update of posture check rules macOS and iOS to latest version
 

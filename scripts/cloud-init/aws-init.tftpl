@@ -35,21 +35,85 @@ write_files:
   - path: /usr/local/bin/vnc-status
     content: |
       #!/bin/bash
-      # Quick VNC status monitoring command
+      # Enhanced VNC status monitoring command
+      echo "=== VNC Server Status ==="
+      echo ""
+
+      # Check if setup completed
       if [ -f /tmp/vnc-setup.log ]; then
-          echo "=== VNC Setup Status ==="
-          echo "🟢 VNC setup completed"
-          echo "Recent logs:"
-          tail -5 /tmp/vnc-setup.log 2>/dev/null
-          echo ""
-          if systemctl is-active --quiet vncserver@1.service 2>/dev/null; then
-              echo "🟢 VNC is running on port 5901"
+          if grep -q "VNC setup completed at" /tmp/vnc-setup.log 2>/dev/null; then
+              echo "✅ VNC setup completed"
+              COMPLETED_TIME=$(grep "VNC setup completed at" /tmp/vnc-setup.log | tail -1)
+              echo "   $COMPLETED_TIME"
           else
-              echo "🔴 VNC service not running"
-              echo "Run: sudo systemctl start vncserver@1.service"
+              # Show installation progress
+              if [ -f /tmp/vnc-progress.pct ]; then
+                  PCT=$(cat /tmp/vnc-progress.pct 2>/dev/null || echo "0")
+                  echo "🚧 VNC installation progress: $PCT%"
+                  if [ -f /tmp/vnc-progress.txt ]; then
+                      echo "   Current step:"
+                      tail -1 /tmp/vnc-progress.txt 2>/dev/null | sed 's/^/   /'
+                  fi
+              else
+                  echo "🚧 VNC setup in progress..."
+                  echo "   Recent activity:"
+                  tail -3 /tmp/vnc-setup.log 2>/dev/null | sed 's/^/   /'
+              fi
           fi
       else
-          echo "VNC setup not started yet"
+          echo "⚠️  VNC setup not started yet"
+          exit 1
+      fi
+
+      echo ""
+      echo "=== Service Status ==="
+
+      # Check VNC service
+      if systemctl is-active --quiet vncserver@1.service 2>/dev/null; then
+          echo "🟢 VNC service: Running"
+          # Check if port is actually listening (try multiple methods)
+          if sudo lsof -i :5901 >/dev/null 2>&1 || ss -tln 2>/dev/null | grep -q ':5901' || netstat -tln 2>/dev/null | grep -q ':5901'; then
+              echo "🟢 Port 5901: Listening"
+          else
+              echo "🔴 Port 5901: Not listening (service may be starting)"
+          fi
+      else
+          echo "🔴 VNC service: Not running"
+          echo ""
+          echo "To start VNC:"
+          echo "  sudo systemctl start vncserver@1.service"
+          echo ""
+          echo "To check detailed status:"
+          echo "  sudo systemctl status vncserver@1.service"
+      fi
+
+      # Show connection info if running
+      if systemctl is-active --quiet vncserver@1.service 2>/dev/null; then
+          echo ""
+          echo "=== Connection Info ==="
+          echo "📍 Hostname: ${hostname}"
+          echo "🔐 VNC Port: 5901"
+          echo "🔑 Password: Set in ~/.vnc/passwd"
+
+          # Check for active VNC sessions
+          echo ""
+          echo "=== Active Sessions ==="
+          SESSIONS=$(ps aux | grep -E "[X]tigervnc|[v]ncserver|[X]vnc" | grep -v grep | wc -l)
+          if [ "$SESSIONS" -gt 0 ]; then
+              echo "📊 Active VNC processes: $SESSIONS"
+              ps aux | grep -E "[X]tigervnc|[v]ncserver|[X]vnc" | grep -v grep | awk '{print "   " $11}' | head -3
+          else
+              echo "📊 No active VNC processes found"
+          fi
+      fi
+
+      # Quick troubleshooting tips
+      if ! systemctl is-active --quiet vncserver@1.service 2>/dev/null; then
+          echo ""
+          echo "=== Troubleshooting ==="
+          echo "📋 Check setup log: tail -50 /tmp/vnc-setup.log"
+          echo "📋 Check service log: sudo journalctl -u vncserver@1.service -n 50"
+          echo "📋 Restart service: sudo systemctl restart vncserver@1.service"
       fi
     permissions: "0755"
 %{ endif ~}
@@ -116,16 +180,32 @@ runcmd:
   # Install VNC packages and setup (optimized for AWS 16KB limit)
   - |
     echo "=== VNC Setup Started ===" > /tmp/vnc-setup.log
-    echo "Installing VNC packages..." >> /tmp/vnc-setup.log
 
-    # Update package lists first
+    # Progress tracking function
+    update_progress() {
+        local step=$1 total=8 msg="$2"
+        local pct=$((step * 100 / total))
+        echo "[$pct%] $msg" | tee -a /tmp/vnc-progress.txt
+        echo "$pct" > /tmp/vnc-progress.pct
+        echo "$msg" >> /tmp/vnc-setup.log
+    }
+
+    update_progress 1 "Starting VNC installation..."
+
+    # Enable universe repository (required for Ubuntu 24.04)
+    update_progress 2 "Enabling universe repository..."
+    add-apt-repository universe -y >> /tmp/vnc-setup.log 2>&1
     apt-get update >> /tmp/vnc-setup.log 2>&1
 
-    # Install packages (using tigervnc-standalone-server instead of tightvncserver)
-    DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tigervnc-standalone-server dbus-x11 xfce4-file-manager >> /tmp/vnc-setup.log 2>&1
+    # Install packages (using tigervnc for Ubuntu 24.04)
+    update_progress 3 "Installing VNC packages..."
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tigervnc-standalone-server tigervnc-common dbus-x11 nano >> /tmp/vnc-setup.log 2>&1
+
+    update_progress 4 "Installing XFCE desktop environment..."
+    DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies >> /tmp/vnc-setup.log 2>&1
 
     # Create ubuntu user configuration
-    echo "Creating user configuration..." >> /tmp/vnc-setup.log
+    update_progress 5 "Creating VNC user configuration..."
 
     # Create .bashrc with green prompt
     cat > /home/ubuntu/.bashrc << 'BASHRC_EOF'
@@ -161,15 +241,8 @@ runcmd:
     mkdir -p /home/ubuntu/.vnc
     cat > /home/ubuntu/.vnc/xstartup << 'XSTARTUP_EOF'
     #!/bin/bash
-    export $(dbus-launch)
-    export XDG_CURRENT_DESKTOP=XFCE
-    export XDG_SESSION_DESKTOP=xfce
-    pkill -f xfce
-    xfce4-panel &
-    xfce4-desktop &
-    xfwm4 &
-    xfce4-file-manager &
-    xfce4-terminal &
+    # Simple XFCE startup script for VNC
+    startxfce4
     XSTARTUP_EOF
 
     # Fix ownership and permissions
@@ -178,7 +251,8 @@ runcmd:
     chmod +x /home/ubuntu/.vnc/xstartup
     chmod 644 /home/ubuntu/.bashrc
 
-    # Set VNC password
+    # Set VNC password (using tigervnc's vncpasswd)
+    update_progress 6 "Setting up VNC authentication..."
     sudo -u ubuntu bash << 'VNCSUDO'
     mkdir -p ~/.vnc
     echo "${vnc_password}" | vncpasswd -f > ~/.vnc/passwd
@@ -186,8 +260,9 @@ runcmd:
     VNCSUDO
 
     # Find VNC binaries and create systemd service
+    update_progress 7 "Configuring VNC systemd service..."
     # Try multiple possible VNC server locations for tigervnc
-    VNCSERVER=$(which vncserver 2>/dev/null || which tigervncserver 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1 || find /usr -name "tigervncserver" 2>/dev/null | head -1)
+    VNCSERVER=$(which vncserver 2>/dev/null || which tigervncserver 2>/dev/null || which Xtigervnc 2>/dev/null || find /usr -name "vncserver" 2>/dev/null | head -1 || find /usr -name "tigervncserver" 2>/dev/null | head -1)
     echo "VNC Server found at: $VNCSERVER" >> /tmp/vnc-setup.log
 
     if [ -z "$VNCSERVER" ]; then
@@ -208,8 +283,8 @@ runcmd:
     Group=ubuntu
     WorkingDirectory=/home/ubuntu
     PIDFile=/home/ubuntu/.vnc/%H:%i.pid
-    ExecStartPre=-$VNCSERVER -kill :%i > /dev/null 2>&1
-    ExecStart=$VNCSERVER -depth 24 -geometry 1280x720 :%i
+    ExecStartPre=-$VNCSERVER -kill :%i
+    ExecStart=$VNCSERVER -depth 24 -geometry 1280x720 -localhost no :%i
     ExecStop=$VNCSERVER -kill :%i
 
     [Install]
@@ -217,16 +292,19 @@ runcmd:
     SERVICEEND
 
     # Enable and start VNC service
+    update_progress 8 "Starting VNC server..."
     systemctl daemon-reload
     systemctl enable vncserver@1.service
     systemctl start vncserver@1.service
 
     # Log completion
     echo "VNC setup completed at $(date)" >> /tmp/vnc-setup.log
+    echo "100" > /tmp/vnc-progress.pct
+    echo "[100%] VNC installation completed successfully!" | tee -a /tmp/vnc-progress.txt
     echo "VNC service status:" >> /tmp/vnc-setup.log
     systemctl status vncserver@1.service >> /tmp/vnc-setup.log 2>&1
 
-  # Create info file
+  # Create info file and ensure vnc-status is accessible
   - |
     cat > /home/ubuntu/VNC_INFO.txt << 'INFOEND'
     VNC Server Setup Complete!
@@ -238,15 +316,24 @@ runcmd:
     VNC server should be running via systemd service.
 
     Commands:
-    - Check status: sudo systemctl status vncserver@1.service
-    - Restart VNC:  sudo systemctl restart vncserver@1.service
-    - Check logs:   cat /tmp/vnc-setup.log
-    - Check port:   sudo netstat -tlnp | grep 5901
+    - Quick status:  vnc-status
+    - Full status:   sudo systemctl status vncserver@1.service
+    - Restart VNC:   sudo systemctl restart vncserver@1.service
+    - Check logs:    cat /tmp/vnc-setup.log
+    - Check port:    sudo lsof -i :5901
 
     Connect your Cloudflare tunnel to: tcp://localhost:5901
     INFOEND
 
     chown ubuntu:ubuntu /home/ubuntu/VNC_INFO.txt
+
+    # Ensure vnc-status is executable and in PATH
+    chmod +x /usr/local/bin/vnc-status
+
+    # Add /usr/local/bin to PATH for ubuntu user if not already there
+    if ! grep -q '/usr/local/bin' /home/ubuntu/.bashrc; then
+        echo 'export PATH="/usr/local/bin:$PATH"' >> /home/ubuntu/.bashrc
+    fi
 %{ endif ~}
 
   # Datadog Agent installation and configuration

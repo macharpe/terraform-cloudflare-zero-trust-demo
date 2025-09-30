@@ -278,7 +278,7 @@ resource "aws_instance" "aws_vm_service" {
 #==========================================================
 resource "aws_instance" "aws_vm_vnc" {
   ami                    = local.aws_common_instance_config.ami
-  instance_type          = local.aws_common_instance_config.instance_type
+  instance_type          = var.aws_ec2_vnc_instance_type
   subnet_id              = local.aws_common_instance_config.subnet_id
   vpc_security_group_ids = [aws_security_group.aws_sg_vnc.id]
   key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name

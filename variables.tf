@@ -72,6 +72,12 @@ variable "gcp_linux_image" {
   default     = "ubuntu-os-cloud/ubuntu-2204-lts-amd64"
 }
 
+variable "gcp_warp_connector_image" {
+  description = "GCP image specifically for WARP connector VM (Ubuntu 22.04 for compatibility)"
+  type        = string
+  default     = "ubuntu-os-cloud/ubuntu-2204-lts"
+}
+
 variable "gcp_windows_image" {
   description = "GCP Windows image for compute instances"
   type        = string
@@ -128,7 +134,13 @@ variable "aws_region" {
 
 # AWS EC2 Configuration
 variable "aws_ec2_instance_config_type" {
-  description = "type of EC2 instance"
+  description = "type of EC2 instance for SSH and cloudflared instances"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "aws_ec2_vnc_instance_type" {
+  description = "type of EC2 instance specifically for VNC desktop VM (t3.small recommended for better desktop performance)"
   type        = string
   default     = "t3.micro"
 }
@@ -290,6 +302,31 @@ variable "azure_image_sku" {
 
 variable "azure_image_version" {
   description = "Azure VM image version"
+  type        = string
+  default     = "latest"
+}
+
+# Azure WARP Connector specific image configuration (Ubuntu 22.04 for compatibility)
+variable "azure_warp_connector_image_publisher" {
+  description = "Azure WARP connector VM image publisher"
+  type        = string
+  default     = "Canonical"
+}
+
+variable "azure_warp_connector_image_offer" {
+  description = "Azure WARP connector VM image offer (Ubuntu 22.04 for compatibility)"
+  type        = string
+  default     = "0001-com-ubuntu-server-jammy"
+}
+
+variable "azure_warp_connector_image_sku" {
+  description = "Azure WARP connector VM image SKU"
+  type        = string
+  default     = "22_04-lts-gen2"
+}
+
+variable "azure_warp_connector_image_version" {
+  description = "Azure WARP connector VM image version"
   type        = string
   default     = "latest"
 }

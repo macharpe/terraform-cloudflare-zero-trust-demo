@@ -20,13 +20,84 @@ gcp_machine_size               = "e2-micro"
 gcp_windows_machine_size       = "e2-medium"
 
 # OS Image Configuration
-gcp_linux_image                = "ubuntu-os-cloud/ubuntu-2204-lts-amd64"
+gcp_linux_image                = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
+gcp_warp_connector_image       = "ubuntu-os-cloud/ubuntu-2204-lts"  # Ubuntu 22.04 for WARP compatibility
 gcp_windows_image              = "windows-server-2025-dc-v20250612"
 
 # Networking
 gcp_infra_cidr              = "10.156.70.0/24"
 gcp_warp_cidr               = "10.156.85.0/24"
 gcp_windows_rdp_cidr        = "10.156.90.0/24"
+
+
+#=====================================
+# AWS variables
+#=====================================
+aws_region                     = "eu-central-1"
+aws_ec2_browser_ssh_name       = "cloudflare-zero-trust-demo-ssh-aws"
+aws_ec2_browser_vnc_name       = "cloudflare-zero-trust-demo-vnc-aws"
+aws_ec2_instance_config_ami_id = "ami-0e872aee57663ae2d" # Ubuntu 24.04 LTS
+
+# Instance Types: t3.micro vs t3.small comparison
+# - t3.micro: $7.59/month, 2 vCPU, 1GB RAM, ~10-12 min VNC setup
+# - t3.small: $15.18/month, 2 vCPU, 2GB RAM, ~5-7 min VNC setup (79% cost premium, 3-4x faster)
+aws_ec2_instance_config_type   = "t3.micro"  # SSH and cloudflared instances
+aws_ec2_vnc_instance_type      = "t3.micro"  # VNC instance (set to t3.small for better desktop performance)
+
+aws_cloudflared_count          = 1
+aws_ec2_cloudflared_name       = "cloudflared-replica-aws"
+
+aws_users                      = ["matthieu", "jose", "bob", "andy"]
+aws_vm_default_user            = "ubuntu"
+aws_vnc_password               = "vnc"
+
+# Networking
+aws_vpc_cidr     = "172.16.0.0/16"
+aws_private_cidr = "172.16.69.0/24"
+aws_public_cidr  = "172.16.84.0/24"
+
+
+#=====================================
+# Azure variables
+#=====================================
+azure_resource_group_region  = "germanywestcentral"
+azure_resource_group_name      = "cloudflare-ressource-group"
+
+# 4 users
+azure_developer1_name = "developer1"
+azure_developer2_name = "developer2"
+azure_sales1_name     = "sales1"
+azure_sales2_name     = "sales2"
+
+azure_user_password            = "********"
+azure_user_principal_domain    = "********.onmicrosoft.com"
+
+azure_vm_count                 = 2
+azure_vm_size                  = "Standard_B1s"
+azure_vm_admin_username        = "ubuntu"
+azure_vm_admin_password        = "********"
+azure_warp_vm_name             = "cloudflare-warp-connector-azure"
+azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
+
+# OS Image Configuration
+azure_image_publisher = "Canonical"
+azure_image_offer     = "ubuntu-24_04-lts"
+azure_image_sku       = "server"
+azure_image_version   = "latest"
+
+# Azure WARP Connector Image (Ubuntu 22.04 for compatibility)
+azure_warp_connector_image_publisher = "Canonical"
+azure_warp_connector_image_offer     = "0001-com-ubuntu-server-jammy"
+azure_warp_connector_image_sku       = "22_04-lts-gen2"
+azure_warp_connector_image_version   = "latest"
+
+# Networking
+azure_subnet_cidr       = "192.168.71.0/24"
+azure_vnet_cidr         = "192.168.0.0/16"
+azure_public_dns_domain = "westeurope.cloudapp.azure.com"
+
+# Sensitive: manually retrieved from Azure AD
+azure_matthieu_user_object_id = "58c64a9c-df3c-********"
 
 
 #=====================================
@@ -103,7 +174,6 @@ cf_default_cgnat_routes = [{
 cf_warp_cgnat_cidr = "100.96.0.0/12"
 
 
-
 #=====================================
 # Okta
 #=====================================
@@ -127,69 +197,9 @@ okta_bob_user_linux_password = "bob"
 
 
 #=====================================
-# AWS variables
-#=====================================
-aws_region                     = "eu-central-1"
-aws_ec2_browser_ssh_name       = "cloudflare-zero-trust-demo-ssh-aws"
-aws_ec2_browser_vnc_name       = "cloudflare-zero-trust-demo-vnc-aws"
-aws_ec2_instance_config_ami_id = "ami-0e872aee57663ae2d" # Ubuntu 24.04 LTS
-aws_ec2_instance_config_type   = "t2.micro"
-
-aws_cloudflared_count          = 1
-aws_ec2_cloudflared_name       = "cloudflared-replica-aws"
-
-aws_users                      = ["matthieu", "jose", "bob", "andy"]
-aws_vm_default_user            = "ubuntu"
-aws_vnc_password               = "vnc"
-
-# Networking
-aws_vpc_cidr     = "172.16.0.0/16"
-aws_private_cidr = "172.16.69.0/24"
-aws_public_cidr  = "172.16.84.0/24"
-
-
-#=====================================
-# Azure variables
-#=====================================
-azure_resource_group_region  = "germanywestcentral"
-azure_resource_group_name      = "cloudflare-ressource-group"
-
-# 4 users
-azure_developer1_name = "developer1"
-azure_developer2_name = "developer2"
-azure_sales1_name     = "sales1"
-azure_sales2_name     = "sales2"
-
-azure_user_password            = "********"
-azure_user_principal_domain    = "********.onmicrosoft.com"
-
-azure_vm_count                 = 2
-azure_vm_size                  = "Standard_B1s"
-azure_vm_admin_username        = "ubuntu"
-azure_vm_admin_password        = "********"
-azure_warp_vm_name             = "cloudflare-warp-connector-azure"
-azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
-
-# OS Image Configuration
-azure_image_publisher = "Canonical"
-azure_image_offer     = "ubuntu-22_04-lts"
-azure_image_sku       = "server"
-azure_image_version   = "latest"
-
-# Networking
-azure_subnet_cidr       = "192.168.71.0/24"
-azure_vnet_cidr         = "192.168.0.0/16"
-azure_public_dns_domain = "westeurope.cloudapp.azure.com"
-
-# Sensitive: manually retrieved from Azure AD
-azure_matthieu_user_object_id = "58c64a9c-df3c-********"
-
-
-#=====================================
 # Datadog variables
 #=====================================
 datadog_region = "datadoghq.eu"
-
 
 
 #=====================================
