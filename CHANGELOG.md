@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **VNC Setup Duration Tracking**: Added timing metrics to AWS VNC cloud-init script
+  - Tracks total setup duration from start to completion with minute/second precision
+  - Displays elapsed time in vnc-status command for troubleshooting and performance analysis
+  - Helps identify performance differences between instance types (t3.micro vs t3.small)
+- **Comprehensive Provider Version Constraints**: Added version pinning across all 4 modules
+  - cloudflare module: http (~> 3.4), null (~> 3.2), local (~> 2.5), external (~> 2.3)
+  - warp-routing module: null (~> 3.2), local (~> 2.5)
+  - keys module: tls (~> 4.0), local (~> 2.5)
+  - Root module: null (~> 3.2), http (~> 3.4), tls (~> 4.0), random (~> 3.6)
+  - Ensures reproducible builds and prevents breaking changes from provider updates
+
+### Changed
+
+- **Module Naming Standardization**: Renamed modules from kebab-case to snake_case for Terraform conventions
+  - `azure-ad` → `azure_ad`
+  - `warp-routing` → `warp_routing`
+  - Updated all references in main.tf and cross-module dependencies
+  - Folder names remain kebab-case for backward compatibility
+- **Output Naming Standardization**: Converted all outputs from ALL_CAPS to snake_case
+  - `MY_IP` → `my_ip`
+  - `GCP_COMPUTE_INSTANCES` → `gcp_compute_instances`
+  - `AWS_EC2_INSTANCES` → `aws_ec2_instances`
+  - `AZURE_VMS` → `azure_vms`
+  - `SSH_FOR_INFRASTRUCTURE_ACCESS` → `ssh_for_infrastructure_access`
+  - `TRAINING_STATUS_ADMIN_PORTAL_AUD` → `training_status_admin_portal_aud`
+- **GCP WARP Connector Image Configuration**: Enhanced conditional image selection
+  - WARP connector VM (index 0) now explicitly uses Ubuntu 22.04 via gcp_warp_connector_image variable
+  - Other GCP VMs continue using Ubuntu 24.04 for latest features
+  - Improved clarity and maintainability of image selection logic
+- **Variable Cleanup**: Removed unused variables from modules for cleaner codebase
+  - Removed from cloudflare module: cf_aws_tag, aws_public_cidr, cf_ios_posture_id, gcp_cloudflared_vm_instance
+  - Removed from warp-routing module: gcp_cloudflared_vm_instance, gcp_vm_instance
+  - Removed from root: azure_warp_connector_image_* (4 variables), local.global_network
+- **Cloudflare RDP App Name**: Made Domain Controller app name configurable via var.cf_browser_rdp_app_name
+
+### Fixed
+
+- **TFLint Code Quality**: Comprehensive cleanup reducing warnings from 17+ to 5 across entire project
+  - Fixed comment syntax (// → #) in vm-gcp-instance.tf
+  - Resolved all module and output naming convention violations
+  - Added missing provider version constraints preventing drift
+  - Active warnings remaining: 3 unused data sources (disregarded), 2 unused root variables (reserved for future use)
+- **Terraform Template Variables**: Fixed VNC timing script variable escaping
+  - Corrected bash variable interpolation (${MINUTES} → $${MINUTES}) to prevent Terraform parsing errors
+  - Resolved "vars map does not contain key" errors during template rendering
+
 ## [2.4.0] - 2025-09-30
 
 ### Added

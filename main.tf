@@ -81,12 +81,11 @@ module "cloudflare" {
   cf_tunnel_warp_connector_azure_id = var.cf_warp_tunnel_azure_id
   cf_tunnel_warp_connector_gcp_id   = var.cf_warp_tunnel_gcp_id
 
-  gcp_vm_internal_ip          = google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip
-  gcp_windows_vm_internal_ip  = google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip
-  gcp_cloudflared_vm_instance = google_compute_instance.gcp_vm_cloudflared
-  gcp_infra_cidr              = var.gcp_infra_cidr
-  gcp_warp_cidr               = var.gcp_warp_cidr
-  gcp_windows_rdp_cidr        = var.gcp_windows_rdp_cidr
+  gcp_vm_internal_ip         = google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip
+  gcp_windows_vm_internal_ip = google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip
+  gcp_infra_cidr             = var.gcp_infra_cidr
+  gcp_warp_cidr              = var.gcp_warp_cidr
+  gcp_windows_rdp_cidr       = var.gcp_windows_rdp_cidr
 
   # Domain
   cf_subdomain_ssh             = var.cf_subdomain_ssh
@@ -128,17 +127,15 @@ module "cloudflare" {
   aws_ec2_ssh_service_private_ip = aws_instance.aws_vm_service.private_ip
   aws_ec2_vnc_service_private_ip = aws_instance.aws_vm_vnc.private_ip
   aws_private_cidr               = var.aws_private_cidr
-  aws_public_cidr                = var.aws_public_cidr
 
   # Azure
-  azure_engineering_group_id = module.azure-ad.azure_engineering_group_id
-  azure_sales_group_id       = module.azure-ad.azure_sales_group_id
+  azure_engineering_group_id = module.azure_ad.azure_engineering_group_id
+  azure_sales_group_id       = module.azure_ad.azure_sales_group_id
   azure_subnet_cidr          = var.azure_subnet_cidr
 
   # Static definition
   cf_gateway_posture_id         = var.cf_gateway_posture_id
   cf_macos_posture_id           = var.cf_macos_posture_id
-  cf_ios_posture_id             = var.cf_ios_posture_id
   cf_windows_posture_id         = var.cf_windows_posture_id
   cf_linux_posture_id           = var.cf_linux_posture_id
   cf_okta_identity_provider_id  = var.cf_okta_identity_provider_id
@@ -153,18 +150,17 @@ module "cloudflare" {
   cf_warp_cgnat_cidr      = var.cf_warp_cgnat_cidr
 
   # Subnet generation
-  cf_azure_json_subnet_generation = module.warp-routing.cf_azure_json_subnet_generation
-  cf_gcp_json_subnet_generation   = module.warp-routing.cf_gcp_json_subnet_generation
-  cf_aws_json_subnet_generation   = module.warp-routing.cf_aws_json_subnet_generation
+  cf_azure_json_subnet_generation = module.warp_routing.cf_azure_json_subnet_generation
+  cf_gcp_json_subnet_generation   = module.warp_routing.cf_gcp_json_subnet_generation
+  cf_aws_json_subnet_generation   = module.warp_routing.cf_aws_json_subnet_generation
 
   # Tags
-  cf_aws_tag        = var.cf_aws_tag
   cf_cloudflare_tag = var.cf_cloudflare_tag
 
   # variable name defined in module == var.variable name defined in variables in main folder
 }
 
-module "azure-ad" {
+module "azure_ad" {
   source                        = "./modules/azure"
   azure_user_password           = var.azure_user_password
   azure_user_principal_domain   = var.azure_user_principal_domain
@@ -176,10 +172,8 @@ module "azure-ad" {
   azure_sales2_name     = var.azure_sales2_name
 }
 
-module "warp-routing" {
-  source                      = "./modules/warp-routing"
-  gcp_cloudflared_vm_instance = google_compute_instance.gcp_vm_cloudflared
-  gcp_vm_instance             = [google_compute_instance.gcp_vm_warp[0]]
+module "warp_routing" {
+  source = "./modules/warp-routing"
 
   azure_subnet_cidr    = var.azure_subnet_cidr
   gcp_infra_cidr       = var.gcp_infra_cidr
