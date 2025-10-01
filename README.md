@@ -62,7 +62,7 @@ This demo environment includes **two optional components** that integrate with C
 
 An optional Cloudflare Access application that integrates with the **Training Compliance Gateway** for advanced training status tracking and compliance evaluation.
 
-- **File**: `modules/cloudflare/optional-cloudflare-apps.tf`
+- **File**: `modules/cloudflare/access_applications_optional.tf`
 - **Requirements**: Requires the [Training Compliance Gateway](https://github.com/macharpe/cloudflare-access-training-evaluator) Cloudflare Worker to be deployed
 - **Features**:
   - Training status tracking and compliance evaluation
@@ -95,7 +95,7 @@ When deploying this component, Terraform will output the `TRAINING_STATUS_ADMIN_
 
 > **⚠️ Important Notes:**
 > - The Training Status Admin Portal app and policy will only function if the Training Compliance Gateway is deployed and running
-> - If you haven't deployed the Training Compliance Gateway, you must comment out the `require_external_evaluation` settings in the Competition App Policy (located in `modules/cloudflare/cloudflare-app-policies.tf`), otherwise the Competition App won't work or appear in the App Launcher
+> - If you haven't deployed the Training Compliance Gateway, you must comment out the `require_external_evaluation` settings in the Competition App Policy (located in `modules/cloudflare/access_policies.tf`), otherwise the Competition App won't work or appear in the App Launcher
 > - Repository: [Training Compliance Gateway for Cloudflare Worker](https://github.com/macharpe/cloudflare-access-training-evaluator)
 
 ### Access Denied Info Page
@@ -110,7 +110,7 @@ An optional custom Access-denied-info-page that provides users with detailed inf
   - Consistent experience across all protected applications
 
 > **⚠️ Important Notes:**
-> - If you don't want to use the custom Access denied page, you must remove the `custom_deny_url` and `custom_non_identity_deny_url` parameters from every access application in `modules/cloudflare/cloudflare-apps.tf`
+> - If you don't want to use the custom Access denied page, you must remove the `custom_deny_url` and `custom_non_identity_deny_url` parameters from every access application in `modules/cloudflare/access_applications.tf`
 > - Repository: [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page)
 
 ## 🏗️ Architecture Overview
