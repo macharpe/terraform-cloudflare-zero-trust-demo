@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-10-01
+
 ### Added
 
 - **Gateway HTTP Policies**: Added AI application redirect policy to improve security and compliance
