@@ -759,7 +759,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |
 | <a name="input_cf_subdomain_ssh"></a> [cf\_subdomain\_ssh](#input\_cf\_subdomain\_ssh) | Name of the subdomain for ssh public hostname of tunnel | `string` | n/a | yes |
-| <a name="input_cf_subdomain_training_status"></a> [cf\_subdomain\_training\_status](#input\_cf\_subdomain\_training\_status) | Name of the subdomain for training status admin portal (OPTIONAL: only needed if using optional-cloudflare-apps.tf) | `string` | n/a | yes |
+| <a name="input_cf_subdomain_training_status"></a> [cf\_subdomain\_training\_status](#input\_cf\_subdomain\_training\_status) | Name of the subdomain for training status admin portal (OPTIONAL: only needed if using access_applications_optional.tf) | `string` | n/a | yes |
 | <a name="input_cf_subdomain_vnc"></a> [cf\_subdomain\_vnc](#input\_cf\_subdomain\_vnc) | Name of the subdomain for VNC public hostname of tunnel | `string` | n/a | yes |
 | <a name="input_cf_subdomain_web"></a> [cf\_subdomain\_web](#input\_cf\_subdomain\_web) | Name of the subdomain for web public hostname of tunnel | `string` | n/a | yes |
 | <a name="input_cf_subdomain_web_sensitive"></a> [cf\_subdomain\_web\_sensitive](#input\_cf\_subdomain\_web\_sensitive) | Name of the subdomain for web sensitive public hostname of tunnel | `string` | n/a | yes |
