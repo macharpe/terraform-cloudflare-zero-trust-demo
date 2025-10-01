@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Gateway HTTP Policies**: Added AI application redirect policy to improve security and compliance
+  - `redirect_ai_to_claude` policy redirects unreviewed AI tools to claude.ai (precedence: 170)
+  - Ensures consistent AI tool usage across organization
+- **ChatGPT Prompt Logging**: Added GenAI prompt logging policy for compliance and audit trails
+  - `allow_chatgpt_log` policy enables logging of ChatGPT prompts (precedence: 12000)
+  - Configured without identity selector for organization-wide logging
+
+### Changed
+
+- **File Naming Standardization**: Converted all Terraform files in modules/cloudflare/ to snake_case convention
+  - `cloudflared-tunnel-main.tf` → `tunnels.tf`
+  - `cloudflare-tags.tf` → `tags.tf`
+  - `cloudflare-apps.tf` → `access_applications.tf`
+  - `cloudflare-app-policies.tf` → `access_policies.tf`
+  - `optional-cloudflare-apps.tf` → `access_applications_optional.tf`
+  - `cloudflare-gateway-policy.tf` → `gateway_policies.tf`
+  - `device-profiles.tf` → `device_profiles.tf`
+  - `dns-records.tf` → `dns_records.tf`
+  - `rule-groups.tf` → `rule_groups.tf`
+  - `short-lived-certificate.tf` → `short_lived_certificate.tf`
+  - `ssh-ca-management.tf` → `ssh_ca_management.tf`
+  - Aligns with Terraform naming conventions and existing resource/variable patterns
+  - Updated all documentation references to reflect new file names
+- **Gateway Policies Organization**: Reorganized gateway_policies.tf for improved clarity and maintainability
+  - Separated NETWORK (L4) and HTTP (L7) policies with clear section dividers
+  - Grouped related policies together (e.g., all lateral movement blocks)
+  - Added inline precedence annotations to each policy for better understanding
+  - Reorganized precedence block to match policy groupings
+  - NETWORK policies: precedence range 5-29000
+  - HTTP policies: precedence range 170-12000
+
+### Fixed
+
+- **Gateway Policies Typo**: Corrected typo in precedence block (`pdf_blockt` → `pdf_block`)
+
 ## [2.5.0] - 2025-09-30
 
 ### Added
