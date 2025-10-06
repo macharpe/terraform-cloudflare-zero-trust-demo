@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2025-10-06
+
+### Added
+
+- **Configurable AWS Spot Instance Toggle**: Added `aws_use_spot_instances` variable to control spot vs on-demand instance usage
+  - New boolean variable with default `false` for on-demand reliability (variables.tf:160-164)
+  - Conditional `aws_spot_instance_options` using ternary operator for dynamic configuration
+  - Dynamic `instance_market_options` blocks across all AWS EC2 resources (cloudflared, service, VNC)
+  - Resolves timeout errors caused by spot capacity constraints in AWS regions
+  - Allows users to toggle between guaranteed capacity (on-demand) and cost savings (spot)
+  - Updated terraform.tfvars.example with configuration guidance
+
+### Changed
+
+- **AWS Spot Instance Configuration**: Removed hardcoded `max_price` from spot configuration
+  - Now defaults to on-demand price for better availability
+  - Applied conditional logic using dynamic blocks for cleaner infrastructure code
+  - Affects all three AWS EC2 instance types: cloudflared replicas, SSH service, and VNC desktop
+
 ## [2.6.0] - 2025-10-01
 
 ### Added
