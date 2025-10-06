@@ -46,6 +46,7 @@ aws_ec2_vnc_instance_type      = "t3.micro"  # VNC instance (set to t3.small for
 
 aws_cloudflared_count          = 1
 aws_ec2_cloudflared_name       = "cloudflared-replica-aws"
+aws_use_spot_instances         = false # Set to true for cost savings, false for reliability
 
 aws_users                      = ["matthieu", "jose", "bob", "andy"]
 aws_vm_default_user            = "ubuntu"
