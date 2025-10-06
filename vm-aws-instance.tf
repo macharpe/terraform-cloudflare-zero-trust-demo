@@ -188,15 +188,15 @@ locals {
     Service     = "cloudflare-zero-trust-demo"
   }
 
-  # Spot instance configuration
-  aws_spot_instance_options = {
+  # Spot instance configuration (conditional based on variable)
+  aws_spot_instance_options = var.aws_use_spot_instances ? {
     market_type = "spot"
     spot_options = {
-      max_price                      = "0.010"
+      # No max_price specified - defaults to on-demand price
       spot_instance_type             = "one-time"
       instance_interruption_behavior = "terminate"
     }
-  }
+  } : null
 }
 
 #==========================================================
@@ -210,12 +210,14 @@ resource "aws_instance" "aws_vm_cloudflared" {
   vpc_security_group_ids = [aws_security_group.aws_sg_cloudflared.id]
   key_name               = aws_key_pair.aws_ec2_cloudflared_key_pair[count.index].key_name
 
-  instance_market_options {
-    market_type = local.aws_spot_instance_options.market_type
-    spot_options {
-      max_price                      = local.aws_spot_instance_options.spot_options.max_price
-      spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
-      instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+  dynamic "instance_market_options" {
+    for_each = local.aws_spot_instance_options != null ? [1] : []
+    content {
+      market_type = local.aws_spot_instance_options.market_type
+      spot_options {
+        spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
+        instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+      }
     }
   }
 
@@ -247,12 +249,14 @@ resource "aws_instance" "aws_vm_service" {
   vpc_security_group_ids = [aws_security_group.aws_sg_ssh.id]
   key_name               = aws_key_pair.aws_ec2_service_key_pair.key_name
 
-  instance_market_options {
-    market_type = local.aws_spot_instance_options.market_type
-    spot_options {
-      max_price                      = local.aws_spot_instance_options.spot_options.max_price
-      spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
-      instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+  dynamic "instance_market_options" {
+    for_each = local.aws_spot_instance_options != null ? [1] : []
+    content {
+      market_type = local.aws_spot_instance_options.market_type
+      spot_options {
+        spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
+        instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+      }
     }
   }
 
@@ -283,12 +287,14 @@ resource "aws_instance" "aws_vm_vnc" {
   vpc_security_group_ids = [aws_security_group.aws_sg_vnc.id]
   key_name               = aws_key_pair.aws_ec2_vnc_key_pair.key_name
 
-  instance_market_options {
-    market_type = local.aws_spot_instance_options.market_type
-    spot_options {
-      max_price                      = local.aws_spot_instance_options.spot_options.max_price
-      spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
-      instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+  dynamic "instance_market_options" {
+    for_each = local.aws_spot_instance_options != null ? [1] : []
+    content {
+      market_type = local.aws_spot_instance_options.market_type
+      spot_options {
+        spot_instance_type             = local.aws_spot_instance_options.spot_options.spot_instance_type
+        instance_interruption_behavior = local.aws_spot_instance_options.spot_options.instance_interruption_behavior
+      }
     }
   }
 

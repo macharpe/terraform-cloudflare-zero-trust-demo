@@ -157,6 +157,12 @@ variable "aws_cloudflared_count" {
   default     = 1
 }
 
+variable "aws_use_spot_instances" {
+  description = "Whether to use spot instances for AWS EC2 (false = on-demand for reliability, true = spot for cost savings)"
+  type        = bool
+  default     = false
+}
+
 # AWS Instance Names
 variable "aws_ec2_browser_ssh_name" {
   description = "Name of the EC2 instance browser rendered SSH"
