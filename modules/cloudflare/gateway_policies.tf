@@ -12,13 +12,12 @@ locals {
     block_lateral_smb      = 25    # Block SMB lateral movement
     block_lateral_winrm    = 30    # Block WinRM lateral movement
     block_lateral_database = 35    # Block database lateral movement
-    ip_access_block        = 669   # Block direct IP access to apps
+    ip_access_block        = 670   # Block direct IP access to apps
     rdp_default_deny       = 29000 # Default deny RDP (lowest priority)
 
     # HTTP (L7) Policies - Application/Content-based filtering
     ai_tools_redirect = 170   # Redirect unreviewed AI tools to Claude
     pdf_block         = 180   # Block PDF downloads for Sales Eng
-    gambling_block    = 502   # Block gambling websites
     chatgpt_allow_log = 12000 # Allow ChatGPT with prompt logging
   }
 
@@ -182,19 +181,6 @@ locals {
       notification_enabled = true
     }
 
-    # Category Blocking (Precedence: 502)
-    block_gambling = {
-      name                 = "HTTP-Block: Zero-Trust demo Block Gambling websites"
-      description          = "Block Gambling website according to corporate policies (HTTP)."
-      enabled              = true
-      action               = "block"
-      precedence           = local.precedence.gambling_block
-      filters              = ["http"]
-      traffic              = "any(http.request.uri.content_category[*] in {99})"
-      identity             = "not(any(identity.saml_attributes[*] == \"groups=${var.okta_contractors_saml_group_name}\")) or not(identity.email == \"${var.okta_bob_user_login}\")"
-      block_reason         = "This website is blocked according to corporate policies (HTTP)"
-      notification_enabled = true
-    }
 
     # AI Application Logging (Precedence: 12000)
     allow_chatgpt_log = {

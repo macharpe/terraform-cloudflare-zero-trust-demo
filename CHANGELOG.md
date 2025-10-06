@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2025-10-06
+
+### Added
+
+- **SSH IdentitiesOnly Flag**: Enhanced SSH connection strings with `-o IdentitiesOnly=yes` flag
+  - Prevents SSH key confusion when multiple keys are loaded in ssh-agent
+  - Ensures only the specified private key is used for authentication
+  - Applied across all cloud providers: AWS, Azure, and GCP SSH outputs
+  - Improves connection reliability and troubleshooting experience
+
+### Removed
+
+- **Gambling Block Gateway Policy**: Removed contractor-specific gambling restriction policy
+  - Removed `block_gambling` HTTP policy (precedence: 502) from gateway_policies.tf
+  - Removed unused `okta_bob_user_login` variable dependency
+  - Adjusted `ip_access_block` precedence from 669 to 670 to fill gap
+  - Simplifies policy management and reduces contractor-specific complexity
+
+### Changed
+
+- **Project Statistics**: Updated infrastructure metrics to reflect current state
+  - Module directories: 4 → 5 modules
+  - Total deployed resources: 167 → 168 resources
+  - Terraform files: 32 → 34 files
+  - Documentation: 7 → 11 files
+  - Total code lines: ~8,600 → ~10,200 lines
+
 ## [2.7.0] - 2025-10-06
 
 ### Added
