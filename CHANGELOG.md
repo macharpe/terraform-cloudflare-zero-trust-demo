@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] - 2025-10-13
+
+### Added
+
+- **Gambling Block Gateway Policy**: Added back contractor-specific gambling restriction policy with identity-based controls
+  - Added `block_gambling` HTTP policy (precedence: 25100) to gateway_policies.tf
+  - Excludes contractors group and specific user (Bob) from gambling restrictions using SAML attributes
+  - Enforces corporate policies for gambling website access
+  - Re-introduces `okta_bob_user_login` and `okta_contractors_saml_group_name` variable dependencies
+
+### Changed
+
+- **Gateway Policy Precedence Reorganization**: Comprehensive restructuring of precedence values following Cloudflare best practices
+  - Implemented 1000-spacing between major policy groups for better organization and dashboard integration
+  - **Access Infrastructure Integration**: moved from precedence 5 → 4000 (positioned between DNS groups)
+  - **Zero Trust RDP Access Control**:
+    - `rdp_admin_allow`: moved from 10 → 21000 (identity-based allow)
+    - `rdp_default_deny`: moved from 29000 → 21700 (evaluated after allow, before lateral movement)
+  - **Lateral Movement Prevention** (East-West Traffic): reorganized into 22000-22400 range
+    - `block_lateral_ssh`: moved from 15 → 22000
+    - `block_lateral_rdp`: moved from 20 → 22100
+    - `block_lateral_smb`: moved from 25 → 22200
+    - `block_lateral_winrm`: moved from 30 → 22300
+    - `block_lateral_database`: moved from 35 → 22400
+  - **IP Access Control**: `ip_access_block` moved from 670 → 23000 (force hostname-based access)
+  - **AI Application Governance**: reorganized into 24000-24100 range
+    - `ai_tools_redirect`: moved from 170 → 24000
+    - `chatgpt_allow_log`: moved from 12000 → 24100
+  - **Content Filtering & DLP**: reorganized into 25000-25100 range
+    - `pdf_block`: moved from 180 → 25000 (identity-based DLP)
+    - `gambling_block`: new policy at 25100 (category blocking)
+  - Integrates seamlessly with dashboard-managed policies at precedence ranges: 1000-3000, 5000-20000, 36000-40000
+  - Terraform-managed policies now occupy: 4000, 21000-25100 (non-overlapping with dashboard)
+- **Policy Names & Descriptions**: Improved naming conventions and descriptive text for clarity
+  - Standardized format: `[TYPE]-[ACTION]: [Description] [Zero-Trust demo]`
+  - Enhanced descriptions with specific use cases and security rationale
+  - Added detailed comments explaining precedence organization and integration points
+- **Policy Comments & Documentation**: Enhanced inline documentation throughout gateway_policies.tf
+  - Added detailed precedence range documentation for both Terraform and dashboard-managed policies
+  - Clarified policy evaluation order and integration between Terraform and dashboard configurations
+  - Documented best practices for 1000-spacing between major groups
+
 ## [2.8.0] - 2025-10-06
 
 ### Added
