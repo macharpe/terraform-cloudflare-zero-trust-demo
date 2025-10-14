@@ -14,8 +14,8 @@ locals {
     rdp_default_deny = 21700 # Default deny RDP (after allow, before lateral movement)
 
     # NETWORK (L4) Policies - Lateral Movement Prevention (East-West Traffic)
-    block_lateral_ssh      = 22000 # Block SSH lateral movement
-    block_lateral_rdp      = 22100 # Block RDP lateral movement
+    block_lateral_ssh      = 22550 # Block SSH lateral movement
+    block_lateral_rdp      = 22600 # Block RDP lateral movement
     block_lateral_smb      = 22200 # Block SMB lateral movement
     block_lateral_winrm    = 22300 # Block WinRM lateral movement
     block_lateral_database = 22400 # Block database lateral movement
