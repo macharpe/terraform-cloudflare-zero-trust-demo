@@ -2,12 +2,10 @@
 
 A comprehensive, production-ready Terraform infrastructure that demonstrates Cloudflare's Zero Trust capabilities across multi-cloud environments. This project showcases advanced security policies, identity integration, and seamless connectivity between AWS, Azure, and GCP
 
-[![Generate terraform docs on main](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/documentation.yml)
-[![Semgrep Security Scan](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/semgrep.yml/badge.svg)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/actions/workflows/semgrep.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/macharpe/terraform-cloudflare-zero-trust-demo)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/commits/main)
-[![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
 [![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/f9641cfc-17c4-406f-8f64-5038484adbba/repos/8bce00d3-4748-4e36-b419-a8dde3817846/branch/4a9ced8a-0d3d-47a1-87f1-ccf012dfba79)](https://dashboard.infracost.io/org/macharpe/repos/8bce00d3-4748-4e36-b419-a8dde3817846?tab=branches)
 [![Terraform](https://img.shields.io/badge/terraform-1.12.0+-blueviolet?logo=terraform)](https://www.terraform.io/)
+[![Cloudflare Provider](https://img.shields.io/badge/cloudflare%20provider-5.10.0+-F38020?logo=cloudflare)](https://registry.terraform.io/providers/cloudflare/cloudflare/latest)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Zero%20Trust-orange?logo=cloudflare)](https://www.cloudflare.com/zero-trust/)
 [![Multi-Cloud](https://img.shields.io/badge/multi--cloud-AWS%20%7C%20Azure%20%7C%20GCP-blue)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo)
 [![Monitoring](https://img.shields.io/badge/monitoring-Datadog-purple?logo=datadog)](https://www.datadoghq.com/)
@@ -313,8 +311,8 @@ This includes:
    <img src="docs/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
 
 2. **Configure Private Routes**:
-   - **Azure WARP Connector**: Add route for `azure_address_prefixes` variable (e.g., 192.168.71.0/24)
-   - **GCP WARP Connector**: Add route for `gcp_ip_cidr_warp` variable (e.g., 10.156.85.0/24)
+   - **Azure WARP Connector**: Add route for `azure_subnet_cidr` variable (e.g., 192.168.71.0/24)
+   - **GCP WARP Connector**: Add route for `gcp_warp_cidr` variable (e.g., 10.156.85.0/24)
 
    <img src="docs/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
    <img src="docs/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
