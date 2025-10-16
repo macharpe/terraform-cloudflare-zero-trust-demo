@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.1] - 2025-10-16
+
+### Changed
+
+- **Cloudflare Provider Upgrade**: Updated Cloudflare Terraform provider from v5.8.0 to v5.10.0
+  - Updated `provider.tf` (root module) with new version constraint `~> 5.10.0`
+  - Updated `modules/cloudflare/provider.tf` with new version constraint `~> 5.10.0`
+  - Leverages latest features, bug fixes, and performance improvements from Cloudflare provider
+  - Maintains backward compatibility (minor version upgrade within v5.x series)
+
 ## [2.9.0] - 2025-10-13
 
 ### Added
