@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.2] - 2025-11-25
+
+### Added
+
+- **S3 Backend Documentation**: Added comprehensive section documenting the required S3 backend infrastructure
+  - Links to the [cloudflare-zero-trust-demo-backend](https://github.com/macharpe/cloudflare-zero-trust-demo-backend) repository
+  - Documents S3 bucket, DynamoDB table, and IAM policies requirements
+  - Provides step-by-step setup instructions for new deployments
+  - Added Table of Contents entry for the new section
+
+### Changed
+
+- **Azure CLI Installation**: Added macOS installation command (`brew install azure-cli`) to Required Tools section
+
 ## [2.9.1] - 2025-10-16
 
 ### Changed
