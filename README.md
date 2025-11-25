@@ -22,6 +22,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 - [📊 Project Statistics](#-project-statistics)
 - [📚 Background Reading](#-background-reading)
 - [📋 Prerequisites](#-prerequisites)
+  - [S3 Backend Infrastructure (Required)](#s3-backend-infrastructure-required)
 - [🛠️ Step-by-Step Setup](#️-step-by-step-setup)
   - [1. Clone and Initialize](#1-clone-and-initialize)
   - [2. Configure Cloudflare API Token Permissions](#2-configure-cloudflare-api-token-permissions)
@@ -221,9 +222,27 @@ Before deploying this infrastructure, ensure you have the following accounts and
 
 - **Terraform** >= 1.12.0
 - **AWS CLI** configured with credentials
-- **Azure CLI** configured with subscription
+- **Azure CLI** configured with subscription (`brew install azure-cli` on macOS)
 - **Google Cloud SDK** with service account
 - **Git** for version control
+
+### S3 Backend Infrastructure (Required)
+
+This project uses an S3 backend with DynamoDB for Terraform state management. **You must deploy the backend infrastructure before cloning and initializing this repository.**
+
+**Backend Repository**: [cloudflare-zero-trust-demo-backend](https://github.com/macharpe/cloudflare-zero-trust-demo-backend)
+
+The backend infrastructure includes:
+- **S3 Bucket**: Stores Terraform state files with versioning and encryption
+- **DynamoDB Table**: Provides state locking to prevent concurrent modifications
+- **IAM Policies**: Secure access controls for state management
+
+**Setup Steps:**
+1. Clone the backend repository: `git clone https://github.com/macharpe/cloudflare-zero-trust-demo-backend`
+2. Follow the setup instructions in the backend repository README
+3. Deploy the S3 + DynamoDB infrastructure with `terraform apply`
+4. Note the S3 bucket name and DynamoDB table name from the outputs
+5. Return to this repository and configure `backend.conf` with those values (see [Step 6](#6-configure-backend-first-time-setup))
 
 ## 🛠️ Step-by-Step Setup
 
