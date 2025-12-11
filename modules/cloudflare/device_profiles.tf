@@ -147,7 +147,7 @@ locals {
       name        = "Zero-Trust demo VMs (Ubuntu and Windows 11)"
       description = "This profile is for my VMs for my zero-trust demo"
       precedence  = local.device_precedence.vm
-      match       = "any(identity.saml_attributes[*] in {\"groups=${var.okta_infra_admin_saml_group_name}\"}) or any(identity.saml_attributes[*] in {\"groups=${var.okta_contractors_saml_group_name}\"}) or identity.email matches \"${var.cf_email_domain}\""
+      match       = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\"}) or any(identity.groups.name[*] in {\"${var.okta_contractors_group_name}\"}) or identity.email matches \"${var.cf_email_domain}\""
       support_url = "Zero-TrustDemo-VMProfile"
     }
     warp_connector = {

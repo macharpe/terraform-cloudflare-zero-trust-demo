@@ -121,9 +121,14 @@ locals {
   })
 
   # Common scheduling for preemptible instances
+  # COMMENTED OUT - preemptible causing issues, using standard instead
+  # preemptible_scheduling = {
+  #   preemptible       = true
+  #   automatic_restart = false
+  # }
   preemptible_scheduling = {
-    preemptible       = true
-    automatic_restart = false
+    preemptible       = false
+    automatic_restart = true
   }
 
   # Common scheduling for standard instances

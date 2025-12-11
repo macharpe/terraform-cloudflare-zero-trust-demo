@@ -511,8 +511,8 @@ variable "cf_target_rdp_name" {
 # CLOUDFLARE IDENTITY PROVIDERS
 #======================================================
 
-variable "cf_okta_identity_provider_id" {
-  description = "Okta Identity Provider ID in Cloudflare"
+variable "cf_okta_new_identity_provider_id" {
+  description = "Okta Identity Provider ID in Cloudflare (OIDC)"
   type        = string
   sensitive   = true
 }
@@ -608,31 +608,29 @@ variable "cf_warp_cgnat_cidr" {
 # OKTA CONFIGURATION
 #======================================================
 
-# Okta Group IDs (only used variables retained)
-
-# Okta SAML Group Names
-variable "okta_infra_admin_saml_group_name" {
-  description = "SAML Group name for InfrastructureAdmin group"
+# Okta Group Names (OIDC)
+variable "okta_infra_admin_group_name" {
+  description = "Okta group name for InfrastructureAdmin"
   type        = string
 }
 
-variable "okta_contractors_saml_group_name" {
-  description = "SAML Group name for Contractors group"
+variable "okta_contractors_group_name" {
+  description = "Okta group name for Contractors"
   type        = string
 }
 
-variable "okta_sales_eng_saml_group_name" {
-  description = "SAML Group name for SalesEngineering group"
+variable "okta_sales_eng_group_name" {
+  description = "Okta group name for SalesEngineering"
   type        = string
 }
 
-variable "okta_sales_saml_group_name" {
-  description = "SAML Group name for Sales group"
+variable "okta_sales_group_name" {
+  description = "Okta group name for Sales"
   type        = string
 }
 
-variable "okta_itadmin_saml_group_name" {
-  description = "SAML Group name for ITAdmin group"
+variable "okta_itadmin_group_name" {
+  description = "Okta group name for ITAdmin"
   type        = string
 }
 
@@ -688,6 +686,40 @@ variable "cf_warp_tunnel_gcp_id" {
 }
 
 #======================================================
+# DLP PROFILE IDS (AI Prompt Controls)
+#======================================================
+
+variable "cf_dlp_profile_ai_prompt_ai_security" {
+  description = "DLP Profile ID for AI Security detection in AI prompts"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_dlp_profile_ai_prompt_ai_customer" {
+  description = "DLP Profile ID for AI Customer data detection in AI prompts"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_dlp_profile_ai_prompt_financial_information" {
+  description = "DLP Profile ID for Financial Information detection in AI prompts"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_dlp_profile_ai_prompt_pii" {
+  description = "DLP Profile ID for PII detection in AI prompts"
+  type        = string
+  sensitive   = true
+}
+
+variable "cf_dlp_profile_ai_prompt_technical" {
+  description = "DLP Profile ID for Technical data detection in AI prompts"
+  type        = string
+  sensitive   = true
+}
+
+#======================================================
 # TAGS
 #======================================================
 
@@ -699,4 +731,74 @@ variable "cf_aws_tag" {
 variable "cf_cloudflare_tag" {
   description = "tag name to be assigned to cloudflare zero trust access applications"
   type        = string
+}
+
+#======================================================
+# LOAD BALANCING DEMO CONFIGURATION
+#======================================================
+# These variables control the Load Balancing demo feature
+# which creates VMs in AWS, GCP, and Azure connected via
+# Cloudflare tunnels to demonstrate load balancing.
+
+variable "lb_demo_enabled" {
+  description = "Enable/Disable the Load Balancing demo infrastructure"
+  type        = bool
+  default     = false
+}
+
+# VM Names
+variable "lb_aws_vm_name" {
+  description = "Name of the AWS EC2 instance for LB demo (DC1)"
+  type        = string
+  default     = "cloudflare-lb-demo-dc1-aws"
+}
+
+variable "lb_gcp_vm_name" {
+  description = "Name of the GCP Compute instance for LB demo (On-Prem)"
+  type        = string
+  default     = "cloudflare-lb-demo-onprem-gcp"
+}
+
+variable "lb_azure_vm_name" {
+  description = "Name of the Azure VM for LB demo (DR)"
+  type        = string
+  default     = "cloudflare-lb-demo-dr-azure"
+}
+
+# Tunnel Names
+variable "lb_tunnel_name_aws" {
+  description = "Name of the Cloudflare tunnel for AWS LB demo"
+  type        = string
+  default     = "Tunnel LB AWS - DC1"
+}
+
+variable "lb_tunnel_name_gcp" {
+  description = "Name of the Cloudflare tunnel for GCP LB demo"
+  type        = string
+  default     = "Tunnel LB GCP - onprem"
+}
+
+variable "lb_tunnel_name_azure" {
+  description = "Name of the Cloudflare tunnel for Azure LB demo"
+  type        = string
+  default     = "Tunnel LB Azure - DR"
+}
+
+# Web Server Configuration
+variable "lb_web_port" {
+  description = "Port for the web server on LB demo VMs"
+  type        = number
+  default     = 80
+}
+
+variable "lb_subdomain" {
+  description = "Subdomain for the load balancer (e.g., 'roger' for roger.example.com)"
+  type        = string
+  default     = "roger"
+}
+
+variable "cf_domain" {
+  description = "Domain name for Cloudflare DNS records (e.g., macharpe.com)"
+  type        = string
+  default     = ""
 }

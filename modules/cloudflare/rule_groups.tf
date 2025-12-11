@@ -2,13 +2,13 @@
 # Local Variables
 #==========================================================
 locals {
-  # SAML groups from Okta
-  saml_groups = {
-    contractors          = var.okta_contractors_saml_group_name
-    infrastructure_admin = var.okta_infra_admin_saml_group_name
-    sales_engineering    = var.okta_sales_eng_saml_group_name
-    sales                = var.okta_sales_saml_group_name
-    it_admin             = var.okta_itadmin_saml_group_name
+  # OIDC groups from Okta tenant
+  okta_oidc_groups = {
+    contractors          = var.okta_contractors_group_name
+    infrastructure_admin = var.okta_infra_admin_group_name
+    sales_engineering    = var.okta_sales_eng_group_name
+    sales                = var.okta_sales_group_name
+    it_admin             = var.okta_itadmin_group_name
   }
 
   # Azure AD groups
@@ -31,18 +31,17 @@ locals {
 }
 
 #==================================================
-# SAML Rule Groups
+# Okta Rule Groups (using native Okta integration)
 #===================================================
 resource "cloudflare_zero_trust_access_group" "saml_groups" {
-  for_each   = local.saml_groups
+  for_each   = local.okta_oidc_groups
   account_id = var.cloudflare_account_id
   name       = each.value
 
   include = [{
-    saml = {
-      identity_provider_id = var.cf_okta_identity_provider_id
-      attribute_name       = "groups"
-      attribute_value      = each.value
+    okta = {
+      identity_provider_id = var.cf_okta_new_identity_provider_id
+      name                 = each.value
     }
   }]
 }

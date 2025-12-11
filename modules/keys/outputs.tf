@@ -171,3 +171,21 @@ output "azure_key_paths" {
   value       = local.azure_key_paths
   sensitive   = false
 }
+
+#======================================
+# Output: LB Demo key pairs
+#======================================
+output "aws_lb_demo_public_key" {
+  description = "SSH public key for AWS LB Demo instance"
+  value       = var.lb_demo_enabled ? tls_private_key.ssh_keys["lb_aws"].public_key_openssh : null
+}
+
+output "gcp_lb_demo_public_key" {
+  description = "SSH public key for GCP LB Demo instance"
+  value       = var.lb_demo_enabled ? tls_private_key.ssh_keys["lb_gcp"].public_key_openssh : null
+}
+
+output "azure_lb_demo_public_key" {
+  description = "SSH public key for Azure LB Demo instance"
+  value       = var.lb_demo_enabled ? tls_private_key.ssh_keys["lb_azure"].public_key_openssh : null
+}

@@ -17,7 +17,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_ssh_infra" {
   account_id                   = var.cloudflare_account_id
   type                         = "infrastructure"
   name                         = var.cf_infra_app_name
-  logo_url                     = "https://upload.wikimedia.org/wikipedia/commons/0/01/Google-cloud-platform.svg"
+  logo_url                     = "https://pub-ff52653899f447f999d673ac6de72bb4.r2.dev/gcp-ssh-infrastructure.svg"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
   custom_deny_url              = "https://denied.macharpe.com/"
   custom_non_identity_deny_url = "https://denied.macharpe.com/"
@@ -34,23 +34,21 @@ resource "cloudflare_zero_trust_access_application" "cf_app_ssh_infra" {
     name     = "SSH GCP Infrastructure Policy"
     decision = "allow"
 
-    allowed_idps                = [var.cf_okta_identity_provider_id]
+    allowed_idps                = [var.cf_okta_new_identity_provider_id]
     auto_redirect_to_identity   = true
     allow_authenticate_via_warp = false
 
     include = [
       {
-        saml = {
-          identity_provider_id = var.cf_okta_identity_provider_id
-          attribute_name       = "groups"
-          attribute_value      = var.okta_infra_admin_saml_group_name
+        okta = {
+          identity_provider_id = var.cf_okta_new_identity_provider_id
+          name                 = var.okta_infra_admin_group_name
         }
       },
       {
-        saml = {
-          identity_provider_id = var.cf_okta_identity_provider_id
-          attribute_name       = "groups"
-          attribute_value      = var.okta_contractors_saml_group_name
+        okta = {
+          identity_provider_id = var.cf_okta_new_identity_provider_id
+          name                 = var.okta_contractors_group_name
         }
       },
       {
@@ -101,7 +99,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_ssh_browser" {
   type                         = "ssh"
   name                         = var.cf_browser_ssh_app_name
   app_launcher_visible         = true
-  logo_url                     = "https://cdn.iconscout.com/icon/free/png-256/free-database-icon-download-in-svg-png-gif-file-formats--ui-elements-pack-user-interface-icons-444649.png"
+  logo_url                     = "https://pub-ff52653899f447f999d673ac6de72bb4.r2.dev/aws-ssh-browser-db-server.png"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
   session_duration             = "0s"
   custom_deny_url              = "https://denied.macharpe.com/"
@@ -112,7 +110,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_ssh_browser" {
     uri  = var.cf_subdomain_ssh
   }]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_otp_identity_provider_id]
+  allowed_idps                = [var.cf_okta_new_identity_provider_id, var.cf_otp_identity_provider_id]
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
@@ -135,7 +133,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_vnc_browser" {
   type                         = "vnc"
   name                         = var.cf_browser_vnc_app_name
   app_launcher_visible         = true
-  logo_url                     = "https://blog.zwindler.fr/2015/07/vnc.png"
+  logo_url                     = "https://pub-ff52653899f447f999d673ac6de72bb4.r2.dev/aws-vnc-postgresdb-admin.png"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
   session_duration             = "0s"
   custom_deny_url              = "https://denied.macharpe.com/"
@@ -146,7 +144,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_vnc_browser" {
     uri  = var.cf_subdomain_vnc
   }]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id, var.cf_otp_identity_provider_id]
+  allowed_idps                = [var.cf_okta_new_identity_provider_id, var.cf_otp_identity_provider_id]
   auto_redirect_to_identity   = false
   allow_authenticate_via_warp = false
 
@@ -166,7 +164,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_web_competition" {
   type                         = "self_hosted"
   name                         = var.cf_sensitive_web_app_name
   app_launcher_visible         = true
-  logo_url                     = "https://img.freepik.com/free-vector/trophy_78370-345.jpg"
+  logo_url                     = "https://pub-ff52653899f447f999d673ac6de72bb4.r2.dev/gcp-competition-app.jpg"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
   session_duration             = "0s"
   custom_deny_url              = "https://denied.macharpe.com/"
@@ -177,7 +175,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_web_competition" {
     uri  = var.cf_subdomain_web_sensitive
   }]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id]
+  allowed_idps                = [var.cf_okta_new_identity_provider_id]
   auto_redirect_to_identity   = true
   allow_authenticate_via_warp = false
 
@@ -198,7 +196,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_web_intranet" {
   type                         = "self_hosted"
   name                         = var.cf_intranet_web_app_name
   app_launcher_visible         = true
-  logo_url                     = "https://raw.githubusercontent.com/uditkumar489/Icon-pack/master/Entrepreneur/digital-marketing/svg/computer-1.svg"
+  logo_url                     = "https://pub-ff52653899f447f999d673ac6de72bb4.r2.dev/gcp-macharpe-intranet.svg"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
   session_duration             = "0s"
   custom_deny_url              = "https://denied.macharpe.com/"
@@ -209,7 +207,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_web_intranet" {
     uri  = var.cf_subdomain_web
   }]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id]
+  allowed_idps                = [var.cf_okta_new_identity_provider_id]
   auto_redirect_to_identity   = true
   allow_authenticate_via_warp = false
 
@@ -240,7 +238,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_rdp_domain" {
   type                         = "rdp"
   name                         = var.cf_browser_rdp_app_name
   app_launcher_visible         = true
-  logo_url                     = "https://www.kevinsubileau.fr/wp-content/uploads/2016/05/RDP_icon.png"
+  logo_url                     = "https://pub-ff52653899f447f999d673ac6de72bb4.r2.dev/domain-controller-rdp.png"
   tags                         = [cloudflare_zero_trust_access_tag.zero_trust_demo_tag.name]
   session_duration             = "0s"
   custom_deny_url              = "https://denied.macharpe.com/"
@@ -259,7 +257,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_rdp_domain" {
   }]
 
   # Identity provider settings
-  allowed_idps               = [var.cf_okta_identity_provider_id]
+  allowed_idps               = [var.cf_okta_new_identity_provider_id]
   auto_redirect_to_identity  = true
   enable_binding_cookie      = false
   http_only_cookie_attribute = false

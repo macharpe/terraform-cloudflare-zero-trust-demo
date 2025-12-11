@@ -61,7 +61,28 @@ locals {
         identifier  = i
         name_prefix = "azure_ssh_key_pair_${i}"
       }
-    }
+    },
+    # LB Demo keys (conditionally created)
+    var.lb_demo_enabled ? {
+      "lb_aws" = {
+        type        = "lb_demo"
+        cloud       = "aws"
+        identifier  = "lb_aws"
+        name_prefix = "aws_lb_demo_key_pair"
+      }
+      "lb_gcp" = {
+        type        = "lb_demo"
+        cloud       = "gcp"
+        identifier  = "lb_gcp"
+        name_prefix = "gcp_lb_demo_key_pair"
+      }
+      "lb_azure" = {
+        type        = "lb_demo"
+        cloud       = "azure"
+        identifier  = "lb_azure"
+        name_prefix = "azure_lb_demo_key_pair"
+      }
+    } : {}
   )
 }
 

@@ -2,7 +2,7 @@
 # Local Variables
 #==========================================================
 locals {
-  # Group mapping for policies (supports both SAML and composite groups)
+  # Group mapping for policies (supports both OIDC and composite groups)
   policy_groups = {
     # Composite groups
     employees   = cloudflare_zero_trust_access_group.employees_rule_group.id
@@ -10,7 +10,7 @@ locals {
     admins      = cloudflare_zero_trust_access_group.admins_rule_group.id
     contractors = cloudflare_zero_trust_access_group.contractors_rule_group.id
 
-    # Individual SAML groups
+    # Individual Okta OIDC groups (migrated from SAML)
     infrastructure_admin = cloudflare_zero_trust_access_group.saml_groups["infrastructure_admin"].id
     sales_engineering    = cloudflare_zero_trust_access_group.saml_groups["sales_engineering"].id
     sales                = cloudflare_zero_trust_access_group.saml_groups["sales"].id
@@ -139,7 +139,7 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
     # Login method (for specific policies)
     try(each.value.require_login_method, false) ? [{
       login_method = {
-        id = var.cf_okta_identity_provider_id
+        id = var.cf_okta_new_identity_provider_id
       }
     }] : [],
     # Country requirements

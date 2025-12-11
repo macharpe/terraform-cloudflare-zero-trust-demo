@@ -88,7 +88,7 @@ resource "cloudflare_zero_trust_access_application" "cf_app_training_portal" {
     }
   ]
 
-  allowed_idps                = [var.cf_okta_identity_provider_id]
+  allowed_idps                = [var.cf_okta_new_identity_provider_id]
   auto_redirect_to_identity   = true
   allow_authenticate_via_warp = false
 

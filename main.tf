@@ -64,6 +64,7 @@ module "ssh_keys" {
   aws_cloudflared_count = var.aws_cloudflared_count
   azure_vm_count        = var.azure_vm_count
   gcp_vm_count          = var.gcp_vm_count
+  lb_demo_enabled       = var.lb_demo_enabled
 }
 
 module "cloudflare" {
@@ -99,12 +100,12 @@ module "cloudflare" {
   cf_target_ssh_name = var.cf_target_ssh_name
   cf_target_rdp_name = var.cf_target_rdp_name
 
-  # SAML OKTA
-  okta_infra_admin_saml_group_name = var.okta_infra_admin_saml_group_name
-  okta_contractors_saml_group_name = var.okta_contractors_saml_group_name
-  okta_sales_eng_saml_group_name   = var.okta_sales_eng_saml_group_name
-  okta_itadmin_saml_group_name     = var.okta_itadmin_saml_group_name
-  okta_sales_saml_group_name       = var.okta_sales_saml_group_name
+  # Okta OIDC
+  okta_infra_admin_group_name = var.okta_infra_admin_group_name
+  okta_contractors_group_name = var.okta_contractors_group_name
+  okta_sales_eng_group_name   = var.okta_sales_eng_group_name
+  okta_itadmin_group_name     = var.okta_itadmin_group_name
+  okta_sales_group_name       = var.okta_sales_group_name
 
   okta_bob_user_login      = var.okta_bob_user_login
   okta_matthieu_user_login = var.okta_matthieu_user_login
@@ -138,8 +139,8 @@ module "cloudflare" {
   cf_macos_posture_id           = var.cf_macos_posture_id
   cf_windows_posture_id         = var.cf_windows_posture_id
   cf_linux_posture_id           = var.cf_linux_posture_id
-  cf_okta_identity_provider_id  = var.cf_okta_identity_provider_id
-  cf_otp_identity_provider_id   = var.cf_otp_identity_provider_id
+  cf_okta_new_identity_provider_id = var.cf_okta_new_identity_provider_id
+  cf_otp_identity_provider_id      = var.cf_otp_identity_provider_id
   cf_azure_identity_provider_id = var.cf_azure_identity_provider_id
   cf_azure_admin_rule_group_id  = var.cf_azure_admin_rule_group_id
 
@@ -156,6 +157,22 @@ module "cloudflare" {
 
   # Tags
   cf_cloudflare_tag = var.cf_cloudflare_tag
+
+  # DLP Profiles (AI Prompt Controls)
+  cf_dlp_profile_ai_prompt_ai_security           = var.cf_dlp_profile_ai_prompt_ai_security
+  cf_dlp_profile_ai_prompt_ai_customer           = var.cf_dlp_profile_ai_prompt_ai_customer
+  cf_dlp_profile_ai_prompt_financial_information = var.cf_dlp_profile_ai_prompt_financial_information
+  cf_dlp_profile_ai_prompt_pii                   = var.cf_dlp_profile_ai_prompt_pii
+  cf_dlp_profile_ai_prompt_technical             = var.cf_dlp_profile_ai_prompt_technical
+
+  # Load Balancing Demo
+  lb_demo_enabled      = var.lb_demo_enabled
+  lb_tunnel_name_aws   = var.lb_tunnel_name_aws
+  lb_tunnel_name_gcp   = var.lb_tunnel_name_gcp
+  lb_tunnel_name_azure = var.lb_tunnel_name_azure
+  lb_web_port          = var.lb_web_port
+  lb_subdomain         = var.lb_subdomain
+  cf_domain            = var.cf_domain
 
   # variable name defined in module == var.variable name defined in variables in main folder
 }

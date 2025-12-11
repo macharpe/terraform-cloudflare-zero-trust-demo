@@ -105,3 +105,31 @@ output "training_status_admin_portal_aud" {
   description = "Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS_APP_AUD in your worker"
   value       = module.cloudflare.training_status_admin_portal_aud
 }
+
+# Load Balanced Instances
+output "load_balanced_instances" {
+  description = "Load Balanced demo instances across all cloud providers"
+  value = var.lb_demo_enabled ? tolist([
+    {
+      provider    = "AWS"
+      name        = aws_instance.aws_vm_lb_demo[0].tags["Name"]
+      internal_ip = aws_instance.aws_vm_lb_demo[0].private_ip
+      public_ip   = aws_eip.nat_eip.public_ip
+      ssh         = "ssh ${var.aws_vm_default_user}@${aws_instance.aws_vm_lb_demo[0].private_ip} -i modules/keys/out/aws_lb_demo_key_pair -o IdentitiesOnly=yes"
+    },
+    {
+      provider    = "GCP"
+      name        = google_compute_instance.gcp_vm_lb_demo[0].name
+      internal_ip = google_compute_instance.gcp_vm_lb_demo[0].network_interface[0].network_ip
+      public_ip   = google_compute_address.cloud_nat_ip.address
+      ssh         = "ssh ${var.gcp_vm_default_user}@${google_compute_instance.gcp_vm_lb_demo[0].network_interface[0].network_ip} -i modules/keys/out/gcp_lb_demo_key_pair -o IdentitiesOnly=yes"
+    },
+    {
+      provider    = "Azure"
+      name        = azurerm_linux_virtual_machine.azure_vm_lb_demo[0].name
+      internal_ip = azurerm_linux_virtual_machine.azure_vm_lb_demo[0].private_ip_address
+      public_ip   = azurerm_public_ip.nat_gateway_public_ip.ip_address
+      ssh         = "ssh ${var.azure_vm_admin_username}@${azurerm_linux_virtual_machine.azure_vm_lb_demo[0].private_ip_address} -i modules/keys/out/azure_lb_demo_key_pair -o IdentitiesOnly=yes"
+    }
+  ]) : []
+}

@@ -125,20 +125,20 @@ _Last Updated: 27th of September 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Deployed Resources**: 168 resources *(in Terraform state)*
-- **Resource Definitions**: 94 resources *(in .tf files)*
+- **Total Deployed Resources**: 186 resources *(in Terraform state)*
+- **Resource Definitions**: 105 resources *(in .tf files)*
 - **Module Directories**: 5 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| Terraform (.tf) | 34 | ~5200 | Infrastructure as Code |
-| Documentation (.md) | 11 | ~2700 | Project documentation |
+| Terraform (.tf) | 38 | ~5800 | Infrastructure as Code |
+| Documentation (.md) | 10 | ~2700 | Project documentation |
 | Scripts (.sh) | 4 | ~500 | Cleanup & maintenance |
-| HTML (.html) | 3 | ~1100 | Demo applications |
+| HTML (.html) | 4 | ~1500 | Demo applications |
+| Templates (.tfpl, .tpl, .cmd) | 3 | ~500 | Cloud-init & startup scripts |
 | Python (.py) | 2 | ~300 | WARP routing utilities |
-| Templates (.tfpl, .tpl, .cmd) | 2 | ~400 | Cloud-init & startup scripts |
-| **Total Core Code** | **56** | **~10200** | **Production-ready infrastructure** |
+| **Total Core Code** | **61** | **~11300** | **Production-ready infrastructure** |
 
 <table>
 <tr>
@@ -146,8 +146,8 @@ _Last Updated: 27th of September 2025_
 
 **📁 Infrastructure Resources** *(via terraform state)*
 
-- **168** total resources deployed
-- **94** resource definitions in code
+- **186** total resources deployed
+- **105** resource definitions in code
 - **33** Terraform files
 - **5** custom modules
 - **Multi-provider** architecture

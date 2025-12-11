@@ -17,3 +17,9 @@ variable "gcp_vm_count" {
   description = "number of vm not running cloudflared"
   type        = number
 }
+
+variable "lb_demo_enabled" {
+  description = "Enable Load Balancing demo SSH keys"
+  type        = bool
+  default     = false
+}

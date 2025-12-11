@@ -256,3 +256,24 @@ output "training_status_admin_portal_aud" {
   EOT
   value       = cloudflare_zero_trust_access_application.cf_app_training_portal.aud
 }
+
+#======================================================
+# Load Balancing Demo Tunnel Tokens
+#======================================================
+output "lb_aws_tunnel_token" {
+  description = "Cloudflared tunnel token for AWS LB Demo (DC1)"
+  value       = var.lb_demo_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.lb_tunnel_tokens["lb_aws_dc1"].token : null
+  sensitive   = true
+}
+
+output "lb_gcp_tunnel_token" {
+  description = "Cloudflared tunnel token for GCP LB Demo (On-Prem)"
+  value       = var.lb_demo_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.lb_tunnel_tokens["lb_gcp_onprem"].token : null
+  sensitive   = true
+}
+
+output "lb_azure_tunnel_token" {
+  description = "Cloudflared tunnel token for Azure LB Demo (DR)"
+  value       = var.lb_demo_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.lb_tunnel_tokens["lb_azure_dr"].token : null
+  sensitive   = true
+}

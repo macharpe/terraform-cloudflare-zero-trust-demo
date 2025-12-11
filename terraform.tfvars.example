@@ -136,7 +136,7 @@ cf_intranet_app_port    = 8181
 cf_domain_controller_rdp_port = 3389
 
 # Identity Providers - Sensitive: manually retrieved from Cloudflare dashboard
-cf_okta_identity_provider_id  = "8fd4786e-97d7-4257-********"
+cf_okta_new_identity_provider_id = "ddbfa126-c93e-4b03-********"
 cf_otp_identity_provider_id   = "a6dfbf35-0e20-4244-********"
 cf_azure_identity_provider_id = "8c593fe8-aee3-4075-********"
 cf_azure_admin_rule_group_id  = "5f253130-a400-4215-********"
@@ -147,7 +147,14 @@ cf_macos_posture_id   = "6d64ff80-1308-4462-********"
 cf_ios_posture_id     = "56454654-1245-8564-********"
 cf_windows_posture_id = "67b05735-3b9b-4bcc-********"
 cf_linux_posture_id   = "ed5639c7-3305-4a91-********"
-cf_device_os                   = "mac"                              # Options: "linux", "windows", "mac"
+cf_device_os          = "mac"  # Options: "linux", "windows", "mac"
+
+# DLP Profiles (AI Prompt Controls) - Sensitive: manually retrieved from Cloudflare dashboard
+cf_dlp_profile_ai_prompt_ai_security           = "a0cabf16-7491-4c9a-********"
+cf_dlp_profile_ai_prompt_ai_customer           = "0ec8551b-e278-45a0-********"
+cf_dlp_profile_ai_prompt_financial_information = "bdf84737-5046-46c7-********"
+cf_dlp_profile_ai_prompt_pii                   = "8c426a20-34fb-4fdc-********"
+cf_dlp_profile_ai_prompt_technical             = "90a1626d-556f-416f-********"
 
 # WARP CGNAT Routes
 cf_custom_cgnat_routes = [
@@ -173,14 +180,12 @@ cf_warp_cgnat_cidr = "100.96.0.0/12"
 # Okta
 #=====================================
 
-# SAML Group IDs - Unused variables removed
-
-# SAML Group names
-okta_sales_eng_saml_group_name   = "SalesEngineering"
-okta_itadmin_saml_group_name     = "ITAdmin"
-okta_sales_saml_group_name       = "Sales"
-okta_contractors_saml_group_name = "Contractors"
-okta_infra_admin_saml_group_name = "InfrastructureAdmin"
+# Okta Group Names (OIDC)
+okta_sales_eng_group_name   = "SalesEngineering"
+okta_itadmin_group_name     = "ITAdmin"
+okta_sales_group_name       = "Sales"
+okta_contractors_group_name = "Contractors"
+okta_infra_admin_group_name = "InfrastructureAdmin"
 
 # User IDs - Unused variables removed
 
@@ -202,3 +207,24 @@ datadog_region = "datadoghq.eu"
 #=====================================
 cf_aws_tag        = "Dev"  # Must be: Dev, Stage, or Prod (for Infracost compliance)
 cf_cloudflare_tag = "ZeroTrustDemo"
+
+
+#=====================================
+# Load Balancing Demo (Optional)
+#=====================================
+# Set lb_demo_enabled = true to create 2 additional VMs (AWS DC1, GCP On-Prem)
+# connected via cloudflared tunnels for load balancing demonstration.
+# Public website: roger.macharpe.com (no WARP required)
+
+lb_demo_enabled      = false  # Set to true to enable the load balancing demo
+lb_subdomain         = "roger"
+cf_domain            = "macharpe.com"
+lb_web_port          = 80
+
+# VM Names
+lb_aws_vm_name       = "cloudflare-lb-demo-dc1-aws"
+lb_gcp_vm_name       = "cloudflare-lb-demo-onprem-gcp"
+
+# Tunnel Names
+lb_tunnel_name_aws   = "Tunnel LB AWS - DC1"
+lb_tunnel_name_gcp   = "Tunnel LB GCP - onprem"
