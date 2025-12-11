@@ -655,35 +655,44 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 |------|------|
 | [aws_eip.nat_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_instance.aws_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_instance.aws_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_instance.aws_vm_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_instance.aws_vm_vnc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_internet_gateway.igw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_key_pair.aws_ec2_cloudflared_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_key_pair.aws_ec2_service_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_key_pair.aws_ec2_vnc_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
+| [aws_key_pair.aws_lb_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_nat_gateway.nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
 | [aws_route_table.private_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.public_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_security_group.aws_sg_cloudflared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.aws_sg_lb_demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.aws_sg_ssh](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.aws_sg_vnc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_subnet.aws_subnet_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.aws_subnet_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.aws_vpc_main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
+| [azurerm_linux_virtual_machine.azure_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
 | [azurerm_linux_virtual_machine.azure_vm_linux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
 | [azurerm_nat_gateway.cloudflare_natgw](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway) | resource |
 | [azurerm_nat_gateway_public_ip_association.natgw_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway_public_ip_association) | resource |
+| [azurerm_network_interface.lb_demo_nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
 | [azurerm_network_interface.nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface_security_group_association.lb_demo_nsg_assoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
 | [azurerm_network_interface_security_group_association.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
 | [azurerm_network_security_group.azure_nsg_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.lb_demo_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_public_ip.nat_gateway_public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_resource_group.cloudflare_rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_route_table.cloudflare_route_table_warp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
+| [azurerm_subnet.azure_subnet_lb_demo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.azure_subnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.cloudflare_natgw_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_nat_gateway_association.lb_demo_natgw_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
 | [azurerm_subnet_route_table_association.azure_subnet_route_assoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_virtual_network.azure_vnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [google_compute_address.cloud_nat_ip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
@@ -692,7 +701,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | [google_compute_firewall.gcp_fw_ingress_icmp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_firewall.gcp_fw_ingress_ssh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_firewall.gcp_fw_ingress_ssh_deny](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.gcp_fw_lb_demo_http](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_instance.gcp_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
+| [google_compute_instance.gcp_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance.gcp_vm_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance.gcp_vm_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_network.gcp_vpc_main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
@@ -763,6 +774,12 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_custom_cgnat_routes"></a> [cf\_custom\_cgnat\_routes](#input\_cf\_custom\_cgnat\_routes) | List of custom CGNAT routes to add to the device profile | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_cf_default_cgnat_routes"></a> [cf\_default\_cgnat\_routes](#input\_cf\_default\_cgnat\_routes) | default cgnat routes | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "address": "100.64.0.0/10",<br/>    "description": "Default CGNAT Range"<br/>  }<br/>]</pre> | no |
 | <a name="input_cf_device_os"></a> [cf\_device\_os](#input\_cf\_device\_os) | This is the OS you are running on your own client machine | `string` | n/a | yes |
+| <a name="input_cf_dlp_profile_ai_prompt_ai_customer"></a> [cf\_dlp\_profile\_ai\_prompt\_ai\_customer](#input\_cf\_dlp\_profile\_ai\_prompt\_ai\_customer) | DLP Profile ID for AI Customer data detection in AI prompts | `string` | n/a | yes |
+| <a name="input_cf_dlp_profile_ai_prompt_ai_security"></a> [cf\_dlp\_profile\_ai\_prompt\_ai\_security](#input\_cf\_dlp\_profile\_ai\_prompt\_ai\_security) | DLP Profile ID for AI Security detection in AI prompts | `string` | n/a | yes |
+| <a name="input_cf_dlp_profile_ai_prompt_financial_information"></a> [cf\_dlp\_profile\_ai\_prompt\_financial\_information](#input\_cf\_dlp\_profile\_ai\_prompt\_financial\_information) | DLP Profile ID for Financial Information detection in AI prompts | `string` | n/a | yes |
+| <a name="input_cf_dlp_profile_ai_prompt_pii"></a> [cf\_dlp\_profile\_ai\_prompt\_pii](#input\_cf\_dlp\_profile\_ai\_prompt\_pii) | DLP Profile ID for PII detection in AI prompts | `string` | n/a | yes |
+| <a name="input_cf_dlp_profile_ai_prompt_technical"></a> [cf\_dlp\_profile\_ai\_prompt\_technical](#input\_cf\_dlp\_profile\_ai\_prompt\_technical) | DLP Profile ID for Technical data detection in AI prompts | `string` | n/a | yes |
+| <a name="input_cf_domain"></a> [cf\_domain](#input\_cf\_domain) | Domain name for Cloudflare DNS records (e.g., macharpe.com) | `string` | `""` | no |
 | <a name="input_cf_domain_controller_rdp_port"></a> [cf\_domain\_controller\_rdp\_port](#input\_cf\_domain\_controller\_rdp\_port) | Port for the Domain Controller RDP in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_email_domain"></a> [cf\_email\_domain](#input\_cf\_email\_domain) | Email Domain used for email authentication in App policies | `string` | n/a | yes |
 | <a name="input_cf_gateway_posture_id"></a> [cf\_gateway\_posture\_id](#input\_cf\_gateway\_posture\_id) | Gateway posture ID in Cloudflare | `string` | n/a | yes |
@@ -772,7 +789,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_ios_posture_id"></a> [cf\_ios\_posture\_id](#input\_cf\_ios\_posture\_id) | Latest iOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_okta_identity_provider_id"></a> [cf\_okta\_identity\_provider\_id](#input\_cf\_okta\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_okta_new_identity_provider_id"></a> [cf\_okta\_new\_identity\_provider\_id](#input\_cf\_okta\_new\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare (OIDC) | `string` | n/a | yes |
 | <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |
@@ -817,14 +834,23 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_windows_rdp_cidr"></a> [gcp\_windows\_rdp\_cidr](#input\_gcp\_windows\_rdp\_cidr) | CIDR Range for GCP VMs running cloudflared, Windows and RDP Server | `string` | n/a | yes |
 | <a name="input_gcp_windows_rdp_vm_name"></a> [gcp\_windows\_rdp\_vm\_name](#input\_gcp\_windows\_rdp\_vm\_name) | Name for the VM instance running cloudflared and Windows RDP Server on GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_user_name"></a> [gcp\_windows\_user\_name](#input\_gcp\_windows\_user\_name) | vm user name for GCP Windows VM | `string` | n/a | yes |
+| <a name="input_lb_aws_vm_name"></a> [lb\_aws\_vm\_name](#input\_lb\_aws\_vm\_name) | Name of the AWS EC2 instance for LB demo (DC1) | `string` | `"cloudflare-lb-demo-dc1-aws"` | no |
+| <a name="input_lb_azure_vm_name"></a> [lb\_azure\_vm\_name](#input\_lb\_azure\_vm\_name) | Name of the Azure VM for LB demo (DR) | `string` | `"cloudflare-lb-demo-dr-azure"` | no |
+| <a name="input_lb_demo_enabled"></a> [lb\_demo\_enabled](#input\_lb\_demo\_enabled) | Enable/Disable the Load Balancing demo infrastructure | `bool` | `false` | no |
+| <a name="input_lb_gcp_vm_name"></a> [lb\_gcp\_vm\_name](#input\_lb\_gcp\_vm\_name) | Name of the GCP Compute instance for LB demo (On-Prem) | `string` | `"cloudflare-lb-demo-onprem-gcp"` | no |
+| <a name="input_lb_subdomain"></a> [lb\_subdomain](#input\_lb\_subdomain) | Subdomain for the load balancer (e.g., 'roger' for roger.example.com) | `string` | `"roger"` | no |
+| <a name="input_lb_tunnel_name_aws"></a> [lb\_tunnel\_name\_aws](#input\_lb\_tunnel\_name\_aws) | Name of the Cloudflare tunnel for AWS LB demo | `string` | `"Tunnel LB AWS - DC1"` | no |
+| <a name="input_lb_tunnel_name_azure"></a> [lb\_tunnel\_name\_azure](#input\_lb\_tunnel\_name\_azure) | Name of the Cloudflare tunnel for Azure LB demo | `string` | `"Tunnel LB Azure - DR"` | no |
+| <a name="input_lb_tunnel_name_gcp"></a> [lb\_tunnel\_name\_gcp](#input\_lb\_tunnel\_name\_gcp) | Name of the Cloudflare tunnel for GCP LB demo | `string` | `"Tunnel LB GCP - onprem"` | no |
+| <a name="input_lb_web_port"></a> [lb\_web\_port](#input\_lb\_web\_port) | Port for the web server on LB demo VMs | `number` | `80` | no |
 | <a name="input_okta_bob_user_linux_password"></a> [okta\_bob\_user\_linux\_password](#input\_okta\_bob\_user\_linux\_password) | Linux password for user bob in EC2 instance | `string` | n/a | yes |
 | <a name="input_okta_bob_user_login"></a> [okta\_bob\_user\_login](#input\_okta\_bob\_user\_login) | User login for bob, in an email format | `string` | n/a | yes |
-| <a name="input_okta_contractors_saml_group_name"></a> [okta\_contractors\_saml\_group\_name](#input\_okta\_contractors\_saml\_group\_name) | SAML Group name for Contractors group | `string` | n/a | yes |
-| <a name="input_okta_infra_admin_saml_group_name"></a> [okta\_infra\_admin\_saml\_group\_name](#input\_okta\_infra\_admin\_saml\_group\_name) | SAML Group name for InfrastructureAdmin group | `string` | n/a | yes |
-| <a name="input_okta_itadmin_saml_group_name"></a> [okta\_itadmin\_saml\_group\_name](#input\_okta\_itadmin\_saml\_group\_name) | SAML Group name for ITAdmin group | `string` | n/a | yes |
+| <a name="input_okta_contractors_group_name"></a> [okta\_contractors\_group\_name](#input\_okta\_contractors\_group\_name) | Okta group name for Contractors | `string` | n/a | yes |
+| <a name="input_okta_infra_admin_group_name"></a> [okta\_infra\_admin\_group\_name](#input\_okta\_infra\_admin\_group\_name) | Okta group name for InfrastructureAdmin | `string` | n/a | yes |
+| <a name="input_okta_itadmin_group_name"></a> [okta\_itadmin\_group\_name](#input\_okta\_itadmin\_group\_name) | Okta group name for ITAdmin | `string` | n/a | yes |
 | <a name="input_okta_matthieu_user_login"></a> [okta\_matthieu\_user\_login](#input\_okta\_matthieu\_user\_login) | User login for matthieu, in an email format | `string` | n/a | yes |
-| <a name="input_okta_sales_eng_saml_group_name"></a> [okta\_sales\_eng\_saml\_group\_name](#input\_okta\_sales\_eng\_saml\_group\_name) | SAML Group name for SalesEngineering group | `string` | n/a | yes |
-| <a name="input_okta_sales_saml_group_name"></a> [okta\_sales\_saml\_group\_name](#input\_okta\_sales\_saml\_group\_name) | SAML Group name for Sales group | `string` | n/a | yes |
+| <a name="input_okta_sales_eng_group_name"></a> [okta\_sales\_eng\_group\_name](#input\_okta\_sales\_eng\_group\_name) | Okta group name for SalesEngineering | `string` | n/a | yes |
+| <a name="input_okta_sales_group_name"></a> [okta\_sales\_group\_name](#input\_okta\_sales\_group\_name) | Okta group name for Sales | `string` | n/a | yes |
 
 ## Outputs
 
@@ -833,6 +859,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="output_aws_ec2_instances"></a> [aws\_ec2\_instances](#output\_aws\_ec2\_instances) | AWS instance details |
 | <a name="output_azure_vms"></a> [azure\_vms](#output\_azure\_vms) | Azure instance details |
 | <a name="output_gcp_compute_instances"></a> [gcp\_compute\_instances](#output\_gcp\_compute\_instances) | GCP instance details |
+| <a name="output_load_balanced_instances"></a> [load\_balanced\_instances](#output\_load\_balanced\_instances) | Load Balanced demo instances across all cloud providers |
 | <a name="output_my_ip"></a> [my\_ip](#output\_my\_ip) | This is your Public IP |
 | <a name="output_ssh_for_infrastructure_access"></a> [ssh\_for\_infrastructure\_access](#output\_ssh\_for\_infrastructure\_access) | SSH with Access for Infrastructure command |
 | <a name="output_training_status_admin_portal_aud"></a> [training\_status\_admin\_portal\_aud](#output\_training\_status\_admin\_portal\_aud) | Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS\_APP\_AUD in your worker |
