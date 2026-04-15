@@ -620,10 +620,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.40 |
 | <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.4 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
-| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.12.0 |
+| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.18.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.4 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
@@ -634,10 +634,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.40 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | ~> 3.4 |
 | <a name="provider_null"></a> [null](#provider\_null) | ~> 3.2 |
 
 ## Modules
@@ -718,7 +717,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | [google_compute_subnetwork.gcp_subnet_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [null_resource.cleanup_devices](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.cleanup_known_hosts](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [http_http.my_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
 
@@ -860,7 +858,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="output_azure_vms"></a> [azure\_vms](#output\_azure\_vms) | Azure instance details |
 | <a name="output_gcp_compute_instances"></a> [gcp\_compute\_instances](#output\_gcp\_compute\_instances) | GCP instance details |
 | <a name="output_load_balanced_instances"></a> [load\_balanced\_instances](#output\_load\_balanced\_instances) | Load Balanced demo instances across all cloud providers |
-| <a name="output_my_ip"></a> [my\_ip](#output\_my\_ip) | This is your Public IP |
 | <a name="output_ssh_for_infrastructure_access"></a> [ssh\_for\_infrastructure\_access](#output\_ssh\_for\_infrastructure\_access) | SSH with Access for Infrastructure command |
 | <a name="output_training_status_admin_portal_aud"></a> [training\_status\_admin\_portal\_aud](#output\_training\_status\_admin\_portal\_aud) | Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS\_APP\_AUD in your worker |
 <!-- END_TF_DOCS -->
