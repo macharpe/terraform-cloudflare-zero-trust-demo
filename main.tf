@@ -54,10 +54,6 @@ resource "null_resource" "cleanup_devices" {
 #==========================================
 # main.tf
 #==========================================
-data "http" "my_ip" {
-  url = "https://4.ident.me/"
-}
-
 module "ssh_keys" {
   source                = "./modules/keys"
   gcp_users             = toset(var.gcp_users)

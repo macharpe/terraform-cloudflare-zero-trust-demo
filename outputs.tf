@@ -1,11 +1,3 @@
-# My IP
-output "my_ip" {
-  description = "This is your Public IP"
-  value = {
-    IPv4 = data.http.my_ip.response_body
-  }
-}
-
 # GCP
 output "gcp_compute_instances" {
   description = "GCP instance details"

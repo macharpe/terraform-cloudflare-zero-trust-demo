@@ -236,7 +236,7 @@ locals {
       action               = "redirect"
       precedence           = local.precedence.redirect_ai_tools
       filters              = ["http"]
-      traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Artificial Intelligence"]}}) and any(app.statuses[*] == \"unapproved\")"
+      traffic              = "any(http.request.uri.content_category[*] in {${local.subcategory_ids["Artificial Intelligence"]}}) and any(app.statuses[*] == \"unapproved\")"
       redirect_url         = "https://claude.ai"
       notification_enabled = false
     }
