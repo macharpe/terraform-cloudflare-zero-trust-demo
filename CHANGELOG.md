@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-04-15
+
+### Changed
+
+- **Provider Upgrades**: Upgraded all Terraform providers to latest stable versions
+  - `cloudflare/cloudflare`: 5.12.0 → 5.18.0
+  - `hashicorp/aws`: 6.21.0 → 6.40.0 (constraint updated to `~> 6.40`)
+  - `hashicorp/azuread`: 3.6.0 → 3.8.0 (constraint updated to `~> 3.8`)
+  - `hashicorp/azurerm`: 4.53.0 → 4.68.0
+  - `hashicorp/google`: 7.11.0 → 7.27.0
+  - `hashicorp/local`: 2.6.1 → 2.8.0
+  - `hashicorp/random`: 3.7.2 → 3.8.1 (constraint updated to `~> 3.8`)
+  - `hashicorp/tls`: 4.1.0 → 4.2.1
+
+### Fixed
+
+- **Gateway Policy**: Fix AI tools redirect rule to use `subcategory_ids` instead of `category_ids` for the Artificial Intelligence category
+
 ## [2.9.2] - 2025-11-25
 
 ### Added
