@@ -621,13 +621,13 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.40 |
-| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.4 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.8 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
 | <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.18.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.4 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.8 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4.0 |
 
 ## Providers
