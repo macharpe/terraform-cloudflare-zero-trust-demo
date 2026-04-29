@@ -91,6 +91,9 @@ module "cloudflare" {
   cf_subdomain_web_sensitive   = var.cf_subdomain_web_sensitive
   cf_subdomain_rdp             = var.cf_subdomain_rdp
   cf_subdomain_training_status = var.cf_subdomain_training_status
+  cf_subdomain_rbi_warning     = var.cf_subdomain_rbi_warning
+  cf_rbi_warning_worker_url    = var.cf_rbi_warning_worker_url
+  cf_rbi_source_cidr           = var.cf_rbi_source_cidr
 
   # Targets
   cf_target_ssh_name = var.cf_target_ssh_name

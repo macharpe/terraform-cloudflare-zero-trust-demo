@@ -440,6 +440,27 @@ variable "cf_subdomain_training_status" {
   type        = string
 }
 
+variable "cf_subdomain_rbi_warning" {
+  description = "Subdomain for the Warning-to-RBI Worker (OPTIONAL: only needed if using the RBI audit portal in access_applications_optional.tf)"
+  type        = string
+  default     = ""
+}
+
+#======================================================
+# WARNING-TO-RBI WORKER
+#======================================================
+variable "cf_rbi_warning_worker_url" {
+  description = "Full URL of the Warning-to-RBI Worker warn endpoint"
+  type        = string
+  default     = "https://warning-to-rbi.macharpe.com/warn"
+}
+
+variable "cf_rbi_source_cidr" {
+  description = "Source IP CIDR for Clientless RBI egress (used in HTTP allow exception — http.conn.src_ip[*] selector)"
+  type        = string
+  default     = "198.41.211.0/24"
+}
+
 #======================================================
 # CLOUDFLARE ACCESS APPLICATION CONFIGURATION
 #======================================================

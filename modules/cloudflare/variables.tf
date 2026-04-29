@@ -138,6 +138,12 @@ variable "cf_subdomain_training_status" {
   type        = string
 }
 
+variable "cf_subdomain_rbi_warning" {
+  description = "Subdomain for the Warning-to-RBI Worker (OPTIONAL: only needed if using the RBI audit portal in access_applications_optional.tf). Example: warning-to-rbi.macharpe.com"
+  type        = string
+  default     = ""
+}
+
 #======================================================
 # ACCESS APPLICATION CONFIGURATION
 #======================================================
@@ -447,6 +453,21 @@ variable "cf_dlp_profile_ai_prompt_technical" {
   description = "DLP Profile ID for Technical data detection in AI prompts"
   type        = string
   sensitive   = true
+}
+
+#======================================================
+# WARNING-TO-RBI WORKER
+#======================================================
+variable "cf_rbi_warning_worker_url" {
+  description = "Full URL of the Warning-to-RBI Worker warn endpoint (e.g. https://warning-to-rbi.macharpe.com/warn)"
+  type        = string
+  default     = "https://warning-to-rbi.macharpe.com/warn"
+}
+
+variable "cf_rbi_source_cidr" {
+  description = "Source IP CIDR for Clientless RBI egress traffic. Used in the HTTP allow exception policy to prevent double-isolation loops. The correct HTTP-layer selector is http.conn.src_ip[*] (not net.src.ip which is L4-only). Cloudflare's current RBI egress range is 198.41.211.0/24."
+  type        = string
+  default     = "198.41.211.0/24"
 }
 
 #======================================================

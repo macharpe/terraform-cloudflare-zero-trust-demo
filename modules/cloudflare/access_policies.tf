@@ -11,10 +11,10 @@ locals {
     contractors = cloudflare_zero_trust_access_group.contractors_rule_group.id
 
     # Individual Okta OIDC groups (migrated from SAML)
-    infrastructure_admin = cloudflare_zero_trust_access_group.saml_groups["infrastructure_admin"].id
-    sales_engineering    = cloudflare_zero_trust_access_group.saml_groups["sales_engineering"].id
-    sales                = cloudflare_zero_trust_access_group.saml_groups["sales"].id
-    it_admin             = cloudflare_zero_trust_access_group.saml_groups["it_admin"].id
+    infrastructure_admin = cloudflare_zero_trust_access_group.okta_oidc_groups["infrastructure_admin"].id
+    sales_engineering    = cloudflare_zero_trust_access_group.okta_oidc_groups["sales_engineering"].id
+    sales                = cloudflare_zero_trust_access_group.okta_oidc_groups["sales"].id
+    it_admin             = cloudflare_zero_trust_access_group.okta_oidc_groups["it_admin"].id
   }
 
   # Common access policy configurations
@@ -177,7 +177,7 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
     cloudflare_zero_trust_access_group.sales_team_rule_group,
     cloudflare_zero_trust_access_group.admins_rule_group,
     cloudflare_zero_trust_access_group.contractors_rule_group,
-    cloudflare_zero_trust_access_group.saml_groups
+    cloudflare_zero_trust_access_group.okta_oidc_groups
   ]
 
   # Note: lifecycle blocks cannot be conditional in for_each resources

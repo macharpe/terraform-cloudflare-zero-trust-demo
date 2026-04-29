@@ -18,6 +18,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 - [🔧 Integration with Cloudflare Workers (Optional)](#-integration-with-cloudflare-workers-optional)
   - [Training Status Admin Portal](#training-status-admin-portal)
   - [Access Denied Info Page](#access-denied-info-page)
+  - [Warning-to-RBI Worker](#warning-to-rbi-worker)
 - [🏗️ Architecture Overview](#️-architecture-overview)
 - [📊 Project Statistics](#-project-statistics)
 - [📚 Background Reading](#-background-reading)
@@ -45,17 +46,20 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 
 - **Multi-Cloud Architecture**: Seamless integration across AWS, Azure, and GCP
 - **Zero Trust Security**: Complete implementation of Cloudflare's SASE platform
-- **Identity Integration**: Support for Okta, Azure AD, and custom identity providers
+- **Identity Integration**: Support for Okta OIDC, Azure AD, and custom identity providers
 - **Advanced Networking**: WARP Connector tunnels and private network routing
 - **Infrastructure as Code**: Fully automated with Terraform
-- **Real-World Use Cases**: Browser rendering, RDP access, infrastructure management, and external validation for training compliance
+- **Real-World Use Cases**: Browser rendering, RDP access, infrastructure management, external training compliance validation, and Warning-to-RBI pattern
+- **Warning-to-RBI Pattern**: Gateway redirect policy + Cloudflare Worker warning page + Clientless RBI with enforced controls (no print, copy, download)
+- **Remote Browser Isolation**: Clientless RBI with Gateway isolate policies — disables printing, copy/paste, and file downloads in the remote browser session
+- **KV Audit Logging**: Workers KV audit trail of every user proceed action through the RBI warning page
 - **Automated Cleanup**: Built-in scripts for environment management
 - **Device Posture Checks**: OS version compliance and security validation
 - **Policy-Based Access**: Role-based access control with comprehensive policies
 
 ## 🔧 Integration with Cloudflare Workers (Optional)
 
-This demo environment includes **two optional components** that integrate with Cloudflare Workers and can be enabled based on your specific requirements:
+This demo environment includes **three optional components** that integrate with Cloudflare Workers and can be enabled based on your specific requirements:
 
 ### Training Status Admin Portal
 
@@ -111,6 +115,53 @@ An optional custom Access-denied-info-page that provides users with detailed inf
 > **⚠️ Important Notes:**
 > - If you don't want to use the custom Access denied page, you must remove the `custom_deny_url` and `custom_non_identity_deny_url` parameters from every access application in `modules/cloudflare/access_applications.tf`
 > - Repository: [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page)
+
+### Warning-to-RBI Worker
+
+A Cloudflare Worker that implements the **Warning-to-RBI pattern**: when an employee accesses a gambling-category website, instead of a hard block, they see a warning page. If they choose to proceed, the site opens exclusively in **Clientless Remote Browser Isolation (RBI)** — active content never runs on their device.
+
+- **Worker repo**: `/Users/mcharpentier/Documents/2-github/cf-workers-projects/cf-warning-to-rbi/`
+- **Deployed at**: `warning-to-rbi.macharpe.com`
+- **File**: `modules/cloudflare/access_applications_optional.tf`
+- **Features**:
+  - Warning page with CF Workers Design System + Kumo UI (light/dark mode, moon/sun toggle)
+  - Gateway HTTP redirect policy with policy context (`cf_site_uri`, `cf_user_email`, `cf_request_categories`)
+  - KV audit log of every proceed action (email, blocked URL, category, timestamp) — 30-day retention
+  - `/admin` dashboard protected by Cloudflare Access (admins group + MFA) showing audit log entries
+  - RBI allow exception (`http.conn.src_ip in {198.41.211.0/24}`) prevents double-isolation loop
+  - Gateway **Isolate** policy disables printing, copy/paste, and file downloads inside the RBI session
+  - Contractors receive a hard block (no warning page, no RBI option)
+
+#### Gateway Policy Order
+
+| Precedence | Policy | Action | Who |
+|---|---|---|---|
+| 38300 | `HTTP-Isolate: Gambling — Disable Print, Copy & Download` | Isolate | Employees |
+| 38400 | `HTTP-Allow: RBI Clientless Browser Egress Exception` | Allow | Employees (from RBI IPs) |
+| 38800 | `HTTP-Redirect: Gambling → Warning Worker` | Redirect | Employees |
+| 39200 | `HTTP-Block: Gambling — Contractors Default Deny` | Block | Contractors |
+
+#### Worker Setup
+
+1. Deploy the KV namespace and Access policy via Terraform:
+   ```bash
+   terraform apply
+   ```
+2. Create the KV namespace via Wrangler (managed separately from Terraform):
+   ```bash
+   cd /Users/mcharpentier/Documents/2-github/cf-workers-projects/cf-warning-to-rbi
+   wrangler kv namespace create "rbi-warning-audit-log"
+   ```
+3. Paste the KV namespace ID into `wrangler.jsonc` under `kv_namespaces[].id`, then deploy:
+   ```bash
+   wrangler deploy
+   ```
+4. In the Cloudflare dashboard:
+   - **Zero Trust → Browser Isolation → Browser Isolation Settings**: enable Clientless RBI
+   - Attach `Warning-to-RBI Audit Log Admin Policy` to remote browser permissions
+   - **Security → WAF → Custom rules**: add a skip rule for `http.host eq "warning-to-rbi.macharpe.com"` to prevent WAF blocking Gateway redirect parameters
+
+> **Source**: Based on internal wiki pattern by Daisuke Doi. See `0-documentation/5-Roadmap/8-RBI/` for full implementation spec and technical guide.
 
 ## 🏗️ Architecture Overview
 
@@ -400,7 +451,7 @@ cf_gateway_posture_id = "your_gateway_posture_id"
 cf_macos_posture_id   = "your_macos_posture_id"
 cf_windows_posture_id = "your_windows_posture_id"
 
-# SAML Group IDs - Sensitive: manually retrieved from Okta
+# Okta OIDC Group Names - manually retrieved from Okta
 okta_infra_admin_group_id = "your_infra_admin_group_id"
 okta_contractors_group_id = "your_contractors_group_id"
 ```
@@ -601,6 +652,25 @@ Planned enhancements and features:
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
 - **Post-Quantum Cryptography**: Implementation of [post-quantum algorithms](https://blog.cloudflare.com/post-quantum-zero-trust/) for future-proof encryption and Zero Trust communications
+- **Warning-to-RBI `/admin` dashboard**: Worker-side `/admin` route for the RBI audit log (already deployed — see `cf-warning-to-rbi/`)
+- **Native RBI Traffic Selector**: When Cloudflare adds `Traffic Origin = Browser Isolation`, replace the current `http.conn.src_ip` allow exception with a cleaner policy
+
+## 📝 Recent Changes
+
+### v2.11.0 — Warning-to-RBI Pattern + OIDC rename (2026-04-29)
+
+**New: Warning-to-RBI pattern**
+- Added Gateway redirect policy (`HTTP-Redirect: Gambling → Warning Worker`) — sends employees to a warning page before proceeding to Clientless RBI
+- Added Gateway isolate policy (`HTTP-Isolate: Gambling — Disable Print, Copy & Download`) — disables printing, copy/paste, and file downloads in the RBI session
+- Added Gateway allow exception (`HTTP-Allow: RBI Clientless Browser Egress Exception`) — uses `http.conn.src_ip` (HTTP-layer selector) to prevent double-isolation loop
+- Added hard-block policy for contractors (`HTTP-Block: Gambling — Contractors Default Deny`)
+- Added `cf_app_rbi_audit_portal` Access application protecting `warning-to-rbi.macharpe.com/admin` (admins group + MFA)
+- Added `workers-kv-rbi` Workers KV namespace for audit logging (managed via Wrangler, not Terraform)
+- New variables: `cf_rbi_warning_worker_url`, `cf_rbi_source_cidr`, `cf_subdomain_rbi_warning`
+
+**Fix: SAML → OIDC resource rename**
+- Renamed `cloudflare_zero_trust_access_group.saml_groups` → `okta_oidc_groups` with `moved` blocks (no destroy/recreate) — the Okta integration uses OIDC, not SAML
+- Added `modules/cloudflare/moved.tf` with 5 moved blocks for clean state rename
 
 ## 🤝 Contributing
 

@@ -117,6 +117,8 @@ cf_subdomain_web            = "intranet.example.com"
 cf_subdomain_rdp            = "rdp.example.com"
 cf_subdomain_web_sensitive  = "competition.example.com"
 cf_subdomain_training_status = "training-status.example.com"  # OPTIONAL: Only needed if using optional-cloudflare-apps.tf and Training Compliance Gateway
+cf_subdomain_rbi_warning     = "warning-to-rbi.example.com"   # OPTIONAL: Only needed if using the RBI audit portal in access_applications_optional.tf
+cf_rbi_source_cidr           = "198.41.211.0/24"              # Cloudflare Clientless RBI egress CIDR — used in http.conn.src_ip[*] HTTP allow exception
 
 # Targets
 cf_target_ssh_name = "GCP-database"

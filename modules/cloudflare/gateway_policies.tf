@@ -66,8 +66,16 @@ locals {
     # NETWORK (L4) Policies - IP Access Control
     block_ip_access = 38000 # Block direct IP access to apps (force hostname-based access)
 
-    # HTTP (L7) Policies - Content Filtering & DLP
-    block_gambling = 39000 # Block gambling websites (category blocking)
+    # HTTP (L7) Policies - Warning-to-RBI Pattern
+    # Inserted between block_ip_access (38000) and former block_gambling (39000)
+    # Note: net.src.ip is L4-only. The correct HTTP-layer selector is http.conn.src_ip
+    # per https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/
+    # Note: Isolate policies are evaluated first by Gateway (before Allow/Block/Redirect)
+    # regardless of their precedence number relative to other policy types.
+    isolate_gambling_rbi        = 38300 # Isolate gambling sites for employees — disables print, copy & download in RBI session
+    allow_rbi_traffic_exception = 38400 # Allow RBI egress re-evaluation — prevents double-isolation loop
+    redirect_gambling_to_rbi    = 38800 # Redirect employees on gambling sites to Warning Worker
+    block_gambling_contractors  = 39200 # Hard-block gambling for contractors (preserves original behavior)
 
     # HTTP (L7) Policies - AI Application Governance
     # Note: Dashboard Egress rule at 40000
@@ -209,21 +217,83 @@ locals {
     #==========================================================
     # HTTP (L7) POLICIES
     # Application/Content-based filtering
-    # Terraform precedence ranges: 39000-43000
+    # Terraform precedence ranges: 38400-39200 (Warning-to-RBI), 41000-43000 (AI)
     # Dashboard precedence ranges: 13000-19000, 40000 (Egress)
     # Note: Dashboard Do-Not-Inspect policies (13000-15000) evaluated before Terraform HTTP policies
     #==========================================================
 
-    # Content Filtering & DLP (Precedence: 39000)
-    block_gambling = {
-      name                 = "HTTP-Block: Gambling websites [Zero-Trust demo]"
-      description          = "Block Gambling website according to corporate policies (HTTP)."
+    #==========================================================
+    # HTTP (L7) POLICIES - Warning-to-RBI Pattern
+    # Precedence: 38400 (allow RBI exception), 38800 (redirect), 39200 (contractor block)
+    # Reference: 0-documentation/5-Roadmap/8-RBI/IMPL.md
+    #
+    # The allow exception uses http.conn.src_ip — the correct HTTP-layer Source IP
+    # selector — NOT net.src.ip which is L4-only. This matches the pattern recommended
+    # in the internal wiki (Daisuke Doi, page 1396049229).
+    #==========================================================
+
+    # Isolate gambling sites for employees — disables print + copy in RBI session (Precedence: 38300)
+    # Gateway evaluates Isolate policies before Allow/Block/Redirect, so this fires first.
+    # When the user proceeds to RBI via the warning Worker, this policy applies the
+    # biso_admin_controls to the remote browser session — preventing printing and copy/paste.
+    isolate_gambling_rbi = {
+      name                 = "HTTP-Isolate: Gambling — Disable Print, Copy & Download [RBI Warning Pattern]"
+      description          = "Isolate gambling sites for employees accessing via RBI. Disables printing, copy/paste, and file downloads to prevent data exfiltration from the isolated session."
       enabled              = true
-      action               = "block"
-      precedence           = local.precedence.block_gambling
+      action               = "isolate"
+      precedence           = local.precedence.isolate_gambling_rbi
       filters              = ["http"]
       traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
-      identity             = "not(any(identity.groups.name[*] in {\"${var.okta_contractors_group_name}\"})) or not(identity.email == \"${var.okta_bob_user_login}\")"
+      identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
+      notification_enabled = false
+      # biso_admin_controls v1 API: dp = disable printing, dcp = disable copy-paste, dd = disable download
+      # Set to false to DISABLE the capability (counterintuitive but correct per API spec)
+      biso_admin_controls  = {
+        dp  = false  # disable printing
+        dcp = false  # disable copy-paste (remote → local clipboard)
+        dd  = false  # disable download
+      }
+    }
+
+    # Allow RBI egress re-evaluation — prevents double-isolation loop (Precedence: 38400)
+    # http.conn.src_ip is the HTTP-layer Source IP selector (not net.src.ip which is L4-only)
+    allow_rbi_traffic_exception = {
+      name                 = "HTTP-Allow: RBI Clientless Browser Egress Exception [RBI Warning Pattern]"
+      description          = "Allow HTTP traffic from Clientless RBI egress IPs targeting gambling sites. Prevents Gateway from re-matching the redirect policy and creating a double-isolation loop. Uses http.conn.src_ip (HTTP-layer selector) per Cloudflare docs."
+      enabled              = true
+      action               = "allow"
+      precedence           = local.precedence.allow_rbi_traffic_exception
+      filters              = ["http"]
+      traffic              = "http.conn.src_ip in {${var.cf_rbi_source_cidr}} and any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
+      notification_enabled = false
+    }
+
+    # Redirect employees on gambling sites to Warning Worker (Precedence: 38800)
+    redirect_gambling_to_rbi = {
+      name                 = "HTTP-Redirect: Gambling → Warning Worker [RBI Warning Pattern]"
+      description          = "Redirect employees accessing gambling-category sites to the Warning Worker. User is shown a warning page and may proceed to Clientless RBI."
+      enabled              = true
+      action               = "redirect"
+      precedence           = local.precedence.redirect_gambling_to_rbi
+      filters              = ["http"]
+      traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
+      redirect_url         = var.cf_rbi_warning_worker_url
+      include_context      = true
+      notification_enabled = false
+    }
+
+    # Hard-block gambling for contractors — preserves original block_gambling behavior (Precedence: 39200)
+    block_gambling_contractors = {
+      name                 = "HTTP-Block: Gambling — Contractors Default Deny [Zero-Trust demo]"
+      description          = "Hard-block gambling sites for contractors and Bob. Contractors do not receive the RBI warning flow."
+      enabled              = true
+      action               = "block"
+      precedence           = local.precedence.block_gambling_contractors
+      filters              = ["http"]
+      traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      identity             = "any(identity.groups.name[*] in {\"${var.okta_contractors_group_name}\"}) or identity.email == \"${var.okta_bob_user_login}\""
       block_reason         = "This website is blocked according to corporate policies (HTTP)"
       notification_enabled = true
     }
@@ -300,7 +370,7 @@ resource "cloudflare_zero_trust_gateway_policy" "policies" {
       redirect = try(each.value.redirect_url, null) != null ? {
         target_uri              = each.value.redirect_url
         preserve_path_and_query = false
-        include_context         = false
+        include_context         = try(each.value.include_context, false)
       } : null
       gen_ai_prompt_log = try(each.value.gen_ai_prompt_log, null) != null ? {
         enabled = each.value.gen_ai_prompt_log
@@ -310,6 +380,16 @@ resource "cloudflare_zero_trust_gateway_policy" "policies" {
       } : null
       forensic_copy = try(each.value.forensic_copy, null) != null ? {
         enabled = each.value.forensic_copy
+      } : null
+      # biso_admin_controls: only set when policy defines it (isolate action only)
+      # v1 API field names: dp=printing, dcp=copy, dd=download, du=upload, dk=keyboard
+      # false = feature DISABLED, true = feature enabled (default)
+      biso_admin_controls = try(each.value.biso_admin_controls, null) != null ? {
+        dp  = try(each.value.biso_admin_controls.dp,  true)  # printing
+        dcp = try(each.value.biso_admin_controls.dcp, true)  # copy-paste
+        dd  = try(each.value.biso_admin_controls.dd,  true)  # download
+        du  = try(each.value.biso_admin_controls.du,  true)  # upload
+        dk  = try(each.value.biso_admin_controls.dk,  true)  # keyboard
       } : null
     }
   )
