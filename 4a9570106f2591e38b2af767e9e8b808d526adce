@@ -1,0 +1,23 @@
+CHANGELOG.md
+  3990c2326b39e0a8 10-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "4a9570106f2591e38b2af767e9e8b808d526adce",
+  "prompts": {
+    "3990c2326b39e0a8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_22b954e01ffenbhdB0kOu53VIF",
+        "model": "anthropic/claude-sonnet-4-6"
+      },
+      "human_author": "macharpe",
+      "messages": [],
+      "total_additions": 36,
+      "total_deletions": 0,
+      "accepted_lines": 36,
+      "overriden_lines": 0
+    }
+  }
+}
