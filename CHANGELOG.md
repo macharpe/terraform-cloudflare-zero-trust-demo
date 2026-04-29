@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.11.0] - 2026-04-29
+
+### Added
+
+- **Warning-to-RBI Pattern**: Implemented the Warning-to-RBI Gateway pattern based on internal Cloudflare wiki (Daisuke Doi). When employees access gambling-category websites, they see a warning page before proceeding to Clientless Remote Browser Isolation instead of receiving a hard block.
+  - `HTTP-Redirect: Gambling → Warning Worker` (precedence 38800): redirects employees to `warning-to-rbi.macharpe.com/warn` with Gateway policy context (`cf_site_uri`, `cf_user_email`, `cf_request_categories`)
+  - `HTTP-Isolate: Gambling — Disable Print, Copy & Download` (precedence 38300): applies `biso_admin_controls` to the RBI session — disables printing (`dp=false`), copy/paste (`dcp=false`), and file downloads (`dd=false`)
+  - `HTTP-Allow: RBI Clientless Browser Egress Exception` (precedence 38400): uses `http.conn.src_ip in {198.41.211.0/24}` (HTTP-layer selector, not L4) to allow RBI re-evaluation and prevent double-isolation loop
+  - `HTTP-Block: Gambling — Contractors Default Deny` (precedence 39200): contractors receive a hard block with no RBI option (replaces old `block_gambling` policy)
+  - `rule_settings` merge block extended with `biso_admin_controls` support for future isolate policies
+
+- **Warning-to-RBI Audit Log Portal**: Access application protecting `warning-to-rbi.macharpe.com/admin` and `/admin*`
+  - New `rbi_audit_admin_policy`: admins composite group, device posture, MFA required, SMS excluded, 24h session
+  - New `cf_app_rbi_audit_portal`: self-hosted Access app with custom logo, `denied.macharpe.com/` deny URLs, `ZeroTrustDemo` tag
+  - Both resources added to `access_applications_optional.tf` alongside the Training Status Admin Portal
+
+- **Warning-to-RBI Worker** (`cf-warning-to-rbi/`): Cloudflare Worker deployed at `warning-to-rbi.macharpe.com`
+  - `/warn`: warning page with CF Workers Design System + Kumo UI, light/dark mode toggle
+  - `/proceed`: URL normalization, KV audit log write (30-day TTL), redirect to Clientless RBI
+  - `/admin`: audit log dashboard (entry count, unique users, email filter, table view) — Access-protected
+  - KV namespace managed via Wrangler (`wrangler kv namespace create`), not Terraform
+  - See `0-documentation/5-Roadmap/8-RBI/IMPL.md` and `GUIDE.md` for full implementation spec
+
+- **New variables**: `cf_rbi_warning_worker_url`, `cf_rbi_source_cidr` (default: `198.41.211.0/24`), `cf_subdomain_rbi_warning` — wired through module, root, `main.tf`, and `terraform.tfvars.example`
+
+### Changed
+
+- **SAML → OIDC resource rename**: Renamed `cloudflare_zero_trust_access_group.saml_groups` to `okta_oidc_groups` to accurately reflect the Okta OIDC integration (migrated from SAML). Added `modules/cloudflare/moved.tf` with 5 `moved {}` blocks (one per for_each key) — zero destroy/recreate in Cloudflare.
+- **RBI policy identity**: `allow_rbi_traffic_exception` and `redirect_gambling_to_rbi` now use a consolidated `any(identity.groups.name[*] in {...})` expression covering all four employee groups, replacing the previous individual `or` clauses and double-negative contractor exclusion.
+- **`access_applications_optional.tf` header**: Updated to document both optional Worker-backed apps (Training Status + Warning-to-RBI Audit Portal).
+
+### Fixed
+
+- **Gateway HTTP Source IP selector**: Corrected expression from `net.src.ip` (L4-only, causes API error 2091) to `http.conn.src_ip` (HTTP-layer selector) in the RBI allow exception policy.
+- **Gateway redirect parameters**: Worker now reads `cf_site_uri` and `cf_request_categories` (Gateway's actual parameter names) with fallback to `cf_blocked_uri` / `cf_matched_category` for direct/demo calls.
+
 ## [2.10.0] - 2026-04-15
 
 ### Changed
