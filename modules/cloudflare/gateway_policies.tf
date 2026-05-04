@@ -233,25 +233,35 @@ locals {
     #==========================================================
 
     # Isolate gambling sites for employees — disables print + copy in RBI session (Precedence: 38300)
-    # Gateway evaluates Isolate policies before Allow/Block/Redirect, so this fires first.
-    # When the user proceeds to RBI via the warning Worker, this policy applies the
-    # biso_admin_controls to the remote browser session — preventing printing and copy/paste.
+    # IMPORTANT: Gateway evaluates Isolate policies before Allow/Block/Redirect regardless of precedence.
+    # To preserve the Warning Worker flow, this rule MUST be scoped to RBI egress IPs only
+    # (http.conn.src_ip in {cf_rbi_source_cidr}), so it only fires on the second request
+    # (after the user clicked "proceed" on the Warning Worker and was redirected into Clientless RBI).
+    #
+    # Correct flow:
+    #   1. Initial request → Redirect (38800) fires → user sees Warning Worker
+    #   2. User clicks proceed → Warning Worker redirects to Clientless RBI URL
+    #   3. RBI egress IP makes request → Isolate fires (this rule) → biso_admin_controls applied
+    #   4. Allow (38400) prevents re-evaluation loop on subsequent RBI requests
+    #
+    # Without the src_ip constraint, Isolate would fire on the initial request (step 1),
+    # silently bypassing the Warning Worker and sending the user directly into RBI.
     isolate_gambling_rbi = {
       name                 = "HTTP-Isolate: Gambling — Disable Print, Copy & Download [RBI Warning Pattern]"
-      description          = "Isolate gambling sites for employees accessing via RBI. Disables printing, copy/paste, and file downloads to prevent data exfiltration from the isolated session."
+      description          = "Isolate gambling sites when accessed via Clientless RBI egress IPs. Disables printing, copy/paste, and file downloads. Scoped to RBI egress CIDR so the Warning Worker redirect fires first on initial requests."
       enabled              = true
       action               = "isolate"
       precedence           = local.precedence.isolate_gambling_rbi
       filters              = ["http"]
-      traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      traffic              = "http.conn.src_ip in {${var.cf_rbi_source_cidr}} and any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
       identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
       notification_enabled = false
-      # biso_admin_controls v1 API: dp = disable printing, dcp = disable copy-paste, dd = disable download
-      # Set to false to DISABLE the capability (counterintuitive but correct per API spec)
+      # biso_admin_controls v1 API: true = restriction ON (capability disabled), false = restriction OFF (capability enabled)
+      # Counterintuitive: "set to false to ENABLE" per provider schema — so true = DISABLE
       biso_admin_controls  = {
-        dp  = false  # disable printing
-        dcp = false  # disable copy-paste (remote → local clipboard)
-        dd  = false  # disable download
+        dp  = true  # disable printing
+        dcp = true  # disable copy-paste (remote → local clipboard)
+        dd  = true  # disable download
       }
     }
 
