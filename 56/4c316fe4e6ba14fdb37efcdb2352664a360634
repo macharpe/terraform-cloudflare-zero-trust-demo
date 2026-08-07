@@ -1,0 +1,31 @@
+main.tf
+  s_a1152160e9ba0e::t_cbc412515e01a5 15,24,26,28-29,36-37,48,78-79,84,97,197
+modules/cloudflare/gateway_policies.tf
+  s_a1152160e9ba0e::t_b05847d1b4c437 32-34,41-45,72-73,78-80,152,157,163,168,174,179,185,190,196,201,222,228-229,237,251-253,256,258,261-263,265-271,277-279,282,284,289-292,295,297,313-314,325,339,389-391,393-399
+modules/cloudflare/variables.tf
+  s_a1152160e9ba0e::t_a2ea6828ac2925 270-271,317,336,367,370-371,375-376,473-478,484,486
+variables.tf
+  s_a1152160e9ba0e::t_4402d3f0f62f4d 75-76,103-104,114-115,333-334,339,464-469,606,630,702,705-706,710-711
+vm-aws-instance.tf
+  s_a1152160e9ba0e::t_e02ad5c7d548c5 412,414
+vm-azure-lb.tf
+  s_a1152160e9ba0e::t_c30b4c74fb45a4 10,17,69,71,95,97
+vm-gcp-instance.tf
+  s_a1152160e9ba0e::t_379b0eb3fcffae 16-18,76,118,250,252,258-259,265,277-279,282,286,289,298,300-301,305-306,316-317,327-328,353,370,422
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "564c316fe4e6ba14fdb37efcdb2352664a360634",
+  "prompts": {},
+  "sessions": {
+    "s_a1152160e9ba0e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_022cfa54effeb0nk6HL2WdHYb4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "macharpe <macharpe@protonmail.com>"
+    }
+  }
+}
