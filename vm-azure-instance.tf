@@ -34,7 +34,7 @@ resource "azurerm_public_ip" "public_ip" {
   location            = local.azure_common_config.location
   resource_group_name = local.azure_common_config.resource_group_name
   allocation_method   = "Static"
-  domain_name_label   = "${count.index == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${count.index}"
+  domain_name_label   = "${count.index == 0 ? var.azure_mesh_vm_name : var.azure_vm_name}-${count.index}"
 
   tags = local.azure_common_tags
 }
@@ -112,7 +112,7 @@ locals {
 
   # Common user data template variables for Azure
   azure_common_user_data_vars = merge(local.global_monitoring, {
-    warp_tunnel_secret_azure = module.cloudflare.azure_extracted_warp_token
+    mesh_tunnel_secret_azure = module.cloudflare.azure_extracted_mesh_token
     path                     = path.module
   })
 
@@ -144,7 +144,7 @@ locals {
 #==========================================================
 resource "azurerm_linux_virtual_machine" "azure_vm_linux" {
   count               = var.azure_vm_count
-  name                = "${count.index == 0 ? var.azure_warp_vm_name : var.azure_vm_name}-${count.index}"
+  name                = "${count.index == 0 ? var.azure_mesh_vm_name : var.azure_vm_name}-${count.index}"
   resource_group_name = local.azure_common_config.resource_group_name
   location            = local.azure_common_config.location
   size                = var.azure_vm_size
@@ -162,10 +162,10 @@ resource "azurerm_linux_virtual_machine" "azure_vm_linux" {
     public_key = module.ssh_keys.azure_ssh_public_key[count.index]
   }
 
-  # VM index 0 = warp_connector, others = basic
+  # VM index 0 = mesh_connector, others = basic
   custom_data = base64encode(templatefile("${path.module}/scripts/cloud-init/azure-init.tftpl", merge(local.azure_common_user_data_vars, {
-    role     = count.index == 0 ? "warp_connector" : "basic"
-    hostname = count.index == 0 ? "${var.azure_warp_vm_name}-${count.index}" : "${var.azure_vm_name}-${count.index}"
+    role     = count.index == 0 ? "mesh_connector" : "basic"
+    hostname = count.index == 0 ? "${var.azure_mesh_vm_name}-${count.index}" : "${var.azure_vm_name}-${count.index}"
   })))
 
   os_disk {
@@ -192,23 +192,23 @@ resource "azurerm_linux_virtual_machine" "azure_vm_linux" {
 
 
 #==========================================================
-# Routing Setup for WARP Connector
+# Routing Setup for Mesh Connector
 #==========================================================
-resource "azurerm_route_table" "cloudflare_route_table_warp" {
-  name                = "cloudflare-route-table-to-WARP"
+resource "azurerm_route_table" "cloudflare_route_table_mesh" {
+  name                = "cloudflare-route-table-to-Mesh"
   location            = local.azure_common_config.location
   resource_group_name = local.azure_common_config.resource_group_name
 
   route {
-    name                   = "route-to-warp-subnet"
-    address_prefix         = var.cf_warp_cgnat_cidr # WARP subnet CIDR
+    name                   = "route-to-mesh-subnet"
+    address_prefix         = var.cf_warp_cgnat_cidr # WARP CGNAT subnet CIDR
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = azurerm_network_interface.nic[0].private_ip_address
   }
 
   route {
     name                   = "route-to-gcp-subnet"
-    address_prefix         = var.gcp_warp_cidr # GCP subnet CIDR for WARP VM
+    address_prefix         = var.gcp_mesh_cidr # GCP subnet CIDR for Mesh VM
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = azurerm_network_interface.nic[0].private_ip_address
   }
@@ -225,7 +225,7 @@ resource "azurerm_route_table" "cloudflare_route_table_warp" {
 
 resource "azurerm_subnet_route_table_association" "azure_subnet_route_assoc" {
   subnet_id      = azurerm_subnet.azure_subnet_main.id
-  route_table_id = azurerm_route_table.cloudflare_route_table_warp.id
+  route_table_id = azurerm_route_table.cloudflare_route_table_mesh.id
 
 
   depends_on = [azurerm_network_interface.nic] # Wait for NICs to be destroyed first
@@ -266,9 +266,9 @@ resource "azurerm_network_security_group" "azure_nsg_main" {
     destination_address_prefix = "*"
   }
 
-  # Allow ping from Cloudflare WARP CGNAT range
+  # Allow ping from Cloudflare Mesh CGNAT range
   security_rule {
-    name                       = "AllowPingInbound_WARP_client"
+    name                       = "AllowPingInbound_Mesh_client"
     priority                   = 1002
     direction                  = "Inbound"
     access                     = "Allow"
@@ -279,16 +279,16 @@ resource "azurerm_network_security_group" "azure_nsg_main" {
     destination_address_prefix = "*"
   }
 
-  # Allow ping from GCP WARP Subnet
+  # Allow ping from GCP Mesh Subnet
   security_rule {
-    name                       = "AllowPingInbound_GCP_WARP"
+    name                       = "AllowPingInbound_GCP_Mesh"
     priority                   = 1003
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Icmp"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = var.gcp_warp_cidr
+    source_address_prefix      = var.gcp_mesh_cidr
     destination_address_prefix = "*"
   }
 

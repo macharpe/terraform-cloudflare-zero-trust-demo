@@ -7,14 +7,14 @@
 # connected to Cloudflare via a cloudflared tunnel.
 # This instance simulates a "Disaster Recovery" site.
 #
-# Uses a separate subnet with NAT Gateway (no WARP routing interference)
+# Uses a separate subnet with NAT Gateway (no Mesh routing interference)
 # More cost-effective than dedicated Public IP
 #
 # To remove: Delete this file and run terraform apply
 #==========================================================
 
 #==========================================================
-# Separate Subnet for LB Demo (no WARP routing)
+# Separate Subnet for LB Demo (no Mesh routing)
 #==========================================================
 resource "azurerm_subnet" "azure_subnet_lb_demo" {
   count                = var.lb_demo_enabled ? 1 : 0
@@ -66,9 +66,9 @@ resource "azurerm_network_security_group" "lb_demo_nsg" {
   location            = local.azure_common_config.location
   resource_group_name = local.azure_common_config.resource_group_name
 
-  # Allow SSH from WARP CGNAT range (for troubleshooting)
+  # Allow SSH from Mesh CGNAT range (for troubleshooting)
   security_rule {
-    name                       = "AllowSSH_WARP"
+    name                       = "AllowSSH_Mesh"
     priority                   = 1001
     direction                  = "Inbound"
     access                     = "Allow"
@@ -92,9 +92,9 @@ resource "azurerm_network_security_group" "lb_demo_nsg" {
     destination_address_prefix = "*"
   }
 
-  # Allow ICMP (ping) from WARP
+  # Allow ICMP (ping) from Mesh
   security_rule {
-    name                       = "AllowICMP_WARP"
+    name                       = "AllowICMP_Mesh"
     priority                   = 1003
     direction                  = "Inbound"
     access                     = "Allow"

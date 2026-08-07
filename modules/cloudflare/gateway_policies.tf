@@ -29,17 +29,20 @@ locals {
   # Note: No data source available - these are hardcoded by Cloudflare
   # Reference: https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/granular-controls/
   app_ids = {
-    claude  = 2430
-    chatgpt = 1199
+    claude   = 2430
+    chatgpt  = 1199
+    mistral  = 2481 # Mistral AI / Le Chat — confirmed not in any DNI policy
   }
 
   # Application Granular Control IDs
   # Note: No data source available - these are hardcoded by Cloudflare
   # Controls allow fine-grained actions like blocking uploads or prompts
   app_control_ids = {
-    claude_prompt  = 2127 # Block/allow prompts to Claude
-    chatgpt_upload = 1653 # Block/allow file uploads to ChatGPT
-    chatgpt_prompt = 1652 # Block/allow prompts to ChatGPT
+    claude_prompt             = 2127 # Block/allow prompts to Claude (individual control)
+    claude_all_operations     = 2126 # All Claude operations group (Chat, Upload, Share, etc.) — verified from dashboard wirefilter
+    chatgpt_upload            = 1653 # Block/allow file uploads to ChatGPT
+    chatgpt_prompt            = 1652 # Block/allow prompts to ChatGPT (individual control)
+    chatgpt_all_operations    = 1650 # All ChatGPT operations group
   }
 
   # Precedence values - organized by policy type and purpose
@@ -66,16 +69,15 @@ locals {
     # NETWORK (L4) Policies - IP Access Control
     block_ip_access = 38000 # Block direct IP access to apps (force hostname-based access)
 
-    # HTTP (L7) Policies - Warning-to-RBI Pattern
-    # Inserted between block_ip_access (38000) and former block_gambling (39000)
+    # HTTP (L7) Policies - Warning-to-RBI Pattern (Gambling & Mistral AI)
+    # Inserted between block_ip_access (38000) and AI governance policies (41000+)
     # Note: net.src.ip is L4-only. The correct HTTP-layer selector is http.conn.src_ip
     # per https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/
     # Note: Isolate policies are evaluated first by Gateway (before Allow/Block/Redirect)
     # regardless of their precedence number relative to other policy types.
-    isolate_gambling_rbi        = 38300 # Isolate gambling sites for employees — disables print, copy & download in RBI session
-    allow_rbi_traffic_exception = 38400 # Allow RBI egress re-evaluation — prevents double-isolation loop
-    redirect_gambling_to_rbi    = 38800 # Redirect employees on gambling sites to Warning Worker
-    block_gambling_contractors  = 39200 # Hard-block gambling for contractors (preserves original behavior)
+    isolate_rbi_warning_pattern     = 38300 # Isolate gambling & Mistral AI for employees — disables print, copy, upload & download in RBI session
+    allow_rbi_egress_exception      = 38400 # Allow RBI egress re-evaluation — prevents double-isolation loop
+    redirect_to_rbi_warning_worker  = 38800 # Redirect employees on gambling sites and Mistral AI to Warning Worker
 
     # HTTP (L7) Policies - AI Application Governance
     # Note: Dashboard Egress rule at 40000
@@ -147,56 +149,56 @@ locals {
     # Lateral Movement Prevention - East-West Traffic (Precedence: 33000-35600)
     block_lateral_smb = {
       name                 = "NETWORK-Block: SMB Lateral Movement [Zero-Trust demo]"
-      description          = "Block SMB/CIFS connections between internal VMs for lateral movement prevention, while allowing direct SMB from WARP clients"
+      description          = "Block SMB/CIFS connections between internal VMs for lateral movement prevention, while allowing direct SMB from Mesh clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_smb
       filters              = ["l4"]
-      traffic              = "net.dst.port in {445 139} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      traffic              = "net.dst.port in {445 139} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
       block_reason         = "SMB lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_lateral_winrm = {
       name                 = "NETWORK-Block: WinRM Lateral Movement [Zero-Trust demo]"
-      description          = "Block WinRM connections between internal VMs for lateral movement prevention, while allowing direct WinRM from WARP clients"
+      description          = "Block WinRM connections between internal VMs for lateral movement prevention, while allowing direct WinRM from Mesh clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_winrm
       filters              = ["l4"]
-      traffic              = "net.dst.port in {5985 5986} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      traffic              = "net.dst.port in {5985 5986} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
       block_reason         = "WinRM lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_lateral_database = {
       name                 = "NETWORK-Block: Database Lateral Movement [Zero-Trust demo]"
-      description          = "Block database connections between internal VMs for lateral movement prevention, while allowing direct database access from WARP clients"
+      description          = "Block database connections between internal VMs for lateral movement prevention, while allowing direct database access from Mesh clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_database
       filters              = ["l4"]
-      traffic              = "net.dst.port in {3306 5432 1433 1521 27017} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      traffic              = "net.dst.port in {3306 5432 1433 1521 27017} and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
       block_reason         = "Database lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
     block_lateral_ssh = {
       name                 = "NETWORK-Block: SSH Lateral Movement [Zero-Trust demo]"
-      description          = "Block SSH connections between internal VMs for lateral movement prevention, while allowing direct SSH from WARP clients"
+      description          = "Block SSH connections between internal VMs for lateral movement prevention, while allowing direct SSH from Mesh clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_ssh
       filters              = ["l4"]
-      traffic              = "net.dst.port == 22 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      traffic              = "net.dst.port == 22 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
       block_reason         = "SSH lateral movement blocked - use authorized access methods or ensure device compliance"
       notification_enabled = true
     }
     block_lateral_rdp = {
       name                 = "NETWORK-Block: RDP Lateral Movement [Zero-Trust demo]"
-      description          = "Block RDP connections between internal VMs for lateral movement prevention, while allowing direct RDP from WARP clients"
+      description          = "Block RDP connections between internal VMs for lateral movement prevention, while allowing direct RDP from Mesh clients"
       enabled              = true
       action               = "block"
       precedence           = local.precedence.block_lateral_rdp
       filters              = ["l4"]
-      traffic              = "net.dst.port == 3389 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_warp_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
+      traffic              = "net.dst.port == 3389 and net.protocol == \"tcp\" and (net.dst.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and (net.src.ip in {${var.aws_private_cidr} ${var.gcp_infra_cidr} ${var.gcp_windows_rdp_cidr} ${var.gcp_mesh_cidr} ${var.azure_subnet_cidr}}) and not (net.src.ip in {${var.cf_warp_cgnat_cidr}})"
       block_reason         = "RDP lateral movement blocked - use authorized methods"
       notification_enabled = true
     }
@@ -217,14 +219,14 @@ locals {
     #==========================================================
     # HTTP (L7) POLICIES
     # Application/Content-based filtering
-    # Terraform precedence ranges: 38400-39200 (Warning-to-RBI), 41000-43000 (AI)
+    # Terraform precedence ranges: 38300-38800 (Warning-to-RBI), 41000-43000 (AI)
     # Dashboard precedence ranges: 13000-19000, 40000 (Egress)
     # Note: Dashboard Do-Not-Inspect policies (13000-15000) evaluated before Terraform HTTP policies
     #==========================================================
 
     #==========================================================
-    # HTTP (L7) POLICIES - Warning-to-RBI Pattern
-    # Precedence: 38400 (allow RBI exception), 38800 (redirect), 39200 (contractor block)
+    # HTTP (L7) POLICIES - Warning-to-RBI Pattern (Gambling & Mistral AI)
+    # Precedence: 38300 (isolate), 38400 (allow RBI egress exception), 38800 (redirect)
     # Reference: 0-documentation/5-Roadmap/8-RBI/IMPL.md
     #
     # The allow exception uses http.conn.src_ip — the correct HTTP-layer Source IP
@@ -232,7 +234,7 @@ locals {
     # in the internal wiki (Daisuke Doi, page 1396049229).
     #==========================================================
 
-    # Isolate gambling sites for employees — disables print + copy in RBI session (Precedence: 38300)
+    # Isolate gambling sites and Mistral AI for employees — disables print, upload & download; copy is remote-only; keyboard & paste enabled (Precedence: 38300)
     # IMPORTANT: Gateway evaluates Isolate policies before Allow/Block/Redirect regardless of precedence.
     # To preserve the Warning Worker flow, this rule MUST be scoped to RBI egress IPs only
     # (http.conn.src_ip in {cf_rbi_source_cidr}), so it only fires on the second request
@@ -246,66 +248,57 @@ locals {
     #
     # Without the src_ip constraint, Isolate would fire on the initial request (step 1),
     # silently bypassing the Warning Worker and sending the user directly into RBI.
-    isolate_gambling_rbi = {
-      name                 = "HTTP-Isolate: Gambling — Disable Print, Copy & Download [RBI Warning Pattern]"
-      description          = "Isolate gambling sites when accessed via Clientless RBI egress IPs. Disables printing, copy/paste, and file downloads. Scoped to RBI egress CIDR so the Warning Worker redirect fires first on initial requests."
+    isolate_rbi_warning_pattern = {
+      name                 = "HTTP-Isolate: Gambling & Mistral AI — Disable Print, Copy, Upload & Download [RBI Warning Pattern]"
+      description          = "Isolate gambling sites and Mistral AI (Le Chat) when accessed via Clientless RBI egress IPs. Disables printing, copy/paste, file uploads, and file downloads. Keyboard input is preserved to allow interaction with chat interfaces such as Mistral Le Chat. Scoped to RBI egress CIDR so the Warning Worker redirect fires first on initial requests."
       enabled              = true
       action               = "isolate"
-      precedence           = local.precedence.isolate_gambling_rbi
+      precedence           = local.precedence.isolate_rbi_warning_pattern
       filters              = ["http"]
-      traffic              = "http.conn.src_ip in {${var.cf_rbi_source_cidr}} and any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      traffic              = "http.conn.src_ip in {${var.cf_rbi_source_cidr}} and (any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}}) or any(app.ids[*] == ${local.app_ids["mistral"]}))"
       identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
       notification_enabled = false
-      # biso_admin_controls v1 API: true = restriction ON (capability disabled), false = restriction OFF (capability enabled)
-      # Counterintuitive: "set to false to ENABLE" per provider schema — so true = DISABLE
+      # biso_admin_controls v2 API: explicit string values — no inverted boolean logic
+      # copy = "remote_only": users can copy within the RBI session but cannot exfiltrate to local clipboard
+      # paste = "enabled": users can paste queries in (required for chat interfaces like Mistral Le Chat)
       biso_admin_controls  = {
-        dp  = true  # disable printing
-        dcp = true  # disable copy-paste (remote → local clipboard)
-        dd  = true  # disable download
+        version  = "v2"
+        printing = "disabled"
+        copy     = "remote_only" # copy within RBI session allowed; local clipboard exfil blocked
+        paste    = "enabled"     # paste into session allowed — required for chat interfaces
+        download = "disabled"
+        upload   = "disabled"
+        keyboard = "enabled"     # required for chat interfaces (e.g. Mistral Le Chat)
       }
     }
 
     # Allow RBI egress re-evaluation — prevents double-isolation loop (Precedence: 38400)
     # http.conn.src_ip is the HTTP-layer Source IP selector (not net.src.ip which is L4-only)
-    allow_rbi_traffic_exception = {
-      name                 = "HTTP-Allow: RBI Clientless Browser Egress Exception [RBI Warning Pattern]"
-      description          = "Allow HTTP traffic from Clientless RBI egress IPs targeting gambling sites. Prevents Gateway from re-matching the redirect policy and creating a double-isolation loop. Uses http.conn.src_ip (HTTP-layer selector) per Cloudflare docs."
+    allow_rbi_egress_exception = {
+      name                 = "HTTP-Allow: RBI Clientless Browser Egress Exception — Gambling & Mistral AI [RBI Warning Pattern]"
+      description          = "Allow HTTP traffic from Clientless RBI egress IPs targeting gambling sites and Mistral AI. Prevents Gateway from re-matching the redirect policy and creating a double-isolation loop. Uses http.conn.src_ip (HTTP-layer selector) per Cloudflare docs."
       enabled              = true
       action               = "allow"
-      precedence           = local.precedence.allow_rbi_traffic_exception
+      precedence           = local.precedence.allow_rbi_egress_exception
       filters              = ["http"]
-      traffic              = "http.conn.src_ip in {${var.cf_rbi_source_cidr}} and any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      traffic              = "http.conn.src_ip in {${var.cf_rbi_source_cidr}} and (any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}}) or any(app.ids[*] == ${local.app_ids["mistral"]}))"
       identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
       notification_enabled = false
     }
 
-    # Redirect employees on gambling sites to Warning Worker (Precedence: 38800)
-    redirect_gambling_to_rbi = {
-      name                 = "HTTP-Redirect: Gambling → Warning Worker [RBI Warning Pattern]"
-      description          = "Redirect employees accessing gambling-category sites to the Warning Worker. User is shown a warning page and may proceed to Clientless RBI."
+    # Redirect employees on gambling sites and Mistral AI to Warning Worker (Precedence: 38800)
+    redirect_to_rbi_warning_worker = {
+      name                 = "HTTP-Redirect: Gambling & Mistral AI → Warning Worker [RBI Warning Pattern]"
+      description          = "Redirect employees accessing gambling-category sites or Mistral AI (Le Chat) to the Warning Worker. User is shown a warning page and may proceed to Clientless RBI."
       enabled              = true
       action               = "redirect"
-      precedence           = local.precedence.redirect_gambling_to_rbi
+      precedence           = local.precedence.redirect_to_rbi_warning_worker
       filters              = ["http"]
-      traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
+      traffic              = "(any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}}) or any(app.ids[*] == ${local.app_ids["mistral"]}))"
       identity             = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\" \"${var.okta_sales_eng_group_name}\" \"${var.okta_sales_group_name}\" \"${var.okta_itadmin_group_name}\"})"
       redirect_url         = var.cf_rbi_warning_worker_url
       include_context      = true
       notification_enabled = false
-    }
-
-    # Hard-block gambling for contractors — preserves original block_gambling behavior (Precedence: 39200)
-    block_gambling_contractors = {
-      name                 = "HTTP-Block: Gambling — Contractors Default Deny [Zero-Trust demo]"
-      description          = "Hard-block gambling sites for contractors and Bob. Contractors do not receive the RBI warning flow."
-      enabled              = true
-      action               = "block"
-      precedence           = local.precedence.block_gambling_contractors
-      filters              = ["http"]
-      traffic              = "any(http.request.uri.content_category[*] in {${local.category_ids["Gambling"]}})"
-      identity             = "any(identity.groups.name[*] in {\"${var.okta_contractors_group_name}\"}) or identity.email == \"${var.okta_bob_user_login}\""
-      block_reason         = "This website is blocked according to corporate policies (HTTP)"
-      notification_enabled = true
     }
 
     # AI Application Governance (Precedence: 41000-43000)
@@ -317,7 +310,8 @@ locals {
       precedence           = local.precedence.redirect_ai_tools
       filters              = ["http"]
       traffic              = "any(http.request.uri.content_category[*] in {${local.subcategory_ids["Artificial Intelligence"]}}) and any(app.statuses[*] == \"unapproved\")"
-      redirect_url         = "https://claude.ai"
+      redirect_url         = "${var.cf_redirect_ai_worker_url}?targetUrl=https%3A%2F%2Fdeepseek.com"
+      include_context      = true
       notification_enabled = false
     }
 
@@ -328,7 +322,7 @@ locals {
       action               = "block"
       precedence           = local.precedence.block_genai_prompt
       filters              = ["http"]
-      traffic              = "any(app.ids[*] == ${local.app_ids["claude"]}) and any(app_control.controls[*] in {${local.app_control_ids["claude_prompt"]}}) and any(dlp.profiles[*] in {\"${var.cf_dlp_profile_ai_prompt_ai_security}\" \"${var.cf_dlp_profile_ai_prompt_ai_customer}\" \"${var.cf_dlp_profile_ai_prompt_financial_information}\" \"${var.cf_dlp_profile_ai_prompt_pii}\" \"${var.cf_dlp_profile_ai_prompt_technical}\"})"
+      traffic              = "any(app.ids[*] == ${local.app_ids["claude"]}) and (any(app_control.controls[*] in {${local.app_control_ids["claude_prompt"]}}) or any(app_control.operation_groups[*] in {${local.app_control_ids["claude_all_operations"]}})) and any(dlp.profiles[*] in {\"${var.cf_dlp_profile_ai_prompt_ai_security}\" \"${var.cf_dlp_profile_ai_prompt_ai_customer}\" \"${var.cf_dlp_profile_ai_prompt_financial_information}\" \"${var.cf_dlp_profile_ai_prompt_pii}\" \"${var.cf_dlp_profile_ai_prompt_technical}\"})"
       block_reason         = "You cannot send sensitive data to AI applications"
       notification_enabled = true
       notification_msg     = "This action was blocked due to Claude prompt controls"
@@ -342,7 +336,7 @@ locals {
       action               = "allow"
       precedence           = local.precedence.allow_chatgpt_log
       filters              = ["http"]
-      traffic              = "any(app.ids[*] == ${local.app_ids["chatgpt"]}) and any(app_control.controls[*] in {${local.app_control_ids["chatgpt_prompt"]}}) and any(dlp.profiles[*] in {\"${var.cf_dlp_profile_ai_prompt_ai_security}\" \"${var.cf_dlp_profile_ai_prompt_ai_customer}\" \"${var.cf_dlp_profile_ai_prompt_financial_information}\" \"${var.cf_dlp_profile_ai_prompt_pii}\" \"${var.cf_dlp_profile_ai_prompt_technical}\"})"
+      traffic              = "any(app.ids[*] == ${local.app_ids["chatgpt"]}) and (any(app_control.controls[*] in {${local.app_control_ids["chatgpt_prompt"]}}) or any(app_control.operation_groups[*] in {${local.app_control_ids["chatgpt_all_operations"]}})) and any(dlp.profiles[*] in {\"${var.cf_dlp_profile_ai_prompt_ai_security}\" \"${var.cf_dlp_profile_ai_prompt_ai_customer}\" \"${var.cf_dlp_profile_ai_prompt_financial_information}\" \"${var.cf_dlp_profile_ai_prompt_pii}\" \"${var.cf_dlp_profile_ai_prompt_technical}\"})"
       notification_enabled = false
       payload_log          = true
       gen_ai_prompt_log    = true # does not apply in Terraform
@@ -392,14 +386,17 @@ resource "cloudflare_zero_trust_gateway_policy" "policies" {
         enabled = each.value.forensic_copy
       } : null
       # biso_admin_controls: only set when policy defines it (isolate action only)
-      # v1 API field names: dp=printing, dcp=copy, dd=download, du=upload, dk=keyboard
-      # false = feature DISABLED, true = feature enabled (default)
+      # v2 API field names: version, printing, copy, paste, download, upload, keyboard
+      # String values: "enabled" | "disabled" | "remote_only" (copy/paste/download only)
+      # wm_id: optional watermark UUID — omit to disable watermarking
       biso_admin_controls = try(each.value.biso_admin_controls, null) != null ? {
-        dp  = try(each.value.biso_admin_controls.dp,  true)  # printing
-        dcp = try(each.value.biso_admin_controls.dcp, true)  # copy-paste
-        dd  = try(each.value.biso_admin_controls.dd,  true)  # download
-        du  = try(each.value.biso_admin_controls.du,  true)  # upload
-        dk  = try(each.value.biso_admin_controls.dk,  true)  # keyboard
+        version  = try(each.value.biso_admin_controls.version,  "v2")
+        printing = try(each.value.biso_admin_controls.printing, "enabled")
+        copy     = try(each.value.biso_admin_controls.copy,     "enabled")
+        paste    = try(each.value.biso_admin_controls.paste,    "enabled")
+        download = try(each.value.biso_admin_controls.download, "enabled")
+        upload   = try(each.value.biso_admin_controls.upload,   "enabled")
+        keyboard = try(each.value.biso_admin_controls.keyboard, "enabled")
       } : null
     }
   )

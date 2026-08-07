@@ -22,10 +22,10 @@ timedatectl set-timezone Europe/Paris
 apt-get update -y
 apt-get install -y wget traceroute unzip build-essential hping3 net-tools nmap curl gnupg2
 
-if [[ "$ROLE" == "warp_connector" ]]; then
-    echo "Configuring Warp Connector..."
+if [[ "$ROLE" == "mesh_connector" ]]; then
+    echo "Configuring Mesh Connector..."
 
-    # Install WARP
+    # Install Mesh
     curl https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
     apt-get update -y
@@ -35,7 +35,7 @@ if [[ "$ROLE" == "warp_connector" ]]; then
     sysctl -w net.ipv4.ip_forward=1
     echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-ip-forward.conf
 
-    # Ensure warp service is enabled and running
+    # Ensure mesh service is enabled and running
     systemctl enable warp-svc
     systemctl start warp-svc
     
@@ -46,7 +46,7 @@ if [[ "$ROLE" == "warp_connector" ]]; then
     systemctl status warp-svc --no-pager
     
     # Register and connect
-    warp-cli --accept-tos connector new ${warp_token}
+    warp-cli --accept-tos connector new ${mesh_token}
     
     # Wait a moment after registration
     sleep 5
@@ -56,15 +56,15 @@ if [[ "$ROLE" == "warp_connector" ]]; then
     
     # Verify connection status
     sleep 10
-    warp-cli --accept-tos status || echo "WARP status check failed, continuing..."
+    warp-cli --accept-tos status || echo "Mesh status check failed, continuing..."
     
     # If still disconnected, try to connect again
     if ! warp-cli --accept-tos status | grep -q "Connected" 2>/dev/null; then
         echo "First connection attempt failed, trying again..."
         sleep 5
-        warp-cli --accept-tos connect || echo "WARP connect retry failed, continuing..."
+        warp-cli --accept-tos connect || echo "Mesh connect retry failed, continuing..."
         sleep 10
-        warp-cli --accept-tos status || echo "WARP final status check failed, continuing..."
+        warp-cli --accept-tos status || echo "Mesh final status check failed, continuing..."
     fi
 
 elif [[ "$ROLE" == "cloudflared" ]]; then

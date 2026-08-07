@@ -267,8 +267,8 @@ variable "gcp_infra_cidr" {
   type        = string
 }
 
-variable "gcp_warp_cidr" {
-  description = "CIDR Range for GCP VMs running warp"
+variable "gcp_mesh_cidr" {
+  description = "CIDR Range for GCP VMs running mesh"
   type        = string
 }
 
@@ -314,7 +314,7 @@ variable "azure_subnet_cidr" {
 }
 
 #======================================================
-# WARP CONNECTOR CONFIGURATION
+# MESH CONNECTOR CONFIGURATION
 #======================================================
 variable "cf_default_cgnat_routes" {
   description = "default cgnat routes"
@@ -333,7 +333,7 @@ variable "cf_custom_cgnat_routes" {
 }
 
 variable "cf_warp_cgnat_cidr" {
-  description = "default ip range for WARP when overriding local interface IP"
+  description = "default ip range for Mesh when overriding local interface IP"
   type        = string
 }
 
@@ -364,16 +364,16 @@ variable "cf_cloudflare_tag" {
 }
 
 #======================================================
-# WARP CONNECTOR TUNNEL IDS
+# MESH CONNECTOR TUNNEL IDS
 #======================================================
 
-variable "cf_tunnel_warp_connector_azure_id" {
-  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
+variable "cf_tunnel_mesh_connector_azure_id" {
+  description = "ID of the Mesh Connector Tunnel manually created for Azure in UI"
   type        = string
 }
 
-variable "cf_tunnel_warp_connector_gcp_id" {
-  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
+variable "cf_tunnel_mesh_connector_gcp_id" {
+  description = "ID of the Mesh Connector Tunnel manually created for GCP in UI"
   type        = string
 }
 
@@ -470,12 +470,18 @@ variable "cf_rbi_source_cidr" {
   default     = "198.41.211.0/24"
 }
 
+variable "cf_redirect_ai_worker_url" {
+  description = "Full URL of the Gateway redirect Worker for unapproved AI apps (cf-gateway-redirect worker)"
+  type        = string
+  default     = "https://redirect.macharpe.com"
+}
+
 #======================================================
 # COMMENTED OUT VARIABLES
 #======================================================
 # The following variables are commented out but kept for reference
 
-#variable "azure_warp_connector_name" {
+#variable "azure_mesh_connector_name" {
 #  type        = string
-#  description = "Name of the Warp Connector tunnel for Azure"
+#  description = "Name of the Mesh Connector tunnel for Azure"
 #}

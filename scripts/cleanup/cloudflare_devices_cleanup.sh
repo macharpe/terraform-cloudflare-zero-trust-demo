@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Cloudflare Zero Trust Device Cleanup Script - Terraform Compatible Version
-# This script removes devices with names starting with "cloudflare-warp-connector-"
+# This script removes devices with names starting with "cloudflare-mesh-connector-"
 # Designed for automation/CI/CD without interactive prompts
 
 set -euo pipefail
 
 # Configuration
-PREFIX="${PREFIX:-cloudflare-warp-connector-}"
+PREFIX="${PREFIX:-cloudflare-mesh-connector-}"
 DRY_RUN="${DRY_RUN:-true}"
 FORCE_DELETE="${FORCE_DELETE:-false}"
 
@@ -37,7 +37,7 @@ OPTIONS:
     -d, --dry-run       Show what would be deleted without actually deleting (default)
     -l, --live          Actually delete devices (turns off dry-run)
     -f, --force         Force deletion without confirmation (required for live mode)
-    -p, --prefix PREFIX Set device name prefix to filter (default: cloudflare-warp-connector-)
+    -p, --prefix PREFIX Set device name prefix to filter (default: cloudflare-mesh-connector-)
 
 ENVIRONMENT VARIABLES:
     CLOUDFLARE_API_TOKEN        Your Cloudflare API Token (required)

@@ -108,8 +108,8 @@ locals {
     # GCP Cloudflared instances
     vm_cloudflared = local.base_timeouts.vm_standard
 
-    # GCP WARP connector instances
-    vm_warp = local.base_timeouts.vm_standard
+    # GCP Mesh Connector instances
+    vm_mesh = local.base_timeouts.vm_standard
 
     # GCP network resources
     network = local.base_timeouts.network
@@ -143,7 +143,7 @@ locals {
     vm             = local.gcp_timeouts.vm
     vm_windows     = local.gcp_timeouts.vm_windows
     vm_cloudflared = local.gcp_timeouts.vm_cloudflared
-    vm_warp        = local.gcp_timeouts.vm_warp
+    vm_mesh        = local.gcp_timeouts.vm_mesh
     network        = local.gcp_timeouts.network
     storage        = local.gcp_timeouts.storage
   }

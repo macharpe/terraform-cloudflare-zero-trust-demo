@@ -5,7 +5,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 [![Last Commit](https://img.shields.io/github/last-commit/macharpe/terraform-cloudflare-zero-trust-demo)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/commits/main)
 [![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/f9641cfc-17c4-406f-8f64-5038484adbba/repos/8bce00d3-4748-4e36-b419-a8dde3817846/branch/4a9ced8a-0d3d-47a1-87f1-ccf012dfba79)](https://dashboard.infracost.io/org/macharpe/repos/8bce00d3-4748-4e36-b419-a8dde3817846?tab=branches)
 [![Terraform](https://img.shields.io/badge/terraform-1.12.0+-blueviolet?logo=terraform)](https://www.terraform.io/)
-[![Cloudflare Provider](https://img.shields.io/badge/cloudflare%20provider-5.18.0+-F38020?logo=cloudflare)](https://registry.terraform.io/providers/cloudflare/cloudflare/latest)
+[![Cloudflare Provider](https://img.shields.io/badge/cloudflare%20provider-5.23.0+-F38020?logo=cloudflare)](https://registry.terraform.io/providers/cloudflare/cloudflare/latest)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Zero%20Trust-orange?logo=cloudflare)](https://www.cloudflare.com/zero-trust/)
 [![Multi-Cloud](https://img.shields.io/badge/multi--cloud-AWS%20%7C%20Azure%20%7C%20GCP-blue)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo)
 [![Monitoring](https://img.shields.io/badge/monitoring-Datadog-purple?logo=datadog)](https://www.datadoghq.com/)
@@ -47,7 +47,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 - **Multi-Cloud Architecture**: Seamless integration across AWS, Azure, and GCP
 - **Zero Trust Security**: Complete implementation of Cloudflare's SASE platform
 - **Identity Integration**: Support for Okta OIDC, Azure AD, and custom identity providers
-- **Advanced Networking**: WARP Connector tunnels and private network routing
+- **Advanced Networking**: Mesh Connector (formerly WARP Connector) tunnels and private network routing
 - **Infrastructure as Code**: Fully automated with Terraform
 - **Real-World Use Cases**: Browser rendering, RDP access, infrastructure management, external training compliance validation, and Warning-to-RBI pattern
 - **Warning-to-RBI Pattern**: Gateway redirect policy + Cloudflare Worker warning page + Clientless RBI with enforced controls (no print, copy, download)
@@ -371,26 +371,28 @@ This includes:
 - SaaS application integrations (Okta, Meraki, AWS)
 - Custom rule groups and posture checks
 
-#### WARP Connector Setup
+#### Mesh Connector Setup
 
-1. **Create WARP Connector Tunnels**:
+> **Note**: Cloudflare has renamed "WARP Connector" to **"Mesh"** in the dashboard UI. The Terraform variables `cf_mesh_tunnel_azure_id` / `cf_mesh_tunnel_gcp_id` and VM names (`cloudflare-mesh-connector-*`) reflect this rename.
+
+1. **Create Mesh Connector Tunnels**:
    - Navigate to **Networks > Tunnels > Create tunnel**
-   - Select **Warp Connector** (not cloudflared)
+   - Select **Mesh** (formerly "Warp Connector", not cloudflared)
    - Create two tunnels as shown below:
 
-   <img src="docs/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
+   <img src="docs/images/WARP_connector_tunnels.png" alt="Mesh Connector Tunnels" width="500" />
 
 2. **Configure Private Routes**:
-   - **Azure WARP Connector**: Add route for `azure_subnet_cidr` variable (e.g., 192.168.71.0/24)
-   - **GCP WARP Connector**: Add route for `gcp_warp_cidr` variable (e.g., 10.156.85.0/24)
+   - **Azure Mesh Connector**: Add route for `azure_subnet_cidr` variable (e.g., 192.168.71.0/24)
+   - **GCP Mesh Connector**: Add route for `gcp_mesh_cidr` variable (e.g., 10.156.85.0/24)
 
-   <img src="docs/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
-   <img src="docs/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
+   <img src="docs/images/gcp_warp_connector_route.png" alt="GCP Mesh Connector route" width="400" />
+   <img src="docs/images/Azure_warp_connector_route.png" alt="Azure Mesh Connector route" width="480" />
 
 3. **Retrieve Tunnel IDs**: Copy the tunnel IDs and add them to your `terraform.tfvars`:
    ```hcl
-   cf_warp_tunnel_azure_id = "185f0bc0-986d-46c............."
-   cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-460........"
+   cf_mesh_tunnel_azure_id = "185f0bc0-986d-46c............."
+   cf_mesh_tunnel_gcp_id   = "ad04a3ed-a1a1-460........"
    ```
 
 #### Device Enrollment Policies
@@ -429,7 +431,7 @@ cp terraform.tfvars.example terraform.tfvars
 The configuration file is organized into logical sections for easy navigation:
 
 - **🏗️ GCP Configuration**: Project settings, VM configurations, and networking
-- **☁️ Cloudflare Configuration**: Tunnels, WARP connectors, applications, and security policies  
+- **☁️ Cloudflare Configuration**: Tunnels, Mesh Connectors, applications, and security policies  
 - **🔐 Okta Configuration**: Identity provider groups and user management
 - **⚡ AWS Configuration**: EC2 instances, networking, and security groups
 - **🔷 Azure Configuration**: Resource groups, VMs, and Active Directory integration
@@ -438,9 +440,9 @@ The configuration file is organized into logical sections for easy navigation:
 **Key variables requiring manual configuration:**
 
 ```hcl
-# WARP Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
-cf_warp_tunnel_azure_id = "your_azure_warp_tunnel_id"
-cf_warp_tunnel_gcp_id   = "your_gcp_warp_tunnel_id"
+# Mesh Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
+cf_mesh_tunnel_azure_id = "your_azure_mesh_tunnel_id"
+cf_mesh_tunnel_gcp_id   = "your_gcp_mesh_tunnel_id"
 
 # Identity Providers - Sensitive: manually retrieved from Cloudflare dashboard
 cf_okta_identity_provider_id  = "your_okta_provider_id"
@@ -629,7 +631,7 @@ This prevents the common SSH warning:
 
 #### Cloudflare Devices Cleanup
 
-The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up WARP connector device registrations.
+The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up Mesh Connector device registrations.
 
 
 ## 🧹 Cleanup and Destruction
@@ -641,7 +643,7 @@ Before destroying the environment:
    ```bash
    terraform destroy
    ```
-3. **Clean Up Manual Resources**: Remove manually created WARP connectors and policies
+3. **Clean Up Manual Resources**: Remove manually created Mesh Connectors and policies
 
 ## 🚀 Roadmap
 
@@ -757,7 +759,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | [azurerm_public_ip.nat_gateway_public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_resource_group.cloudflare_rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_route_table.cloudflare_route_table_warp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
+| [azurerm_route_table.cloudflare_route_table_mesh](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_subnet.azure_subnet_lb_demo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.azure_subnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.cloudflare_natgw_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
@@ -773,17 +775,17 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | [google_compute_firewall.gcp_fw_lb_demo_http](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_instance.gcp_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance.gcp_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.gcp_vm_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
+| [google_compute_instance.gcp_vm_mesh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance.gcp_vm_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_network.gcp_vpc_main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
 | [google_compute_route.default_route](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_aws_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_azure_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
-| [google_compute_route.route_to_warp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
+| [google_compute_route.route_to_mesh_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_router.cloud_router](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router) | resource |
 | [google_compute_router_nat.cloud_nat](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router_nat) | resource |
 | [google_compute_subnetwork.gcp_subnet_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
-| [google_compute_subnetwork.gcp_subnet_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
+| [google_compute_subnetwork.gcp_subnet_mesh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.gcp_subnet_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [null_resource.cleanup_devices](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.cleanup_known_hosts](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
@@ -827,10 +829,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_admin_password"></a> [azure\_vm\_admin\_password](#input\_azure\_vm\_admin\_password) | Administrator password (min 12 characters) | `string` | n/a | yes |
 | <a name="input_azure_vm_admin_username"></a> [azure\_vm\_admin\_username](#input\_azure\_vm\_admin\_username) | Administrator username | `string` | n/a | yes |
 | <a name="input_azure_vm_count"></a> [azure\_vm\_count](#input\_azure\_vm\_count) | number of Azure VM | `number` | `1` | no |
-| <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where WARP Connector is NOT installed | `string` | n/a | yes |
+| <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where Mesh Connector is NOT installed | `string` | n/a | yes |
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
-| <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
+| <a name="input_azure_mesh_vm_name"></a> [azure\_mesh\_vm\_name](#input\_azure\_mesh\_vm\_name) | Name of the Azure VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_azure_identity_provider_id"></a> [cf\_azure\_identity\_provider\_id](#input\_cf\_azure\_identity\_provider\_id) | Azure Entra ID identity provider ID in Cloudflare | `string` | n/a | yes |
@@ -875,8 +877,8 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_tunnel_name_aws"></a> [cf\_tunnel\_name\_aws](#input\_cf\_tunnel\_name\_aws) | Name of the Cloudflare tunnel to AWS | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_gcp"></a> [cf\_tunnel\_name\_gcp](#input\_cf\_tunnel\_name\_gcp) | Name of the Cloudflare tunnel to GCP | `string` | n/a | yes |
 | <a name="input_cf_warp_cgnat_cidr"></a> [cf\_warp\_cgnat\_cidr](#input\_cf\_warp\_cgnat\_cidr) | default ip range for WARP when overriding local interface IP | `string` | n/a | yes |
-| <a name="input_cf_warp_tunnel_azure_id"></a> [cf\_warp\_tunnel\_azure\_id](#input\_cf\_warp\_tunnel\_azure\_id) | ID of the WARP Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
-| <a name="input_cf_warp_tunnel_gcp_id"></a> [cf\_warp\_tunnel\_gcp\_id](#input\_cf\_warp\_tunnel\_gcp\_id) | ID of the WARP Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
+| <a name="input_cf_mesh_tunnel_azure_id"></a> [cf\_mesh\_tunnel\_azure\_id](#input\_cf\_mesh\_tunnel\_azure\_id) | ID of the Mesh Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
+| <a name="input_cf_mesh_tunnel_gcp_id"></a> [cf\_mesh\_tunnel\_gcp\_id](#input\_cf\_mesh\_tunnel\_gcp\_id) | ID of the Mesh Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
 | <a name="input_cf_windows_posture_id"></a> [cf\_windows\_posture\_id](#input\_cf\_windows\_posture\_id) | Latest Windows version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_windows_rdp_tunnel_name"></a> [cf\_windows\_rdp\_tunnel\_name](#input\_cf\_windows\_rdp\_tunnel\_name) | Name of the Cloudflared tunnel for Windows RDP Server GCP | `string` | n/a | yes |
 | <a name="input_cloudflare_account_id"></a> [cloudflare\_account\_id](#input\_cloudflare\_account\_id) | Cloudflare account ID | `string` | n/a | yes |
@@ -896,9 +898,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_vm_count"></a> [gcp\_vm\_count](#input\_gcp\_vm\_count) | number of vm not running cloudflared | `number` | `1` | no |
 | <a name="input_gcp_vm_default_user"></a> [gcp\_vm\_default\_user](#input\_gcp\_vm\_default\_user) | default vm user for GCP VM | `string` | n/a | yes |
 | <a name="input_gcp_vm_name"></a> [gcp\_vm\_name](#input\_gcp\_vm\_name) | Name for the VM instance NOT running cloudflared | `string` | n/a | yes |
-| <a name="input_gcp_warp_cidr"></a> [gcp\_warp\_cidr](#input\_gcp\_warp\_cidr) | CIDR Range for GCP VMs running warp | `string` | n/a | yes |
-| <a name="input_gcp_warp_connector_image"></a> [gcp\_warp\_connector\_image](#input\_gcp\_warp\_connector\_image) | GCP image specifically for WARP connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
-| <a name="input_gcp_warp_connector_vm_name"></a> [gcp\_warp\_connector\_vm\_name](#input\_gcp\_warp\_connector\_vm\_name) | Name of the GCP VM where WARP Connector is installed | `string` | n/a | yes |
+| <a name="input_gcp_mesh_cidr"></a> [gcp\_mesh\_cidr](#input\_gcp\_mesh\_cidr) | CIDR Range for GCP VMs running Mesh Connector | `string` | n/a | yes |
+| <a name="input_gcp_mesh_connector_image"></a> [gcp\_mesh\_connector\_image](#input\_gcp\_mesh\_connector\_image) | GCP image specifically for Mesh Connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
+| <a name="input_gcp_mesh_connector_vm_name"></a> [gcp\_mesh\_connector\_vm\_name](#input\_gcp\_mesh\_connector\_vm\_name) | Name of the GCP VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_windows_admin_password"></a> [gcp\_windows\_admin\_password](#input\_gcp\_windows\_admin\_password) | Password for Windows Server admin user in GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_image"></a> [gcp\_windows\_image](#input\_gcp\_windows\_image) | GCP Windows image for compute instances | `string` | `"windows-server-2025-dc-v20250612"` | no |
 | <a name="input_gcp_windows_machine_size"></a> [gcp\_windows\_machine\_size](#input\_gcp\_windows\_machine\_size) | size of the compute engine instance for Windows specifically | `string` | `"e2-medium"` | no |

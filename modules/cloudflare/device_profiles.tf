@@ -116,7 +116,7 @@ locals {
   device_precedence = {
     laptop         = 10 # Highest priority - specific OS match
     vm             = 20 # Medium priority - group-based match  
-    warp_connector = 30 # Lower priority - service account match
+    mesh_connector = 30 # Lower priority - service account match
   }
 
   # Common profile settings
@@ -150,12 +150,12 @@ locals {
       match       = "any(identity.groups.name[*] in {\"${var.okta_infra_admin_group_name}\"}) or any(identity.groups.name[*] in {\"${var.okta_contractors_group_name}\"}) or identity.email matches \"${var.cf_email_domain}\""
       support_url = "Zero-TrustDemo-VMProfile"
     }
-    warp_connector = {
-      name        = "Zero-Trust demo WarpConnector"
-      description = "This profile is dedicated for WARP Connector"
-      precedence  = local.device_precedence.warp_connector
+    mesh_connector = {
+      name        = "Zero-Trust demo MeshConnector"
+      description = "This profile is dedicated for Mesh Connector"
+      precedence  = local.device_precedence.mesh_connector
       match       = "identity.email == \"warp_connector@${var.cf_team_name}.cloudflareaccess.com\""
-      support_url = "WARPConnectorProfile"
+      support_url = "MeshConnectorProfile"
     }
   }
 }
@@ -200,8 +200,4 @@ resource "cloudflare_zero_trust_device_custom_profile" "profiles" {
     }
   ]
 
-  # Apply once and ignore subsequent changes
-  lifecycle {
-    ignore_changes = all
-  }
 }
