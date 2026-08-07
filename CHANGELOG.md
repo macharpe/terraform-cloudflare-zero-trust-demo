@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-08-07
+
+### Changed
+
+- **WARP Connector → Mesh Connector rename**: Cloudflare has rebranded "WARP Connector" to "Mesh" in the dashboard UI. All Terraform variable names, resource labels, cloud resource name strings, cloud-init role strings, and cleanup script prefix have been updated to reflect this rename.
+  - Variable renames: `gcp_warp_connector_vm_name` → `gcp_mesh_connector_vm_name`, `gcp_warp_connector_image` → `gcp_mesh_connector_image`, `gcp_warp_cidr` → `gcp_mesh_cidr`, `azure_warp_vm_name` → `azure_mesh_vm_name`, `cf_warp_tunnel_azure_id` → `cf_mesh_tunnel_azure_id`, `cf_warp_tunnel_gcp_id` → `cf_mesh_tunnel_gcp_id`
+  - GCP resource labels: `gcp_vm_warp` → `gcp_vm_mesh`, `gcp_subnet_warp` → `gcp_subnet_mesh`, `route_to_warp_subnet` → `route_to_mesh_subnet`
+  - GCP resource names: `zero-trust-warp-subnet` → `zero-trust-mesh-subnet`, `route-to-warp-subnet` → `route-to-mesh-subnet`
+  - Azure resource label: `cloudflare_route_table_warp` → `cloudflare_route_table_mesh`
+  - Azure resource name: `cloudflare-route-table-to-WARP` → `cloudflare-route-table-to-Mesh`
+  - VM name values: `cloudflare-warp-connector-azure` → `cloudflare-mesh-connector-azure`, `cloudflare-warp-connector-gcp` → `cloudflare-mesh-connector-gcp`
+  - Cloud-init role string: `warp_connector` → `mesh_connector` in both `gcp-init.tpl` and `azure-init.tftpl` (kept in sync with corresponding `if` conditions)
+  - Cloudflare device profile name: `Zero-Trust demo WarpConnector` → `Zero-Trust demo MeshConnector`; `support_url`: `WARPConnectorProfile` → `MeshConnectorProfile`
+  - Cleanup script default prefix: `cloudflare-warp-connector-` → `cloudflare-mesh-connector-`
+  - Module outputs: `azure_extracted_warp_token` → `azure_extracted_mesh_token`, `gcp_extracted_warp_token` → `gcp_extracted_mesh_token`
+  - **Not changed** (intentional): `cf_warp_cgnat_cidr` (WARP CGNAT range is a protocol concept, not Mesh-specific), `modules/warp-routing/` directory and all internal files (shared with cloudflared routing), Cloudflare API URL path `/warp_connector/`, device profile `match` email `warp_connector@...` (Cloudflare-generated service account), APT package `cloudflare-warp`, systemd service `warp-svc`, binary `warp-cli`, `allow_authenticate_via_warp` provider attribute, `mode = "warp"` enum value
+
+- **Provider upgrades**: Upgraded all Terraform providers to latest stable versions
+  - `cloudflare/cloudflare`: 5.18.0 → 5.23.0 (constraint updated to `~> 5.23.0`)
+  - `hashicorp/aws`: 6.40.0 → 6.58.0
+  - `hashicorp/azurerm`: 4.68.0 → 4.81.0 (latest 4.x)
+  - `hashicorp/azuread`: 3.8.0 → 3.9.0
+  - `hashicorp/google`: 7.27.0 → 7.43.0
+  - `hashicorp/tls`: 4.2.1 → 4.3.0
+  - `hashicorp/null`: 3.2.4 → 3.3.0
+  - `hashicorp/random`: 3.8.1 → 3.9.0
+  - `hashicorp/local`: 2.8.0 → 2.9.0
+  - `hashicorp/http`: 3.5.0 → 3.6.0
+  - `hashicorp/external`: 2.3.5 → 2.4.0 (version constraint `~> 2.3` added to root `provider.tf`)
+
+- **`lifecycle { ignore_changes = all }` removed** from `cloudflare_zero_trust_device_custom_profile` in `modules/cloudflare/device_profiles.tf`: the Cloudflare provider 5.23.0 fixes perpetual drift on `exclude`/`include` nested attributes, making the lifecycle guard unnecessary. The profile is now fully managed by Terraform.
+
+- **`modules/azure/version.tf`**: Terraform `required_version` aligned from `>= 1.11.0` to `>= 1.12.0`, consistent with all other modules.
+
 ## [2.11.0] - 2026-04-29
 
 ### Added

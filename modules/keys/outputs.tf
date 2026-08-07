@@ -71,7 +71,7 @@ output "gcp_vm_key" {
     Usage: Applied to GCP VM metadata for SSH authentication
     Format: List of OpenSSH public key strings
     Security: Safe to expose - public key portion only
-    Related: Used by gcp_vm_cloudflared, gcp_vm_warp, and gcp_vm_windows_rdp
+    Related: Used by gcp_vm_cloudflared, gcp_vm_mesh, and gcp_vm_windows_rdp
   EOT
   value       = local.gcp_vm_keys
 }
@@ -161,7 +161,7 @@ output "azure_ssh_public_key" {
     Usage: Applied to Azure VM admin_ssh_key configuration
     Format: List of OpenSSH public key strings
     Security: Safe to expose - public key portion only
-    Related: Used by azure_vm_linux instances (WARP connector and standard VMs)
+    Related: Used by azure_vm_linux instances (Mesh Connector and standard VMs)
   EOT
   value       = local.azure_vm_keys
 }

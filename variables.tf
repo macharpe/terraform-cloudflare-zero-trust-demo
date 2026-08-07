@@ -72,8 +72,8 @@ variable "gcp_linux_image" {
   default     = "ubuntu-os-cloud/ubuntu-2204-lts-amd64"
 }
 
-variable "gcp_warp_connector_image" {
-  description = "GCP image specifically for WARP connector VM (Ubuntu 22.04 for compatibility)"
+variable "gcp_mesh_connector_image" {
+  description = "GCP image specifically for Mesh Connector VM (Ubuntu 22.04 for compatibility)"
   type        = string
   default     = "ubuntu-os-cloud/ubuntu-2204-lts"
 }
@@ -100,8 +100,8 @@ variable "gcp_vm_name" {
   type        = string
 }
 
-variable "gcp_warp_connector_vm_name" {
-  description = "Name of the GCP VM where WARP Connector is installed"
+variable "gcp_mesh_connector_vm_name" {
+  description = "Name of the GCP VM where Mesh Connector is installed"
   type        = string
 }
 
@@ -111,8 +111,8 @@ variable "gcp_infra_cidr" {
   type        = string
 }
 
-variable "gcp_warp_cidr" {
-  description = "CIDR Range for GCP VMs running warp"
+variable "gcp_mesh_cidr" {
+  description = "CIDR Range for GCP VMs running mesh"
   type        = string
 }
 
@@ -330,13 +330,13 @@ variable "azure_vm_count" {
 }
 
 # Azure VM Names
-variable "azure_warp_vm_name" {
-  description = "Name of the Azure VM where WARP Connector is installed"
+variable "azure_mesh_vm_name" {
+  description = "Name of the Azure VM where Mesh Connector is installed"
   type        = string
 }
 
 variable "azure_vm_name" {
-  description = "Azure VM name where WARP Connector is NOT installed"
+  description = "Azure VM name where Mesh Connector is NOT installed"
   type        = string
 }
 
@@ -459,6 +459,12 @@ variable "cf_rbi_source_cidr" {
   description = "Source IP CIDR for Clientless RBI egress (used in HTTP allow exception — http.conn.src_ip[*] selector)"
   type        = string
   default     = "198.41.211.0/24"
+}
+
+variable "cf_redirect_ai_worker_url" {
+  description = "Full URL of the Gateway redirect Worker for unapproved AI apps (cf-gateway-redirect worker)"
+  type        = string
+  default     = "https://redirect.macharpe.com"
 }
 
 #======================================================
@@ -597,7 +603,7 @@ variable "cf_device_os" {
 
 
 #======================================================
-# CLOUDFLARE WARP CONNECTOR CONFIGURATION
+# CLOUDFLARE MESH CONNECTOR CONFIGURATION
 #======================================================
 
 variable "cf_default_cgnat_routes" {
@@ -621,7 +627,7 @@ variable "cf_custom_cgnat_routes" {
 }
 
 variable "cf_warp_cgnat_cidr" {
-  description = "default ip range for WARP when overriding local interface IP"
+  description = "default ip range for Mesh when overriding local interface IP"
   type        = string
 }
 
@@ -693,16 +699,16 @@ variable "datadog_region" {
 }
 
 #======================================================
-# WARP CONNECTOR TUNNEL IDS
+# MESH CONNECTOR TUNNEL IDS
 #======================================================
 
-variable "cf_warp_tunnel_azure_id" {
-  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
+variable "cf_mesh_tunnel_azure_id" {
+  description = "ID of the Mesh Connector Tunnel manually created for Azure in UI"
   type        = string
 }
 
-variable "cf_warp_tunnel_gcp_id" {
-  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
+variable "cf_mesh_tunnel_gcp_id" {
+  description = "ID of the Mesh Connector Tunnel manually created for GCP in UI"
   type        = string
 }
 

@@ -36,7 +36,7 @@ module "ssh_keys" {
   azure_key_pair_count = var.azure_vm_count
 
   # GCP configuration
-  gcp_key_pair_count = var.gcp_vm_warp_instance_count +
+  gcp_key_pair_count = var.gcp_vm_mesh_instance_count +
                        var.gcp_vm_cloudflared_instance_count +
                        var.gcp_vm_windows_instance_count
 }

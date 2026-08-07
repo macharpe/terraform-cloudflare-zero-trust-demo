@@ -12,7 +12,7 @@ resource "null_resource" "cleanup_known_hosts" {
     aws_cloudflared = join(",", aws_instance.aws_vm_cloudflared[*].id)
     gcp_cloudflared = google_compute_instance.gcp_vm_cloudflared.instance_id
     gcp_windows_rdp = google_compute_instance.gcp_vm_windows_rdp.instance_id
-    gcp_warp        = join(",", google_compute_instance.gcp_vm_warp[*].instance_id)
+    gcp_mesh        = join(",", google_compute_instance.gcp_vm_mesh[*].instance_id)
     azure_linux_vms = join(",", azurerm_linux_virtual_machine.azure_vm_linux[*].id)
   }
 
@@ -21,20 +21,20 @@ resource "null_resource" "cleanup_known_hosts" {
   }
 }
 
-# Cloudflare Device cleanup - for WARP connector management
+# Cloudflare Device cleanup - for Mesh Connector management
 resource "null_resource" "cleanup_devices" {
-  # Demo-First: Only trigger when WARP-related infrastructure changes
+  # Demo-First: Only trigger when Mesh-related infrastructure changes
   triggers = {
-    # Track WARP connector VMs specifically
-    gcp_warp_vms    = join(",", google_compute_instance.gcp_vm_warp[*].instance_id)
+    # Track Mesh Connector VMs specifically
+    gcp_mesh_vms    = join(",", google_compute_instance.gcp_vm_mesh[*].instance_id)
     azure_linux_vms = join(",", azurerm_linux_virtual_machine.azure_vm_linux[*].id)
 
     # Also track Cloudflare configuration changes
     cloudflare_config = md5(jsonencode([
       var.cloudflare_account_id,
       var.cloudflare_api_token,
-      var.cf_warp_tunnel_azure_id,
-      var.cf_warp_tunnel_gcp_id
+      var.cf_mesh_tunnel_azure_id,
+      var.cf_mesh_tunnel_gcp_id
     ]))
   }
 
@@ -45,7 +45,7 @@ resource "null_resource" "cleanup_devices" {
       CLOUDFLARE_ACCOUNT_ID = var.cloudflare_account_id
       DRY_RUN               = "false"
       FORCE_DELETE          = "true"
-      PREFIX                = "cloudflare-warp-connector-"
+      PREFIX                = "cloudflare-mesh-connector-"
     }
   }
 }
@@ -75,13 +75,13 @@ module "cloudflare" {
   cf_tunnel_name_aws             = var.cf_tunnel_name_aws
   cf_windows_rdp_tunnel_name_gcp = var.cf_windows_rdp_tunnel_name
 
-  cf_tunnel_warp_connector_azure_id = var.cf_warp_tunnel_azure_id
-  cf_tunnel_warp_connector_gcp_id   = var.cf_warp_tunnel_gcp_id
+  cf_tunnel_mesh_connector_azure_id = var.cf_mesh_tunnel_azure_id
+  cf_tunnel_mesh_connector_gcp_id   = var.cf_mesh_tunnel_gcp_id
 
   gcp_vm_internal_ip         = google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip
   gcp_windows_vm_internal_ip = google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip
   gcp_infra_cidr             = var.gcp_infra_cidr
-  gcp_warp_cidr              = var.gcp_warp_cidr
+  gcp_mesh_cidr              = var.gcp_mesh_cidr
   gcp_windows_rdp_cidr       = var.gcp_windows_rdp_cidr
 
   # Domain
@@ -94,6 +94,7 @@ module "cloudflare" {
   cf_subdomain_rbi_warning     = var.cf_subdomain_rbi_warning
   cf_rbi_warning_worker_url    = var.cf_rbi_warning_worker_url
   cf_rbi_source_cidr           = var.cf_rbi_source_cidr
+  cf_redirect_ai_worker_url    = var.cf_redirect_ai_worker_url
 
   # Targets
   cf_target_ssh_name = var.cf_target_ssh_name
@@ -193,7 +194,7 @@ module "warp_routing" {
 
   azure_subnet_cidr    = var.azure_subnet_cidr
   gcp_infra_cidr       = var.gcp_infra_cidr
-  gcp_warp_cidr        = var.gcp_warp_cidr
+  gcp_warp_cidr        = var.gcp_mesh_cidr
   aws_private_cidr     = var.aws_private_cidr
   gcp_windows_rdp_cidr = var.gcp_windows_rdp_cidr
 }

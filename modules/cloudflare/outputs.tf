@@ -40,29 +40,29 @@ output "gcp_windows_extracted_token" {
   sensitive   = true
 }
 
-output "azure_extracted_warp_token" {
+output "azure_extracted_mesh_token" {
   description = <<-EOT
-    WARP Connector token for Azure VM routing.
+    Mesh Connector token for Azure VM routing.
 
-    Purpose: Authenticates Azure WARP connector for private network routing
+    Purpose: Authenticates Azure Mesh Connector for private network routing
     Usage: Injected into Azure VM startup script via cloud-init
     Security: Marked as sensitive - do not expose in logs
-    Related: Used by azure_vm_linux[0] (WARP connector) for cross-cloud connectivity
+    Related: Used by azure_vm_linux[0] (Mesh Connector) for cross-cloud connectivity
   EOT
-  value       = local.azure_warp_connector_token
+  value       = local.azure_mesh_connector_token
   sensitive   = true
 }
 
-output "gcp_extracted_warp_token" {
+output "gcp_extracted_mesh_token" {
   description = <<-EOT
-    WARP Connector token for GCP VM routing.
+    Mesh Connector token for GCP VM routing.
 
-    Purpose: Authenticates GCP WARP connector for private network routing
+    Purpose: Authenticates GCP Mesh Connector for private network routing
     Usage: Injected into GCP VM startup script via cloud-init
     Security: Marked as sensitive - do not expose in logs
-    Related: Used by gcp_vm_warp instance for cross-cloud connectivity
+    Related: Used by gcp_vm_mesh instance for cross-cloud connectivity
   EOT
-  value       = local.gcp_warp_connector_token
+  value       = local.gcp_mesh_connector_token
   sensitive   = true
 }
 
@@ -129,7 +129,7 @@ output "aws_tunnel_id" {
 
 #output "azure_tunnel_id" {
 #  value       = cloudflare_zero_trust_tunnel_cloudflared.ssh_aws_tunnel.id
-#  description = "ID of the Cloudflare Zero Trust WARP Connector Tunnel to Azure"
+#  description = "ID of the Cloudflare Zero Trust Mesh Connector Tunnel to Azure"
 #  sensitive   = "true"
 #}
 

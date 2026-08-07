@@ -12,7 +12,7 @@ gcp_service_account_email      = "***@****.iam.gserviceaccount.com"
 
 gcp_vm_count                   = 2
 gcp_vm_default_user            = "ubuntu"
-gcp_warp_connector_vm_name     = "cloudflare-warp-connector-gcp"
+gcp_mesh_connector_vm_name     = "cloudflare-mesh-connector-gcp"
 gcp_vm_name                    = "cloudflare-zero-trust-demo-gcp"
 
 gcp_enable_oslogin             = "false"
@@ -21,12 +21,12 @@ gcp_windows_machine_size       = "e2-medium"
 
 # OS Image Configuration
 gcp_linux_image                = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
-gcp_warp_connector_image       = "ubuntu-os-cloud/ubuntu-2204-lts"  # Ubuntu 22.04 for WARP compatibility
+gcp_mesh_connector_image       = "ubuntu-os-cloud/ubuntu-2204-lts"  # Ubuntu 22.04 for Mesh compatibility
 gcp_windows_image              = "windows-server-2025-dc-v20250612"
 
 # Networking
 gcp_infra_cidr              = "10.156.70.0/24"
-gcp_warp_cidr               = "10.156.85.0/24"
+gcp_mesh_cidr               = "10.156.85.0/24"
 gcp_windows_rdp_cidr        = "10.156.90.0/24"
 
 
@@ -77,7 +77,7 @@ azure_vm_count                 = 2
 azure_vm_size                  = "Standard_B1s"
 azure_vm_admin_username        = "ubuntu"
 azure_vm_admin_password        = "********"
-azure_warp_vm_name             = "cloudflare-warp-connector-azure"
+azure_mesh_vm_name             = "cloudflare-mesh-connector-azure"
 azure_vm_name                  = "cloudflare-zero-trust-demo-azure"
 
 # OS Image Configuration
@@ -106,9 +106,9 @@ cf_tunnel_name_gcp         = "Tunnel GCP (Access For Infrastructure)"
 cf_tunnel_name_aws         = "Tunnel AWS (SSH Browser Rendered)"
 cf_windows_rdp_tunnel_name = "Tunnel GCP (Windows RDP)"
 
-# WARP Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
-cf_warp_tunnel_azure_id = "185f0bc0-986d-********"
-cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-********"
+# Mesh Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
+cf_mesh_tunnel_azure_id = "185f0bc0-986d-********"
+cf_mesh_tunnel_gcp_id   = "ad04a3ed-a1a1-********"
 
 # Subdomains
 cf_subdomain_ssh            = "ssh-database.example.com"
@@ -158,15 +158,15 @@ cf_dlp_profile_ai_prompt_financial_information = "bdf84737-5046-46c7-********"
 cf_dlp_profile_ai_prompt_pii                   = "8c426a20-34fb-4fdc-********"
 cf_dlp_profile_ai_prompt_technical             = "90a1626d-556f-416f-********"
 
-# WARP CGNAT Routes
+# WARP CGNAT Routes (WARP protocol CGNAT range — used by all WARP clients and Mesh Connectors)
 cf_custom_cgnat_routes = [
   {
     address     = "100.64.0.0/11"
-    description = "WARP Connector CGNAT 1"
+    description = "Mesh Connector CGNAT 1"
   },
   {
     address     = "100.112.0.0/12"
-    description = "WARP Connector CGNAT 2"
+    description = "Mesh Connector CGNAT 2"
   }
 ]
 
@@ -216,7 +216,7 @@ cf_cloudflare_tag = "ZeroTrustDemo"
 #=====================================
 # Set lb_demo_enabled = true to create 2 additional VMs (AWS DC1, GCP On-Prem)
 # connected via cloudflared tunnels for load balancing demonstration.
-# Public website: roger.macharpe.com (no WARP required)
+# Public website: roger.macharpe.com (no Mesh required)
 
 lb_demo_enabled      = false  # Set to true to enable the load balancing demo
 lb_subdomain         = "roger"

@@ -19,7 +19,7 @@ terraform {
 
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 5.18.0"
+      version = "~> 5.23.0"
     }
 
     azuread = {
@@ -33,7 +33,8 @@ terraform {
     }
 
     external = {
-      source = "hashicorp/external"
+      source  = "hashicorp/external"
+      version = "~> 2.3"
     }
 
     aws = {

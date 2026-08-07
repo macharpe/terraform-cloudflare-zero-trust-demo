@@ -24,10 +24,10 @@ runcmd:
   # Set timezone
   - timedatectl set-timezone Europe/Paris
 
-%{ if role == "warp_connector" ~}
-  # Install WARP Connector
+%{ if role == "mesh_connector" ~}
+  # Install Mesh Connector
   - |
-    echo "Installing WARP Connector..."
+    echo "Installing Mesh Connector..."
     
     # Download and install GPG key
     curl https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
@@ -35,16 +35,16 @@ runcmd:
     # Add repository (programmatically detect Ubuntu codename)
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
     
-    # Update and install WARP
+    # Update and install Mesh
     sudo apt-get update
     sudo apt-get install -y cloudflare-warp
     
-    # Enable IP forwarding for WARP
+    # Enable IP forwarding for Mesh
     sudo sysctl -w net.ipv4.ip_forward=1
     echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-ip-forward.conf
     
-    # Ensure warp service is enabled and running (following GCP pattern)
-    echo "Starting WARP service..."
+    # Ensure mesh service is enabled and running (following GCP pattern)
+    echo "Starting Mesh service..."
     systemctl enable warp-svc
     systemctl start warp-svc
     
@@ -53,20 +53,20 @@ runcmd:
     
     # Check service status
     if systemctl is-active --quiet warp-svc; then
-        echo "WARP service is running successfully"
+        echo "Mesh service is running successfully"
         systemctl status warp-svc --no-pager
     else
-        echo "WARNING: WARP service may not be running properly"
+        echo "WARNING: Mesh service may not be running properly"
         systemctl status warp-svc --no-pager
         # Try to start again
         systemctl start warp-svc
         sleep 5
     fi
     
-    # Configure WARP Connector
-    echo "Configuring WARP Connector..."
+    # Configure Mesh Connector
+    echo "Configuring Mesh Connector..."
     # Register connector
-    warp-cli --accept-tos connector new ${warp_tunnel_secret_azure}
+    warp-cli --accept-tos connector new ${mesh_tunnel_secret_azure}
     
     # Wait after registration
     sleep 5
@@ -87,7 +87,7 @@ runcmd:
         warp-cli status
     fi
     
-    echo "WARP Connector setup completed"
+    echo "Mesh Connector setup completed"
 %{ endif ~}
 
   # Install Datadog monitoring LAST (following GCP pattern)
