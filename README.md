@@ -695,7 +695,8 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.40 |
 | <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.8 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
-| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.18.0 |
+| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.23.0 |
+| <a name="requirement_external"></a> [external](#requirement\_external) | ~> 2.3 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.4 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
@@ -817,6 +818,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_image_sku"></a> [azure\_image\_sku](#input\_azure\_image\_sku) | Azure VM image SKU | `string` | `"server"` | no |
 | <a name="input_azure_image_version"></a> [azure\_image\_version](#input\_azure\_image\_version) | Azure VM image version | `string` | `"latest"` | no |
 | <a name="input_azure_matthieu_user_object_id"></a> [azure\_matthieu\_user\_object\_id](#input\_azure\_matthieu\_user\_object\_id) | Object ID in Azure for user Matthieu | `string` | n/a | yes |
+| <a name="input_azure_mesh_vm_name"></a> [azure\_mesh\_vm\_name](#input\_azure\_mesh\_vm\_name) | Name of the Azure VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_azure_public_dns_domain"></a> [azure\_public\_dns\_domain](#input\_azure\_public\_dns\_domain) | Azure Public DNS Domain | `string` | n/a | yes |
 | <a name="input_azure_resource_group_name"></a> [azure\_resource\_group\_name](#input\_azure\_resource\_group\_name) | Ressource Group Name | `string` | n/a | yes |
 | <a name="input_azure_resource_group_region"></a> [azure\_resource\_group\_region](#input\_azure\_resource\_group\_region) | Location for all resources | `string` | `"Germany West Central"` | no |
@@ -832,7 +834,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where Mesh Connector is NOT installed | `string` | n/a | yes |
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
-| <a name="input_azure_mesh_vm_name"></a> [azure\_mesh\_vm\_name](#input\_azure\_mesh\_vm\_name) | Name of the Azure VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_azure_identity_provider_id"></a> [cf\_azure\_identity\_provider\_id](#input\_cf\_azure\_identity\_provider\_id) | Azure Entra ID identity provider ID in Cloudflare | `string` | n/a | yes |
@@ -859,10 +860,13 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_ios_posture_id"></a> [cf\_ios\_posture\_id](#input\_cf\_ios\_posture\_id) | Latest iOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
+| <a name="input_cf_mesh_tunnel_azure_id"></a> [cf\_mesh\_tunnel\_azure\_id](#input\_cf\_mesh\_tunnel\_azure\_id) | ID of the Mesh Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
+| <a name="input_cf_mesh_tunnel_gcp_id"></a> [cf\_mesh\_tunnel\_gcp\_id](#input\_cf\_mesh\_tunnel\_gcp\_id) | ID of the Mesh Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
 | <a name="input_cf_okta_new_identity_provider_id"></a> [cf\_okta\_new\_identity\_provider\_id](#input\_cf\_okta\_new\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare (OIDC) | `string` | n/a | yes |
 | <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_rbi_source_cidr"></a> [cf\_rbi\_source\_cidr](#input\_cf\_rbi\_source\_cidr) | Source IP CIDR for Clientless RBI egress (used in HTTP allow exception — http.conn.src\_ip[*] selector) | `string` | `"198.41.211.0/24"` | no |
 | <a name="input_cf_rbi_warning_worker_url"></a> [cf\_rbi\_warning\_worker\_url](#input\_cf\_rbi\_warning\_worker\_url) | Full URL of the Warning-to-RBI Worker warn endpoint | `string` | `"https://warning-to-rbi.macharpe.com/warn"` | no |
+| <a name="input_cf_redirect_ai_worker_url"></a> [cf\_redirect\_ai\_worker\_url](#input\_cf\_redirect\_ai\_worker\_url) | Full URL of the Gateway redirect Worker for unapproved AI apps (cf-gateway-redirect worker) | `string` | `"https://redirect.macharpe.com"` | no |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_subdomain_rbi_warning"></a> [cf\_subdomain\_rbi\_warning](#input\_cf\_subdomain\_rbi\_warning) | Subdomain for the Warning-to-RBI Worker (OPTIONAL: only needed if using the RBI audit portal in access\_applications\_optional.tf) | `string` | `""` | no |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |
@@ -876,9 +880,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_team_name"></a> [cf\_team\_name](#input\_cf\_team\_name) | Name of the Team in Cloudflare, essentially zero-trust org name | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_aws"></a> [cf\_tunnel\_name\_aws](#input\_cf\_tunnel\_name\_aws) | Name of the Cloudflare tunnel to AWS | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_gcp"></a> [cf\_tunnel\_name\_gcp](#input\_cf\_tunnel\_name\_gcp) | Name of the Cloudflare tunnel to GCP | `string` | n/a | yes |
-| <a name="input_cf_warp_cgnat_cidr"></a> [cf\_warp\_cgnat\_cidr](#input\_cf\_warp\_cgnat\_cidr) | default ip range for WARP when overriding local interface IP | `string` | n/a | yes |
-| <a name="input_cf_mesh_tunnel_azure_id"></a> [cf\_mesh\_tunnel\_azure\_id](#input\_cf\_mesh\_tunnel\_azure\_id) | ID of the Mesh Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
-| <a name="input_cf_mesh_tunnel_gcp_id"></a> [cf\_mesh\_tunnel\_gcp\_id](#input\_cf\_mesh\_tunnel\_gcp\_id) | ID of the Mesh Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
+| <a name="input_cf_warp_cgnat_cidr"></a> [cf\_warp\_cgnat\_cidr](#input\_cf\_warp\_cgnat\_cidr) | default ip range for Mesh when overriding local interface IP | `string` | n/a | yes |
 | <a name="input_cf_windows_posture_id"></a> [cf\_windows\_posture\_id](#input\_cf\_windows\_posture\_id) | Latest Windows version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_windows_rdp_tunnel_name"></a> [cf\_windows\_rdp\_tunnel\_name](#input\_cf\_windows\_rdp\_tunnel\_name) | Name of the Cloudflared tunnel for Windows RDP Server GCP | `string` | n/a | yes |
 | <a name="input_cloudflare_account_id"></a> [cloudflare\_account\_id](#input\_cloudflare\_account\_id) | Cloudflare account ID | `string` | n/a | yes |
@@ -891,6 +893,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_infra_cidr"></a> [gcp\_infra\_cidr](#input\_gcp\_infra\_cidr) | CIDR Range for GCP VMs running cloudflared | `string` | n/a | yes |
 | <a name="input_gcp_linux_image"></a> [gcp\_linux\_image](#input\_gcp\_linux\_image) | GCP Linux image for compute instances | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts-amd64"` | no |
 | <a name="input_gcp_machine_size"></a> [gcp\_machine\_size](#input\_gcp\_machine\_size) | size of the compute engine instance | `string` | `"e2-micro"` | no |
+| <a name="input_gcp_mesh_cidr"></a> [gcp\_mesh\_cidr](#input\_gcp\_mesh\_cidr) | CIDR Range for GCP VMs running mesh | `string` | n/a | yes |
+| <a name="input_gcp_mesh_connector_image"></a> [gcp\_mesh\_connector\_image](#input\_gcp\_mesh\_connector\_image) | GCP image specifically for Mesh Connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
+| <a name="input_gcp_mesh_connector_vm_name"></a> [gcp\_mesh\_connector\_vm\_name](#input\_gcp\_mesh\_connector\_vm\_name) | Name of the GCP VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP project ID | `string` | n/a | yes |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region | `string` | `"europe-west3"` | no |
 | <a name="input_gcp_service_account_email"></a> [gcp\_service\_account\_email](#input\_gcp\_service\_account\_email) | Service Account email for Terraform project in GCP | `string` | n/a | yes |
@@ -898,9 +903,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_vm_count"></a> [gcp\_vm\_count](#input\_gcp\_vm\_count) | number of vm not running cloudflared | `number` | `1` | no |
 | <a name="input_gcp_vm_default_user"></a> [gcp\_vm\_default\_user](#input\_gcp\_vm\_default\_user) | default vm user for GCP VM | `string` | n/a | yes |
 | <a name="input_gcp_vm_name"></a> [gcp\_vm\_name](#input\_gcp\_vm\_name) | Name for the VM instance NOT running cloudflared | `string` | n/a | yes |
-| <a name="input_gcp_mesh_cidr"></a> [gcp\_mesh\_cidr](#input\_gcp\_mesh\_cidr) | CIDR Range for GCP VMs running Mesh Connector | `string` | n/a | yes |
-| <a name="input_gcp_mesh_connector_image"></a> [gcp\_mesh\_connector\_image](#input\_gcp\_mesh\_connector\_image) | GCP image specifically for Mesh Connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
-| <a name="input_gcp_mesh_connector_vm_name"></a> [gcp\_mesh\_connector\_vm\_name](#input\_gcp\_mesh\_connector\_vm\_name) | Name of the GCP VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_windows_admin_password"></a> [gcp\_windows\_admin\_password](#input\_gcp\_windows\_admin\_password) | Password for Windows Server admin user in GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_image"></a> [gcp\_windows\_image](#input\_gcp\_windows\_image) | GCP Windows image for compute instances | `string` | `"windows-server-2025-dc-v20250612"` | no |
 | <a name="input_gcp_windows_machine_size"></a> [gcp\_windows\_machine\_size](#input\_gcp\_windows\_machine\_size) | size of the compute engine instance for Windows specifically | `string` | `"e2-medium"` | no |
