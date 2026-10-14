@@ -1,0 +1,43 @@
+main.tf
+  s_1144ebde4e4820::t_9a9295b5d99e02 36-37,78-79,84,137-140,143-144,196
+modules/cloudflare/access_policies.tf
+  s_1144ebde4e4820::t_f634eadba04787 108-113,118-119,124-125,130-181
+modules/cloudflare/gateway_policies.tf
+  s_1144ebde4e4820::t_31e3c64eb19717 155,166,177,188,199
+modules/cloudflare/provider.tf
+  s_1144ebde4e4820::t_ce571917e920b3 7
+modules/cloudflare/variables.tf
+  s_1144ebde4e4820::t_64444fbdc9c202 270-271
+modules/warp-routing/variables.tf
+  s_1144ebde4e4820::t_2861afce2d1318 13-14
+modules/warp-routing/warp_routing_subnets_calculation.tf
+  s_1144ebde4e4820::t_55fb6c5d479e40 30
+outputs.tf
+  s_1144ebde4e4820::t_3c56ddde8baf67 75,78
+provider.tf
+  s_1144ebde4e4820::t_f18ff6c776689e 22
+terraform.tfvars.example
+  s_1144ebde4e4820::t_d41f9d5c522e95 6,16,25,30,81,110-112
+variables.tf
+  s_1144ebde4e4820::t_830bace9720c3d 17-22,81-82,109-110,120-121,339-340,702,705-706,710-711
+vm-azure-instance.tf
+  s_1144ebde4e4820::t_97098fa36f6679 37,147,168,211,291
+vm-gcp-instance.tf
+  s_1144ebde4e4820::t_a7e405ffa79fce 18,100,252,259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e4a0b0834c89c612ef1fb13cbfacb10557cf982e",
+  "prompts": {},
+  "sessions": {
+    "s_1144ebde4e4820": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ec360a7a1ffel0x9f54CZK0nUp",
+        "model": "unknown"
+      },
+      "human_author": "macharpe <macharpe@protonmail.com>"
+    }
+  }
+}
