@@ -4,9 +4,9 @@
 locals {
   # Certificate data - gateway_ca_certificate is defined in ssh-ca-management.tf
 
-  # Mesh Connector tokens
-  azure_mesh_connector_token = jsondecode(data.http.cloudflare_mesh_connector_token_azure.response_body).result
-  gcp_mesh_connector_token   = jsondecode(data.http.cloudflare_mesh_connector_token_gcp.response_body).result
+  # WARP connector tokens
+  azure_warp_connector_token = jsondecode(data.http.cloudflare_warp_connector_token_azure.response_body).result
+  gcp_warp_connector_token   = jsondecode(data.http.cloudflare_warp_connector_token_gcp.response_body).result
 
   # Tunnel configurations
   tunnels = {
@@ -62,13 +62,13 @@ locals {
 # Data Sources
 #==========================================================
 
-data "http" "cloudflare_mesh_connector_token_azure" {
-  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_mesh_connector_azure_id}/token"
+data "http" "cloudflare_warp_connector_token_azure" {
+  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_azure_id}/token"
   request_headers = local.cloudflare_api_headers
 }
 
-data "http" "cloudflare_mesh_connector_token_gcp" {
-  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_mesh_connector_gcp_id}/token"
+data "http" "cloudflare_warp_connector_token_gcp" {
+  url             = "https://api.cloudflare.com/client/v4/accounts/${var.cloudflare_account_id}/warp_connector/${var.cf_tunnel_warp_connector_gcp_id}/token"
   request_headers = local.cloudflare_api_headers
 }
 

@@ -409,9 +409,9 @@ resource "aws_security_group" "aws_sg_vnc" {
   vpc_id      = aws_vpc.aws_vpc_main.id
   depends_on  = [aws_security_group.aws_sg_cloudflared]
 
-  # Allow SSH ingress from Mesh CGNAT range
+  # Allow SSH ingress from WARP CGNAT range
   ingress {
-    description = "Allow SSH from Mesh"
+    description = "Allow SSH from WARP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"

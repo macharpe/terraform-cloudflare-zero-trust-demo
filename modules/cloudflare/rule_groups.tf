@@ -2,13 +2,13 @@
 # Local Variables
 #==========================================================
 locals {
-  # OIDC groups from Okta tenant
-  okta_oidc_groups = {
-    contractors          = var.okta_contractors_group_name
-    infrastructure_admin = var.okta_infra_admin_group_name
-    sales_engineering    = var.okta_sales_eng_group_name
-    sales                = var.okta_sales_group_name
-    it_admin             = var.okta_itadmin_group_name
+  # SAML groups from Okta
+  saml_groups = {
+    contractors          = var.okta_contractors_saml_group_name
+    infrastructure_admin = var.okta_infra_admin_saml_group_name
+    sales_engineering    = var.okta_sales_eng_saml_group_name
+    sales                = var.okta_sales_saml_group_name
+    it_admin             = var.okta_itadmin_saml_group_name
   }
 
   # Azure AD groups
@@ -31,19 +31,18 @@ locals {
 }
 
 #==================================================
-# Okta OIDC Rule Groups
-# Note: Previously named saml_groups — renamed to okta_oidc_groups after
-# migration from SAML to OIDC. A moved block handles the state rename.
+# SAML Rule Groups
 #===================================================
-resource "cloudflare_zero_trust_access_group" "okta_oidc_groups" {
-  for_each   = local.okta_oidc_groups
+resource "cloudflare_zero_trust_access_group" "saml_groups" {
+  for_each   = local.saml_groups
   account_id = var.cloudflare_account_id
   name       = each.value
 
   include = [{
-    okta = {
-      identity_provider_id = var.cf_okta_new_identity_provider_id
-      name                 = each.value
+    saml = {
+      identity_provider_id = var.cf_okta_identity_provider_id
+      attribute_name       = "groups"
+      attribute_value      = each.value
     }
   }]
 }
@@ -97,7 +96,7 @@ resource "cloudflare_zero_trust_access_group" "employees_rule_group" {
   include = [
     for group_key in ["it_admin", "sales", "sales_engineering", "infrastructure_admin"] : {
       group = {
-        id = cloudflare_zero_trust_access_group.okta_oidc_groups[group_key].id
+        id = cloudflare_zero_trust_access_group.saml_groups[group_key].id
       }
     }
   ]
@@ -110,7 +109,7 @@ resource "cloudflare_zero_trust_access_group" "sales_team_rule_group" {
   include = [
     for group_key in ["sales", "sales_engineering"] : {
       group = {
-        id = cloudflare_zero_trust_access_group.okta_oidc_groups[group_key].id
+        id = cloudflare_zero_trust_access_group.saml_groups[group_key].id
       }
     }
   ]
@@ -123,7 +122,7 @@ resource "cloudflare_zero_trust_access_group" "admins_rule_group" {
   include = [
     for group_key in ["it_admin", "infrastructure_admin"] : {
       group = {
-        id = cloudflare_zero_trust_access_group.okta_oidc_groups[group_key].id
+        id = cloudflare_zero_trust_access_group.saml_groups[group_key].id
       }
     }
   ]
@@ -136,7 +135,7 @@ resource "cloudflare_zero_trust_access_group" "contractors_rule_group" {
   include = [
     {
       group = {
-        id = cloudflare_zero_trust_access_group.okta_oidc_groups["contractors"].id
+        id = cloudflare_zero_trust_access_group.saml_groups["contractors"].id
       }
     },
     {

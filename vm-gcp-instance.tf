@@ -13,9 +13,9 @@ resource "google_compute_subnetwork" "gcp_subnet_cloudflared" {
   network       = google_compute_network.gcp_vpc_main.id
 }
 
-resource "google_compute_subnetwork" "gcp_subnet_mesh" {
-  name          = "zero-trust-mesh-subnet"
-  ip_cidr_range = var.gcp_mesh_cidr
+resource "google_compute_subnetwork" "gcp_subnet_warp" {
+  name          = "zero-trust-warp-subnet"
+  ip_cidr_range = var.gcp_warp_cidr
   region        = var.gcp_region
   network       = google_compute_network.gcp_vpc_main.id
 }
@@ -73,7 +73,7 @@ resource "google_compute_router_nat" "cloud_nat" {
   }
 
   subnetwork {
-    name                    = google_compute_subnetwork.gcp_subnet_mesh.id
+    name                    = google_compute_subnetwork.gcp_subnet_warp.id
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
 
@@ -115,20 +115,15 @@ locals {
   gcp_common_user_data_vars = merge(local.global_monitoring, local.global_cloudflare, {
     tunnel_secret_gcp      = module.cloudflare.gcp_extracted_token
     gateway_ca_certificate = module.cloudflare.gateway_ca_certificate
-    mesh_token             = module.cloudflare.gcp_extracted_mesh_token
+    warp_token             = module.cloudflare.gcp_extracted_warp_token
     intranet_html          = file("${path.module}/scripts/html/intranet.html")
     competition_html       = file("${path.module}/scripts/html/competition.html")
   })
 
   # Common scheduling for preemptible instances
-  # COMMENTED OUT - preemptible causing issues, using standard instead
-  # preemptible_scheduling = {
-  #   preemptible       = true
-  #   automatic_restart = false
-  # }
   preemptible_scheduling = {
-    preemptible       = false
-    automatic_restart = true
+    preemptible       = true
+    automatic_restart = false
   }
 
   # Common scheduling for standard instances
@@ -247,22 +242,22 @@ resource "google_compute_instance" "gcp_vm_windows_rdp" {
 #==========================================================
 # GCP INSTANCES NOT RUNNING CLOUDFLARED
 #==========================================================
-resource "google_compute_instance" "gcp_vm_mesh" {
+resource "google_compute_instance" "gcp_vm_warp" {
   count        = var.gcp_vm_count
-  name         = count.index == 0 ? "${var.gcp_mesh_connector_vm_name}-${count.index}" : "${var.gcp_vm_name}-${count.index}"
+  name         = count.index == 0 ? "${var.gcp_warp_connector_vm_name}-${count.index}" : "${var.gcp_vm_name}-${count.index}"
   machine_type = var.gcp_machine_size
   zone         = local.common_gcp_config.zone
 
   boot_disk {
     initialize_params {
-      # Use Ubuntu 22.04 for Mesh Connector (index 0), Ubuntu 24.04 for others
-      image = count.index == 0 ? var.gcp_mesh_connector_image : local.common_linux_boot_disk.image
+      # Use Ubuntu 22.04 for WARP connector (index 0), Ubuntu 24.04 for others
+      image = count.index == 0 ? var.gcp_warp_connector_image : local.common_linux_boot_disk.image
     }
   }
 
   network_interface {
     network    = local.common_gcp_config.network
-    subnetwork = google_compute_subnetwork.gcp_subnet_mesh.id
+    subnetwork = google_compute_subnetwork.gcp_subnet_warp.id
     #    access_config {}
   }
 
@@ -274,19 +269,19 @@ resource "google_compute_instance" "gcp_vm_mesh" {
   }
 
   timeouts {
-    create = local.final_gcp_timeouts.vm_mesh.create
-    update = local.final_gcp_timeouts.vm_mesh.update
-    delete = local.final_gcp_timeouts.vm_mesh.delete
+    create = local.final_gcp_timeouts.vm_warp.create
+    update = local.final_gcp_timeouts.vm_warp.update
+    delete = local.final_gcp_timeouts.vm_warp.delete
   }
 
-  tags = ["mesh-instances"]
+  tags = ["warp-instances"]
 
   metadata = merge(local.common_metadata_vars, {
     ssh-keys = "${var.gcp_vm_default_user}:${module.ssh_keys.gcp_vm_key[count.index]}"
-    ROLE     = count.index == 0 ? "mesh_connector" : "default"
+    ROLE     = count.index == 0 ? "warp_connector" : "default"
 
     user-data = templatefile("${path.module}/scripts/cloud-init/gcp-init.tpl", merge(local.gcp_common_user_data_vars, {
-      role = count.index == 0 ? "mesh_connector" : "default"
+      role = count.index == 0 ? "warp_connector" : "default"
     }))
   })
 }
@@ -295,15 +290,15 @@ resource "google_compute_instance" "gcp_vm_mesh" {
 
 
 #==========================================================
-# Routing Setup for Mesh Connector
+# Routing Setup for WARP Connector
 #==========================================================
-resource "google_compute_route" "route_to_mesh_subnet" {
-  name       = "route-to-mesh-subnet"
+resource "google_compute_route" "route_to_warp_subnet" {
+  name       = "route-to-warp-subnet"
   network    = google_compute_network.gcp_vpc_main.name
   dest_range = var.cf_warp_cgnat_cidr
 
-  next_hop_instance      = google_compute_instance.gcp_vm_mesh[0].self_link
-  next_hop_instance_zone = google_compute_instance.gcp_vm_mesh[0].zone
+  next_hop_instance      = google_compute_instance.gcp_vm_warp[0].self_link
+  next_hop_instance_zone = google_compute_instance.gcp_vm_warp[0].zone
 
   priority = 1000
 }
@@ -313,8 +308,8 @@ resource "google_compute_route" "route_to_azure_subnet" {
   network    = google_compute_network.gcp_vpc_main.name
   dest_range = var.azure_subnet_cidr
 
-  next_hop_instance      = google_compute_instance.gcp_vm_mesh[0].self_link
-  next_hop_instance_zone = google_compute_instance.gcp_vm_mesh[0].zone
+  next_hop_instance      = google_compute_instance.gcp_vm_warp[0].self_link
+  next_hop_instance_zone = google_compute_instance.gcp_vm_warp[0].zone
 
   priority = 1000
 }
@@ -324,8 +319,8 @@ resource "google_compute_route" "route_to_aws_subnet" {
   network    = google_compute_network.gcp_vpc_main.name
   dest_range = var.aws_private_cidr
 
-  next_hop_instance      = google_compute_instance.gcp_vm_mesh[0].self_link
-  next_hop_instance_zone = google_compute_instance.gcp_vm_mesh[0].zone
+  next_hop_instance      = google_compute_instance.gcp_vm_warp[0].self_link
+  next_hop_instance_zone = google_compute_instance.gcp_vm_warp[0].zone
 
   priority = 1000
 }
@@ -350,7 +345,7 @@ resource "google_compute_firewall" "gcp_fw_ingress_ssh" {
   }
 
   source_ranges = [var.cf_warp_cgnat_cidr]
-  target_tags   = ["infrastructure-access-instances", "mesh-instances"]
+  target_tags   = ["infrastructure-access-instances", "warp-instances"]
 }
 
 
@@ -367,7 +362,7 @@ resource "google_compute_firewall" "gcp_fw_ingress_icmp" {
   }
 
   source_ranges = [var.cf_warp_cgnat_cidr, var.azure_subnet_cidr]
-  target_tags   = ["infrastructure-access-instances", "mesh-instances"]
+  target_tags   = ["infrastructure-access-instances", "warp-instances"]
 }
 
 
@@ -419,5 +414,5 @@ resource "google_compute_firewall" "gcp_fw_egress_all" {
   }
 
   destination_ranges = ["0.0.0.0/0"]
-  target_tags        = ["infrastructure-access-instances", "mesh-instances"]
+  target_tags        = ["infrastructure-access-instances", "warp-instances"]
 }

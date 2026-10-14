@@ -19,12 +19,12 @@ terraform {
 
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 5.23.0"
+      version = "~> 5.12.0"
     }
 
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 3.8"
+      version = "~> 3.4"
     }
 
     azurerm = {
@@ -33,13 +33,12 @@ terraform {
     }
 
     external = {
-      source  = "hashicorp/external"
-      version = "~> 2.3"
+      source = "hashicorp/external"
     }
 
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.40"
+      version = "~> 6.0"
     }
 
     null = {
@@ -59,7 +58,7 @@ terraform {
 
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.8"
+      version = "~> 3.6"
     }
   }
 }

@@ -71,7 +71,7 @@ output "gcp_vm_key" {
     Usage: Applied to GCP VM metadata for SSH authentication
     Format: List of OpenSSH public key strings
     Security: Safe to expose - public key portion only
-    Related: Used by gcp_vm_cloudflared, gcp_vm_mesh, and gcp_vm_windows_rdp
+    Related: Used by gcp_vm_cloudflared, gcp_vm_warp, and gcp_vm_windows_rdp
   EOT
   value       = local.gcp_vm_keys
 }
@@ -161,7 +161,7 @@ output "azure_ssh_public_key" {
     Usage: Applied to Azure VM admin_ssh_key configuration
     Format: List of OpenSSH public key strings
     Security: Safe to expose - public key portion only
-    Related: Used by azure_vm_linux instances (Mesh Connector and standard VMs)
+    Related: Used by azure_vm_linux instances (WARP connector and standard VMs)
   EOT
   value       = local.azure_vm_keys
 }
@@ -170,22 +170,4 @@ output "azure_key_paths" {
   description = "Private key file paths for Azure VMs"
   value       = local.azure_key_paths
   sensitive   = false
-}
-
-#======================================
-# Output: LB Demo key pairs
-#======================================
-output "aws_lb_demo_public_key" {
-  description = "SSH public key for AWS LB Demo instance"
-  value       = var.lb_demo_enabled ? tls_private_key.ssh_keys["lb_aws"].public_key_openssh : null
-}
-
-output "gcp_lb_demo_public_key" {
-  description = "SSH public key for GCP LB Demo instance"
-  value       = var.lb_demo_enabled ? tls_private_key.ssh_keys["lb_gcp"].public_key_openssh : null
-}
-
-output "azure_lb_demo_public_key" {
-  description = "SSH public key for Azure LB Demo instance"
-  value       = var.lb_demo_enabled ? tls_private_key.ssh_keys["lb_azure"].public_key_openssh : null
 }

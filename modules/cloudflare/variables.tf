@@ -30,8 +30,8 @@ variable "cf_email_domain" {
 #======================================================
 # IDENTITY PROVIDERS
 #======================================================
-variable "cf_okta_new_identity_provider_id" {
-  description = "Okta Identity Provider ID in Cloudflare (OIDC)"
+variable "cf_okta_identity_provider_id" {
+  description = "Okta Identity Provider ID in Cloudflare"
   type        = string
   sensitive   = true
 }
@@ -138,12 +138,6 @@ variable "cf_subdomain_training_status" {
   type        = string
 }
 
-variable "cf_subdomain_rbi_warning" {
-  description = "Subdomain for the Warning-to-RBI Worker (OPTIONAL: only needed if using the RBI audit portal in access_applications_optional.tf). Example: warning-to-rbi.macharpe.com"
-  type        = string
-  default     = ""
-}
-
 #======================================================
 # ACCESS APPLICATION CONFIGURATION
 #======================================================
@@ -209,30 +203,30 @@ variable "cf_target_rdp_name" {
 }
 
 #======================================================
-# OKTA GROUPS (OIDC)
+# OKTA SAML GROUPS
 #======================================================
-variable "okta_infra_admin_group_name" {
-  description = "Okta group name for InfrastructureAdmin"
+variable "okta_infra_admin_saml_group_name" {
+  description = "SAML Group name for InfrastructureAdmin group"
   type        = string
 }
 
-variable "okta_contractors_group_name" {
-  description = "Okta group name for Contractors"
+variable "okta_contractors_saml_group_name" {
+  description = "SAML Group name for Contractors group"
   type        = string
 }
 
-variable "okta_sales_eng_group_name" {
-  description = "Okta group name for SalesEngineering"
+variable "okta_sales_eng_saml_group_name" {
+  description = "SAML Group name for SalesEngineering group"
   type        = string
 }
 
-variable "okta_sales_group_name" {
-  description = "Okta group name for Sales"
+variable "okta_sales_saml_group_name" {
+  description = "SAML Group name for Sales group"
   type        = string
 }
 
-variable "okta_itadmin_group_name" {
-  description = "Okta group name for ITAdmin"
+variable "okta_itadmin_saml_group_name" {
+  description = "SAML Group name for ITAdmin group"
   type        = string
 }
 
@@ -267,8 +261,8 @@ variable "gcp_infra_cidr" {
   type        = string
 }
 
-variable "gcp_mesh_cidr" {
-  description = "CIDR Range for GCP VMs running mesh"
+variable "gcp_warp_cidr" {
+  description = "CIDR Range for GCP VMs running warp"
   type        = string
 }
 
@@ -314,7 +308,7 @@ variable "azure_subnet_cidr" {
 }
 
 #======================================================
-# MESH CONNECTOR CONFIGURATION
+# WARP CONNECTOR CONFIGURATION
 #======================================================
 variable "cf_default_cgnat_routes" {
   description = "default cgnat routes"
@@ -333,7 +327,7 @@ variable "cf_custom_cgnat_routes" {
 }
 
 variable "cf_warp_cgnat_cidr" {
-  description = "default ip range for Mesh when overriding local interface IP"
+  description = "default ip range for WARP when overriding local interface IP"
   type        = string
 }
 
@@ -364,116 +358,17 @@ variable "cf_cloudflare_tag" {
 }
 
 #======================================================
-# MESH CONNECTOR TUNNEL IDS
+# WARP CONNECTOR TUNNEL IDS
 #======================================================
 
-variable "cf_tunnel_mesh_connector_azure_id" {
-  description = "ID of the Mesh Connector Tunnel manually created for Azure in UI"
+variable "cf_tunnel_warp_connector_azure_id" {
+  description = "ID of the WARP Connector Tunnel manually created for Azure in UI"
   type        = string
 }
 
-variable "cf_tunnel_mesh_connector_gcp_id" {
-  description = "ID of the Mesh Connector Tunnel manually created for GCP in UI"
+variable "cf_tunnel_warp_connector_gcp_id" {
+  description = "ID of the WARP Connector Tunnel manually created for GCP in UI"
   type        = string
-}
-
-#======================================================
-# LOAD BALANCING DEMO CONFIGURATION
-#======================================================
-variable "lb_demo_enabled" {
-  description = "Enable/Disable the Load Balancing demo infrastructure"
-  type        = bool
-  default     = false
-}
-
-variable "lb_tunnel_name_aws" {
-  description = "Name of the Cloudflare tunnel for AWS LB demo"
-  type        = string
-  default     = "Tunnel LB AWS - DC1"
-}
-
-variable "lb_tunnel_name_gcp" {
-  description = "Name of the Cloudflare tunnel for GCP LB demo"
-  type        = string
-  default     = "Tunnel LB GCP - onprem"
-}
-
-variable "lb_tunnel_name_azure" {
-  description = "Name of the Cloudflare tunnel for Azure LB demo"
-  type        = string
-  default     = "Tunnel LB Azure - DR"
-}
-
-variable "lb_web_port" {
-  description = "Port for the web server on LB demo VMs"
-  type        = number
-  default     = 80
-}
-
-variable "lb_subdomain" {
-  description = "Subdomain for the load balancer (e.g., 'roger' for roger.example.com)"
-  type        = string
-  default     = "roger"
-}
-
-variable "cf_domain" {
-  description = "Domain name for Cloudflare DNS records (e.g., example.com)"
-  type        = string
-  default     = ""
-}
-
-#======================================================
-# DLP PROFILE IDS (AI Prompt Controls)
-#======================================================
-variable "cf_dlp_profile_ai_prompt_ai_security" {
-  description = "DLP Profile ID for AI Security detection in AI prompts"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_dlp_profile_ai_prompt_ai_customer" {
-  description = "DLP Profile ID for AI Customer data detection in AI prompts"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_dlp_profile_ai_prompt_financial_information" {
-  description = "DLP Profile ID for Financial Information detection in AI prompts"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_dlp_profile_ai_prompt_pii" {
-  description = "DLP Profile ID for PII detection in AI prompts"
-  type        = string
-  sensitive   = true
-}
-
-variable "cf_dlp_profile_ai_prompt_technical" {
-  description = "DLP Profile ID for Technical data detection in AI prompts"
-  type        = string
-  sensitive   = true
-}
-
-#======================================================
-# WARNING-TO-RBI WORKER
-#======================================================
-variable "cf_rbi_warning_worker_url" {
-  description = "Full URL of the Warning-to-RBI Worker warn endpoint (e.g. https://warning-to-rbi.macharpe.com/warn)"
-  type        = string
-  default     = "https://warning-to-rbi.macharpe.com/warn"
-}
-
-variable "cf_rbi_source_cidr" {
-  description = "Source IP CIDR for Clientless RBI egress traffic. Used in the HTTP allow exception policy to prevent double-isolation loops. The correct HTTP-layer selector is http.conn.src_ip[*] (not net.src.ip which is L4-only). Cloudflare's current RBI egress range is 198.41.211.0/24."
-  type        = string
-  default     = "198.41.211.0/24"
-}
-
-variable "cf_redirect_ai_worker_url" {
-  description = "Full URL of the Gateway redirect Worker for unapproved AI apps (cf-gateway-redirect worker)"
-  type        = string
-  default     = "https://redirect.macharpe.com"
 }
 
 #======================================================
@@ -481,7 +376,7 @@ variable "cf_redirect_ai_worker_url" {
 #======================================================
 # The following variables are commented out but kept for reference
 
-#variable "azure_mesh_connector_name" {
+#variable "azure_warp_connector_name" {
 #  type        = string
-#  description = "Name of the Mesh Connector tunnel for Azure"
+#  description = "Name of the Warp Connector tunnel for Azure"
 #}

@@ -5,7 +5,7 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 [![Last Commit](https://img.shields.io/github/last-commit/macharpe/terraform-cloudflare-zero-trust-demo)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo/commits/main)
 [![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/f9641cfc-17c4-406f-8f64-5038484adbba/repos/8bce00d3-4748-4e36-b419-a8dde3817846/branch/4a9ced8a-0d3d-47a1-87f1-ccf012dfba79)](https://dashboard.infracost.io/org/macharpe/repos/8bce00d3-4748-4e36-b419-a8dde3817846?tab=branches)
 [![Terraform](https://img.shields.io/badge/terraform-1.12.0+-blueviolet?logo=terraform)](https://www.terraform.io/)
-[![Cloudflare Provider](https://img.shields.io/badge/cloudflare%20provider-5.23.0+-F38020?logo=cloudflare)](https://registry.terraform.io/providers/cloudflare/cloudflare/latest)
+[![Cloudflare Provider](https://img.shields.io/badge/cloudflare%20provider-5.12.0+-F38020?logo=cloudflare)](https://registry.terraform.io/providers/cloudflare/cloudflare/latest)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Zero%20Trust-orange?logo=cloudflare)](https://www.cloudflare.com/zero-trust/)
 [![Multi-Cloud](https://img.shields.io/badge/multi--cloud-AWS%20%7C%20Azure%20%7C%20GCP-blue)](https://github.com/macharpe/terraform-cloudflare-zero-trust-demo)
 [![Monitoring](https://img.shields.io/badge/monitoring-Datadog-purple?logo=datadog)](https://www.datadoghq.com/)
@@ -18,7 +18,6 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 - [🔧 Integration with Cloudflare Workers (Optional)](#-integration-with-cloudflare-workers-optional)
   - [Training Status Admin Portal](#training-status-admin-portal)
   - [Access Denied Info Page](#access-denied-info-page)
-  - [Warning-to-RBI Worker](#warning-to-rbi-worker)
 - [🏗️ Architecture Overview](#️-architecture-overview)
 - [📊 Project Statistics](#-project-statistics)
 - [📚 Background Reading](#-background-reading)
@@ -46,20 +45,17 @@ A comprehensive, production-ready Terraform infrastructure that demonstrates Clo
 
 - **Multi-Cloud Architecture**: Seamless integration across AWS, Azure, and GCP
 - **Zero Trust Security**: Complete implementation of Cloudflare's SASE platform
-- **Identity Integration**: Support for Okta OIDC, Azure AD, and custom identity providers
-- **Advanced Networking**: Mesh Connector (formerly WARP Connector) tunnels and private network routing
+- **Identity Integration**: Support for Okta, Azure AD, and custom identity providers
+- **Advanced Networking**: WARP Connector tunnels and private network routing
 - **Infrastructure as Code**: Fully automated with Terraform
-- **Real-World Use Cases**: Browser rendering, RDP access, infrastructure management, external training compliance validation, and Warning-to-RBI pattern
-- **Warning-to-RBI Pattern**: Gateway redirect policy + Cloudflare Worker warning page + Clientless RBI with enforced controls (no print, copy, download)
-- **Remote Browser Isolation**: Clientless RBI with Gateway isolate policies — disables printing, copy/paste, and file downloads in the remote browser session
-- **KV Audit Logging**: Workers KV audit trail of every user proceed action through the RBI warning page
+- **Real-World Use Cases**: Browser rendering, RDP access, infrastructure management, and external validation for training compliance
 - **Automated Cleanup**: Built-in scripts for environment management
 - **Device Posture Checks**: OS version compliance and security validation
 - **Policy-Based Access**: Role-based access control with comprehensive policies
 
 ## 🔧 Integration with Cloudflare Workers (Optional)
 
-This demo environment includes **three optional components** that integrate with Cloudflare Workers and can be enabled based on your specific requirements:
+This demo environment includes **two optional components** that integrate with Cloudflare Workers and can be enabled based on your specific requirements:
 
 ### Training Status Admin Portal
 
@@ -116,53 +112,6 @@ An optional custom Access-denied-info-page that provides users with detailed inf
 > - If you don't want to use the custom Access denied page, you must remove the `custom_deny_url` and `custom_non_identity_deny_url` parameters from every access application in `modules/cloudflare/access_applications.tf`
 > - Repository: [Cloudflare Access-denied-info-page](https://github.com/macharpe/cloudflare-access-denied-info-page)
 
-### Warning-to-RBI Worker
-
-A Cloudflare Worker that implements the **Warning-to-RBI pattern**: when an employee accesses a gambling-category website, instead of a hard block, they see a warning page. If they choose to proceed, the site opens exclusively in **Clientless Remote Browser Isolation (RBI)** — active content never runs on their device.
-
-- **Worker repo**: `/Users/mcharpentier/Documents/2-github/cf-workers-projects/cf-warning-to-rbi/`
-- **Deployed at**: `warning-to-rbi.macharpe.com`
-- **File**: `modules/cloudflare/access_applications_optional.tf`
-- **Features**:
-  - Warning page with CF Workers Design System + Kumo UI (light/dark mode, moon/sun toggle)
-  - Gateway HTTP redirect policy with policy context (`cf_site_uri`, `cf_user_email`, `cf_request_categories`)
-  - KV audit log of every proceed action (email, blocked URL, category, timestamp) — 30-day retention
-  - `/admin` dashboard protected by Cloudflare Access (admins group + MFA) showing audit log entries
-  - RBI allow exception (`http.conn.src_ip in {198.41.211.0/24}`) prevents double-isolation loop
-  - Gateway **Isolate** policy disables printing, copy/paste, and file downloads inside the RBI session
-  - Contractors receive a hard block (no warning page, no RBI option)
-
-#### Gateway Policy Order
-
-| Precedence | Policy | Action | Who |
-|---|---|---|---|
-| 38300 | `HTTP-Isolate: Gambling — Disable Print, Copy & Download` | Isolate | Employees |
-| 38400 | `HTTP-Allow: RBI Clientless Browser Egress Exception` | Allow | Employees (from RBI IPs) |
-| 38800 | `HTTP-Redirect: Gambling → Warning Worker` | Redirect | Employees |
-| 39200 | `HTTP-Block: Gambling — Contractors Default Deny` | Block | Contractors |
-
-#### Worker Setup
-
-1. Deploy the KV namespace and Access policy via Terraform:
-   ```bash
-   terraform apply
-   ```
-2. Create the KV namespace via Wrangler (managed separately from Terraform):
-   ```bash
-   cd /Users/mcharpentier/Documents/2-github/cf-workers-projects/cf-warning-to-rbi
-   wrangler kv namespace create "rbi-warning-audit-log"
-   ```
-3. Paste the KV namespace ID into `wrangler.jsonc` under `kv_namespaces[].id`, then deploy:
-   ```bash
-   wrangler deploy
-   ```
-4. In the Cloudflare dashboard:
-   - **Zero Trust → Browser Isolation → Browser Isolation Settings**: enable Clientless RBI
-   - Attach `Warning-to-RBI Audit Log Admin Policy` to remote browser permissions
-   - **Security → WAF → Custom rules**: add a skip rule for `http.host eq "warning-to-rbi.macharpe.com"` to prevent WAF blocking Gateway redirect parameters
-
-> **Source**: Based on internal wiki pattern by Daisuke Doi. See `0-documentation/5-Roadmap/8-RBI/` for full implementation spec and technical guide.
-
 ## 🏗️ Architecture Overview
 
 This demo environment creates a sophisticated Zero Trust network spanning three major cloud providers, connected through Cloudflare's global network.
@@ -176,20 +125,20 @@ _Last Updated: 27th of September 2025_
 ## 📊 **Project Statistics**
 
 ### 📁 **Core Project Overview**
-- **Total Deployed Resources**: 186 resources *(in Terraform state)*
-- **Resource Definitions**: 105 resources *(in .tf files)*
+- **Total Deployed Resources**: 168 resources *(in Terraform state)*
+- **Resource Definitions**: 94 resources *(in .tf files)*
 - **Module Directories**: 5 directories *(modular architecture)*
 
 ### 📝 **Core Code Files**
 | File Type | Count | Lines | Purpose |
 |-----------|-------|-------|---------|
-| Terraform (.tf) | 38 | ~5800 | Infrastructure as Code |
-| Documentation (.md) | 10 | ~2700 | Project documentation |
+| Terraform (.tf) | 34 | ~5200 | Infrastructure as Code |
+| Documentation (.md) | 11 | ~2700 | Project documentation |
 | Scripts (.sh) | 4 | ~500 | Cleanup & maintenance |
-| HTML (.html) | 4 | ~1500 | Demo applications |
-| Templates (.tfpl, .tpl, .cmd) | 3 | ~500 | Cloud-init & startup scripts |
+| HTML (.html) | 3 | ~1100 | Demo applications |
 | Python (.py) | 2 | ~300 | WARP routing utilities |
-| **Total Core Code** | **61** | **~11300** | **Production-ready infrastructure** |
+| Templates (.tfpl, .tpl, .cmd) | 2 | ~400 | Cloud-init & startup scripts |
+| **Total Core Code** | **56** | **~10200** | **Production-ready infrastructure** |
 
 <table>
 <tr>
@@ -197,8 +146,8 @@ _Last Updated: 27th of September 2025_
 
 **📁 Infrastructure Resources** *(via terraform state)*
 
-- **186** total resources deployed
-- **105** resource definitions in code
+- **168** total resources deployed
+- **94** resource definitions in code
 - **33** Terraform files
 - **5** custom modules
 - **Multi-provider** architecture
@@ -371,28 +320,26 @@ This includes:
 - SaaS application integrations (Okta, Meraki, AWS)
 - Custom rule groups and posture checks
 
-#### Mesh Connector Setup
+#### WARP Connector Setup
 
-> **Note**: Cloudflare has renamed "WARP Connector" to **"Mesh"** in the dashboard UI. The Terraform variables `cf_mesh_tunnel_azure_id` / `cf_mesh_tunnel_gcp_id` and VM names (`cloudflare-mesh-connector-*`) reflect this rename.
-
-1. **Create Mesh Connector Tunnels**:
+1. **Create WARP Connector Tunnels**:
    - Navigate to **Networks > Tunnels > Create tunnel**
-   - Select **Mesh** (formerly "Warp Connector", not cloudflared)
+   - Select **Warp Connector** (not cloudflared)
    - Create two tunnels as shown below:
 
-   <img src="docs/images/WARP_connector_tunnels.png" alt="Mesh Connector Tunnels" width="500" />
+   <img src="docs/images/WARP_connector_tunnels.png" alt="WARP Connector Tunnels" width="500" />
 
 2. **Configure Private Routes**:
-   - **Azure Mesh Connector**: Add route for `azure_subnet_cidr` variable (e.g., 192.168.71.0/24)
-   - **GCP Mesh Connector**: Add route for `gcp_mesh_cidr` variable (e.g., 10.156.85.0/24)
+   - **Azure WARP Connector**: Add route for `azure_subnet_cidr` variable (e.g., 192.168.71.0/24)
+   - **GCP WARP Connector**: Add route for `gcp_warp_cidr` variable (e.g., 10.156.85.0/24)
 
-   <img src="docs/images/gcp_warp_connector_route.png" alt="GCP Mesh Connector route" width="400" />
-   <img src="docs/images/Azure_warp_connector_route.png" alt="Azure Mesh Connector route" width="480" />
+   <img src="docs/images/gcp_warp_connector_route.png" alt="GCP WARP Connector route" width="400" />
+   <img src="docs/images/Azure_warp_connector_route.png" alt="Azure WARP Connector route" width="480" />
 
 3. **Retrieve Tunnel IDs**: Copy the tunnel IDs and add them to your `terraform.tfvars`:
    ```hcl
-   cf_mesh_tunnel_azure_id = "185f0bc0-986d-46c............."
-   cf_mesh_tunnel_gcp_id   = "ad04a3ed-a1a1-460........"
+   cf_warp_tunnel_azure_id = "185f0bc0-986d-46c............."
+   cf_warp_tunnel_gcp_id   = "ad04a3ed-a1a1-460........"
    ```
 
 #### Device Enrollment Policies
@@ -431,7 +378,7 @@ cp terraform.tfvars.example terraform.tfvars
 The configuration file is organized into logical sections for easy navigation:
 
 - **🏗️ GCP Configuration**: Project settings, VM configurations, and networking
-- **☁️ Cloudflare Configuration**: Tunnels, Mesh Connectors, applications, and security policies  
+- **☁️ Cloudflare Configuration**: Tunnels, WARP connectors, applications, and security policies  
 - **🔐 Okta Configuration**: Identity provider groups and user management
 - **⚡ AWS Configuration**: EC2 instances, networking, and security groups
 - **🔷 Azure Configuration**: Resource groups, VMs, and Active Directory integration
@@ -440,9 +387,9 @@ The configuration file is organized into logical sections for easy navigation:
 **Key variables requiring manual configuration:**
 
 ```hcl
-# Mesh Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
-cf_mesh_tunnel_azure_id = "your_azure_mesh_tunnel_id"
-cf_mesh_tunnel_gcp_id   = "your_gcp_mesh_tunnel_id"
+# WARP Connector Tunnels - Sensitive: manually retrieved from Cloudflare dashboard
+cf_warp_tunnel_azure_id = "your_azure_warp_tunnel_id"
+cf_warp_tunnel_gcp_id   = "your_gcp_warp_tunnel_id"
 
 # Identity Providers - Sensitive: manually retrieved from Cloudflare dashboard
 cf_okta_identity_provider_id  = "your_okta_provider_id"
@@ -453,7 +400,7 @@ cf_gateway_posture_id = "your_gateway_posture_id"
 cf_macos_posture_id   = "your_macos_posture_id"
 cf_windows_posture_id = "your_windows_posture_id"
 
-# Okta OIDC Group Names - manually retrieved from Okta
+# SAML Group IDs - Sensitive: manually retrieved from Okta
 okta_infra_admin_group_id = "your_infra_admin_group_id"
 okta_contractors_group_id = "your_contractors_group_id"
 ```
@@ -631,7 +578,7 @@ This prevents the common SSH warning:
 
 #### Cloudflare Devices Cleanup
 
-The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up Mesh Connector device registrations.
+The `cloudflare_devices_cleanup.sh` script removes clutter from **My Team > Devices** in the Cloudflare dashboard, cleaning up WARP connector device registrations.
 
 
 ## 🧹 Cleanup and Destruction
@@ -643,7 +590,7 @@ Before destroying the environment:
    ```bash
    terraform destroy
    ```
-3. **Clean Up Manual Resources**: Remove manually created Mesh Connectors and policies
+3. **Clean Up Manual Resources**: Remove manually created WARP connectors and policies
 
 ## 🚀 Roadmap
 
@@ -654,25 +601,6 @@ Planned enhancements and features:
 - **Enhanced Observability**: Advanced Datadog integration and monitoring
 - **Additional Identity Providers**: Support for more enterprise identity systems
 - **Post-Quantum Cryptography**: Implementation of [post-quantum algorithms](https://blog.cloudflare.com/post-quantum-zero-trust/) for future-proof encryption and Zero Trust communications
-- **Warning-to-RBI `/admin` dashboard**: Worker-side `/admin` route for the RBI audit log (already deployed — see `cf-warning-to-rbi/`)
-- **Native RBI Traffic Selector**: When Cloudflare adds `Traffic Origin = Browser Isolation`, replace the current `http.conn.src_ip` allow exception with a cleaner policy
-
-## 📝 Recent Changes
-
-### v2.11.0 — Warning-to-RBI Pattern + OIDC rename (2026-04-29)
-
-**New: Warning-to-RBI pattern**
-- Added Gateway redirect policy (`HTTP-Redirect: Gambling → Warning Worker`) — sends employees to a warning page before proceeding to Clientless RBI
-- Added Gateway isolate policy (`HTTP-Isolate: Gambling — Disable Print, Copy & Download`) — disables printing, copy/paste, and file downloads in the RBI session
-- Added Gateway allow exception (`HTTP-Allow: RBI Clientless Browser Egress Exception`) — uses `http.conn.src_ip` (HTTP-layer selector) to prevent double-isolation loop
-- Added hard-block policy for contractors (`HTTP-Block: Gambling — Contractors Default Deny`)
-- Added `cf_app_rbi_audit_portal` Access application protecting `warning-to-rbi.macharpe.com/admin` (admins group + MFA)
-- Added `workers-kv-rbi` Workers KV namespace for audit logging (managed via Wrangler, not Terraform)
-- New variables: `cf_rbi_warning_worker_url`, `cf_rbi_source_cidr`, `cf_subdomain_rbi_warning`
-
-**Fix: SAML → OIDC resource rename**
-- Renamed `cloudflare_zero_trust_access_group.saml_groups` → `okta_oidc_groups` with `moved` blocks (no destroy/recreate) — the Okta integration uses OIDC, not SAML
-- Added `modules/cloudflare/moved.tf` with 5 moved blocks for clean state rename
 
 ## 🤝 Contributing
 
@@ -692,24 +620,24 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.40 |
-| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.8 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 3.4 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
-| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.23.0 |
-| <a name="requirement_external"></a> [external](#requirement\_external) | ~> 2.3 |
+| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 5.12.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.4 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.8 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.40 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | ~> 3.4 |
 | <a name="provider_null"></a> [null](#provider\_null) | ~> 3.2 |
 
 ## Modules
@@ -727,44 +655,35 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 |------|------|
 | [aws_eip.nat_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_instance.aws_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
-| [aws_instance.aws_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_instance.aws_vm_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_instance.aws_vm_vnc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_internet_gateway.igw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_key_pair.aws_ec2_cloudflared_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_key_pair.aws_ec2_service_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_key_pair.aws_ec2_vnc_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
-| [aws_key_pair.aws_lb_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_nat_gateway.nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
 | [aws_route_table.private_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.public_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_security_group.aws_sg_cloudflared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group.aws_sg_lb_demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.aws_sg_ssh](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.aws_sg_vnc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_subnet.aws_subnet_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.aws_subnet_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.aws_vpc_main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
-| [azurerm_linux_virtual_machine.azure_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
 | [azurerm_linux_virtual_machine.azure_vm_linux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
 | [azurerm_nat_gateway.cloudflare_natgw](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway) | resource |
 | [azurerm_nat_gateway_public_ip_association.natgw_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway_public_ip_association) | resource |
-| [azurerm_network_interface.lb_demo_nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
 | [azurerm_network_interface.nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
-| [azurerm_network_interface_security_group_association.lb_demo_nsg_assoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
 | [azurerm_network_interface_security_group_association.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
 | [azurerm_network_security_group.azure_nsg_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_group.lb_demo_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_public_ip.nat_gateway_public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_resource_group.cloudflare_rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_route_table.cloudflare_route_table_mesh](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
-| [azurerm_subnet.azure_subnet_lb_demo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_route_table.cloudflare_route_table_warp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_subnet.azure_subnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.cloudflare_natgw_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
-| [azurerm_subnet_nat_gateway_association.lb_demo_natgw_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
 | [azurerm_subnet_route_table_association.azure_subnet_route_assoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_virtual_network.azure_vnet_main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [google_compute_address.cloud_nat_ip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
@@ -773,23 +692,22 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | [google_compute_firewall.gcp_fw_ingress_icmp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_firewall.gcp_fw_ingress_ssh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_firewall.gcp_fw_ingress_ssh_deny](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_firewall.gcp_fw_lb_demo_http](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_instance.gcp_vm_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.gcp_vm_lb_demo](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.gcp_vm_mesh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
+| [google_compute_instance.gcp_vm_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance.gcp_vm_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_network.gcp_vpc_main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
 | [google_compute_route.default_route](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_aws_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_route.route_to_azure_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
-| [google_compute_route.route_to_mesh_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
+| [google_compute_route.route_to_warp_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_router.cloud_router](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router) | resource |
 | [google_compute_router_nat.cloud_nat](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router_nat) | resource |
 | [google_compute_subnetwork.gcp_subnet_cloudflared](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
-| [google_compute_subnetwork.gcp_subnet_mesh](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
+| [google_compute_subnetwork.gcp_subnet_warp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.gcp_subnet_windows_rdp](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [null_resource.cleanup_devices](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.cleanup_known_hosts](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [http_http.my_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
 
@@ -818,7 +736,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_image_sku"></a> [azure\_image\_sku](#input\_azure\_image\_sku) | Azure VM image SKU | `string` | `"server"` | no |
 | <a name="input_azure_image_version"></a> [azure\_image\_version](#input\_azure\_image\_version) | Azure VM image version | `string` | `"latest"` | no |
 | <a name="input_azure_matthieu_user_object_id"></a> [azure\_matthieu\_user\_object\_id](#input\_azure\_matthieu\_user\_object\_id) | Object ID in Azure for user Matthieu | `string` | n/a | yes |
-| <a name="input_azure_mesh_vm_name"></a> [azure\_mesh\_vm\_name](#input\_azure\_mesh\_vm\_name) | Name of the Azure VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_azure_public_dns_domain"></a> [azure\_public\_dns\_domain](#input\_azure\_public\_dns\_domain) | Azure Public DNS Domain | `string` | n/a | yes |
 | <a name="input_azure_resource_group_name"></a> [azure\_resource\_group\_name](#input\_azure\_resource\_group\_name) | Ressource Group Name | `string` | n/a | yes |
 | <a name="input_azure_resource_group_region"></a> [azure\_resource\_group\_region](#input\_azure\_resource\_group\_region) | Location for all resources | `string` | `"Germany West Central"` | no |
@@ -831,9 +748,10 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_azure_vm_admin_password"></a> [azure\_vm\_admin\_password](#input\_azure\_vm\_admin\_password) | Administrator password (min 12 characters) | `string` | n/a | yes |
 | <a name="input_azure_vm_admin_username"></a> [azure\_vm\_admin\_username](#input\_azure\_vm\_admin\_username) | Administrator username | `string` | n/a | yes |
 | <a name="input_azure_vm_count"></a> [azure\_vm\_count](#input\_azure\_vm\_count) | number of Azure VM | `number` | `1` | no |
-| <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where Mesh Connector is NOT installed | `string` | n/a | yes |
+| <a name="input_azure_vm_name"></a> [azure\_vm\_name](#input\_azure\_vm\_name) | Azure VM name where WARP Connector is NOT installed | `string` | n/a | yes |
 | <a name="input_azure_vm_size"></a> [azure\_vm\_size](#input\_azure\_vm\_size) | Azure VM size | `string` | `"Standard_B1ls"` | no |
 | <a name="input_azure_vnet_cidr"></a> [azure\_vnet\_cidr](#input\_azure\_vnet\_cidr) | Azure address vnet, subnet for vnet in Azure | `string` | n/a | yes |
+| <a name="input_azure_warp_vm_name"></a> [azure\_warp\_vm\_name](#input\_azure\_warp\_vm\_name) | Name of the Azure VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_cf_aws_tag"></a> [cf\_aws\_tag](#input\_cf\_aws\_tag) | tag to be assigned to aws environment | `string` | n/a | yes |
 | <a name="input_cf_azure_admin_rule_group_id"></a> [cf\_azure\_admin\_rule\_group\_id](#input\_cf\_azure\_admin\_rule\_group\_id) | Azure Administrators Rule Group ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_azure_identity_provider_id"></a> [cf\_azure\_identity\_provider\_id](#input\_cf\_azure\_identity\_provider\_id) | Azure Entra ID identity provider ID in Cloudflare | `string` | n/a | yes |
@@ -845,12 +763,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_custom_cgnat_routes"></a> [cf\_custom\_cgnat\_routes](#input\_cf\_custom\_cgnat\_routes) | List of custom CGNAT routes to add to the device profile | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_cf_default_cgnat_routes"></a> [cf\_default\_cgnat\_routes](#input\_cf\_default\_cgnat\_routes) | default cgnat routes | <pre>list(object({<br/>    address     = string<br/>    description = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "address": "100.64.0.0/10",<br/>    "description": "Default CGNAT Range"<br/>  }<br/>]</pre> | no |
 | <a name="input_cf_device_os"></a> [cf\_device\_os](#input\_cf\_device\_os) | This is the OS you are running on your own client machine | `string` | n/a | yes |
-| <a name="input_cf_dlp_profile_ai_prompt_ai_customer"></a> [cf\_dlp\_profile\_ai\_prompt\_ai\_customer](#input\_cf\_dlp\_profile\_ai\_prompt\_ai\_customer) | DLP Profile ID for AI Customer data detection in AI prompts | `string` | n/a | yes |
-| <a name="input_cf_dlp_profile_ai_prompt_ai_security"></a> [cf\_dlp\_profile\_ai\_prompt\_ai\_security](#input\_cf\_dlp\_profile\_ai\_prompt\_ai\_security) | DLP Profile ID for AI Security detection in AI prompts | `string` | n/a | yes |
-| <a name="input_cf_dlp_profile_ai_prompt_financial_information"></a> [cf\_dlp\_profile\_ai\_prompt\_financial\_information](#input\_cf\_dlp\_profile\_ai\_prompt\_financial\_information) | DLP Profile ID for Financial Information detection in AI prompts | `string` | n/a | yes |
-| <a name="input_cf_dlp_profile_ai_prompt_pii"></a> [cf\_dlp\_profile\_ai\_prompt\_pii](#input\_cf\_dlp\_profile\_ai\_prompt\_pii) | DLP Profile ID for PII detection in AI prompts | `string` | n/a | yes |
-| <a name="input_cf_dlp_profile_ai_prompt_technical"></a> [cf\_dlp\_profile\_ai\_prompt\_technical](#input\_cf\_dlp\_profile\_ai\_prompt\_technical) | DLP Profile ID for Technical data detection in AI prompts | `string` | n/a | yes |
-| <a name="input_cf_domain"></a> [cf\_domain](#input\_cf\_domain) | Domain name for Cloudflare DNS records (e.g., macharpe.com) | `string` | `""` | no |
 | <a name="input_cf_domain_controller_rdp_port"></a> [cf\_domain\_controller\_rdp\_port](#input\_cf\_domain\_controller\_rdp\_port) | Port for the Domain Controller RDP in Cloudflare | `number` | n/a | yes |
 | <a name="input_cf_email_domain"></a> [cf\_email\_domain](#input\_cf\_email\_domain) | Email Domain used for email authentication in App policies | `string` | n/a | yes |
 | <a name="input_cf_gateway_posture_id"></a> [cf\_gateway\_posture\_id](#input\_cf\_gateway\_posture\_id) | Gateway posture ID in Cloudflare | `string` | n/a | yes |
@@ -860,15 +772,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_ios_posture_id"></a> [cf\_ios\_posture\_id](#input\_cf\_ios\_posture\_id) | Latest iOS version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_linux_posture_id"></a> [cf\_linux\_posture\_id](#input\_cf\_linux\_posture\_id) | Latest Linux Kernel version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_macos_posture_id"></a> [cf\_macos\_posture\_id](#input\_cf\_macos\_posture\_id) | Latest macOS version posture ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_mesh_tunnel_azure_id"></a> [cf\_mesh\_tunnel\_azure\_id](#input\_cf\_mesh\_tunnel\_azure\_id) | ID of the Mesh Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
-| <a name="input_cf_mesh_tunnel_gcp_id"></a> [cf\_mesh\_tunnel\_gcp\_id](#input\_cf\_mesh\_tunnel\_gcp\_id) | ID of the Mesh Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
-| <a name="input_cf_okta_new_identity_provider_id"></a> [cf\_okta\_new\_identity\_provider\_id](#input\_cf\_okta\_new\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare (OIDC) | `string` | n/a | yes |
+| <a name="input_cf_okta_identity_provider_id"></a> [cf\_okta\_identity\_provider\_id](#input\_cf\_okta\_identity\_provider\_id) | Okta Identity Provider ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_otp_identity_provider_id"></a> [cf\_otp\_identity\_provider\_id](#input\_cf\_otp\_identity\_provider\_id) | OneTime PIN identity provider ID in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_rbi_source_cidr"></a> [cf\_rbi\_source\_cidr](#input\_cf\_rbi\_source\_cidr) | Source IP CIDR for Clientless RBI egress (used in HTTP allow exception — http.conn.src\_ip[*] selector) | `string` | `"198.41.211.0/24"` | no |
-| <a name="input_cf_rbi_warning_worker_url"></a> [cf\_rbi\_warning\_worker\_url](#input\_cf\_rbi\_warning\_worker\_url) | Full URL of the Warning-to-RBI Worker warn endpoint | `string` | `"https://warning-to-rbi.macharpe.com/warn"` | no |
-| <a name="input_cf_redirect_ai_worker_url"></a> [cf\_redirect\_ai\_worker\_url](#input\_cf\_redirect\_ai\_worker\_url) | Full URL of the Gateway redirect Worker for unapproved AI apps (cf-gateway-redirect worker) | `string` | `"https://redirect.macharpe.com"` | no |
 | <a name="input_cf_sensitive_web_app_name"></a> [cf\_sensitive\_web\_app\_name](#input\_cf\_sensitive\_web\_app\_name) | Name of the Sensitive web App in Cloudflare | `string` | n/a | yes |
-| <a name="input_cf_subdomain_rbi_warning"></a> [cf\_subdomain\_rbi\_warning](#input\_cf\_subdomain\_rbi\_warning) | Subdomain for the Warning-to-RBI Worker (OPTIONAL: only needed if using the RBI audit portal in access\_applications\_optional.tf) | `string` | `""` | no |
 | <a name="input_cf_subdomain_rdp"></a> [cf\_subdomain\_rdp](#input\_cf\_subdomain\_rdp) | Name of the subdomain for rdp browser rendered public hostname | `string` | n/a | yes |
 | <a name="input_cf_subdomain_ssh"></a> [cf\_subdomain\_ssh](#input\_cf\_subdomain\_ssh) | Name of the subdomain for ssh public hostname of tunnel | `string` | n/a | yes |
 | <a name="input_cf_subdomain_training_status"></a> [cf\_subdomain\_training\_status](#input\_cf\_subdomain\_training\_status) | Name of the subdomain for training status admin portal (OPTIONAL: only needed if using optional-cloudflare-apps.tf) | `string` | n/a | yes |
@@ -880,7 +786,9 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_cf_team_name"></a> [cf\_team\_name](#input\_cf\_team\_name) | Name of the Team in Cloudflare, essentially zero-trust org name | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_aws"></a> [cf\_tunnel\_name\_aws](#input\_cf\_tunnel\_name\_aws) | Name of the Cloudflare tunnel to AWS | `string` | n/a | yes |
 | <a name="input_cf_tunnel_name_gcp"></a> [cf\_tunnel\_name\_gcp](#input\_cf\_tunnel\_name\_gcp) | Name of the Cloudflare tunnel to GCP | `string` | n/a | yes |
-| <a name="input_cf_warp_cgnat_cidr"></a> [cf\_warp\_cgnat\_cidr](#input\_cf\_warp\_cgnat\_cidr) | default ip range for Mesh when overriding local interface IP | `string` | n/a | yes |
+| <a name="input_cf_warp_cgnat_cidr"></a> [cf\_warp\_cgnat\_cidr](#input\_cf\_warp\_cgnat\_cidr) | default ip range for WARP when overriding local interface IP | `string` | n/a | yes |
+| <a name="input_cf_warp_tunnel_azure_id"></a> [cf\_warp\_tunnel\_azure\_id](#input\_cf\_warp\_tunnel\_azure\_id) | ID of the WARP Connector Tunnel manually created for Azure in UI | `string` | n/a | yes |
+| <a name="input_cf_warp_tunnel_gcp_id"></a> [cf\_warp\_tunnel\_gcp\_id](#input\_cf\_warp\_tunnel\_gcp\_id) | ID of the WARP Connector Tunnel manually created for GCP in UI | `string` | n/a | yes |
 | <a name="input_cf_windows_posture_id"></a> [cf\_windows\_posture\_id](#input\_cf\_windows\_posture\_id) | Latest Windows version posture ID in Cloudflare | `string` | n/a | yes |
 | <a name="input_cf_windows_rdp_tunnel_name"></a> [cf\_windows\_rdp\_tunnel\_name](#input\_cf\_windows\_rdp\_tunnel\_name) | Name of the Cloudflared tunnel for Windows RDP Server GCP | `string` | n/a | yes |
 | <a name="input_cloudflare_account_id"></a> [cloudflare\_account\_id](#input\_cloudflare\_account\_id) | Cloudflare account ID | `string` | n/a | yes |
@@ -893,9 +801,6 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_infra_cidr"></a> [gcp\_infra\_cidr](#input\_gcp\_infra\_cidr) | CIDR Range for GCP VMs running cloudflared | `string` | n/a | yes |
 | <a name="input_gcp_linux_image"></a> [gcp\_linux\_image](#input\_gcp\_linux\_image) | GCP Linux image for compute instances | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts-amd64"` | no |
 | <a name="input_gcp_machine_size"></a> [gcp\_machine\_size](#input\_gcp\_machine\_size) | size of the compute engine instance | `string` | `"e2-micro"` | no |
-| <a name="input_gcp_mesh_cidr"></a> [gcp\_mesh\_cidr](#input\_gcp\_mesh\_cidr) | CIDR Range for GCP VMs running mesh | `string` | n/a | yes |
-| <a name="input_gcp_mesh_connector_image"></a> [gcp\_mesh\_connector\_image](#input\_gcp\_mesh\_connector\_image) | GCP image specifically for Mesh Connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
-| <a name="input_gcp_mesh_connector_vm_name"></a> [gcp\_mesh\_connector\_vm\_name](#input\_gcp\_mesh\_connector\_vm\_name) | Name of the GCP VM where Mesh Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP project ID | `string` | n/a | yes |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region | `string` | `"europe-west3"` | no |
 | <a name="input_gcp_service_account_email"></a> [gcp\_service\_account\_email](#input\_gcp\_service\_account\_email) | Service Account email for Terraform project in GCP | `string` | n/a | yes |
@@ -903,29 +808,23 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="input_gcp_vm_count"></a> [gcp\_vm\_count](#input\_gcp\_vm\_count) | number of vm not running cloudflared | `number` | `1` | no |
 | <a name="input_gcp_vm_default_user"></a> [gcp\_vm\_default\_user](#input\_gcp\_vm\_default\_user) | default vm user for GCP VM | `string` | n/a | yes |
 | <a name="input_gcp_vm_name"></a> [gcp\_vm\_name](#input\_gcp\_vm\_name) | Name for the VM instance NOT running cloudflared | `string` | n/a | yes |
+| <a name="input_gcp_warp_cidr"></a> [gcp\_warp\_cidr](#input\_gcp\_warp\_cidr) | CIDR Range for GCP VMs running warp | `string` | n/a | yes |
+| <a name="input_gcp_warp_connector_image"></a> [gcp\_warp\_connector\_image](#input\_gcp\_warp\_connector\_image) | GCP image specifically for WARP connector VM (Ubuntu 22.04 for compatibility) | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
+| <a name="input_gcp_warp_connector_vm_name"></a> [gcp\_warp\_connector\_vm\_name](#input\_gcp\_warp\_connector\_vm\_name) | Name of the GCP VM where WARP Connector is installed | `string` | n/a | yes |
 | <a name="input_gcp_windows_admin_password"></a> [gcp\_windows\_admin\_password](#input\_gcp\_windows\_admin\_password) | Password for Windows Server admin user in GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_image"></a> [gcp\_windows\_image](#input\_gcp\_windows\_image) | GCP Windows image for compute instances | `string` | `"windows-server-2025-dc-v20250612"` | no |
 | <a name="input_gcp_windows_machine_size"></a> [gcp\_windows\_machine\_size](#input\_gcp\_windows\_machine\_size) | size of the compute engine instance for Windows specifically | `string` | `"e2-medium"` | no |
 | <a name="input_gcp_windows_rdp_cidr"></a> [gcp\_windows\_rdp\_cidr](#input\_gcp\_windows\_rdp\_cidr) | CIDR Range for GCP VMs running cloudflared, Windows and RDP Server | `string` | n/a | yes |
 | <a name="input_gcp_windows_rdp_vm_name"></a> [gcp\_windows\_rdp\_vm\_name](#input\_gcp\_windows\_rdp\_vm\_name) | Name for the VM instance running cloudflared and Windows RDP Server on GCP | `string` | n/a | yes |
 | <a name="input_gcp_windows_user_name"></a> [gcp\_windows\_user\_name](#input\_gcp\_windows\_user\_name) | vm user name for GCP Windows VM | `string` | n/a | yes |
-| <a name="input_lb_aws_vm_name"></a> [lb\_aws\_vm\_name](#input\_lb\_aws\_vm\_name) | Name of the AWS EC2 instance for LB demo (DC1) | `string` | `"cloudflare-lb-demo-dc1-aws"` | no |
-| <a name="input_lb_azure_vm_name"></a> [lb\_azure\_vm\_name](#input\_lb\_azure\_vm\_name) | Name of the Azure VM for LB demo (DR) | `string` | `"cloudflare-lb-demo-dr-azure"` | no |
-| <a name="input_lb_demo_enabled"></a> [lb\_demo\_enabled](#input\_lb\_demo\_enabled) | Enable/Disable the Load Balancing demo infrastructure | `bool` | `false` | no |
-| <a name="input_lb_gcp_vm_name"></a> [lb\_gcp\_vm\_name](#input\_lb\_gcp\_vm\_name) | Name of the GCP Compute instance for LB demo (On-Prem) | `string` | `"cloudflare-lb-demo-onprem-gcp"` | no |
-| <a name="input_lb_subdomain"></a> [lb\_subdomain](#input\_lb\_subdomain) | Subdomain for the load balancer (e.g., 'roger' for roger.example.com) | `string` | `"roger"` | no |
-| <a name="input_lb_tunnel_name_aws"></a> [lb\_tunnel\_name\_aws](#input\_lb\_tunnel\_name\_aws) | Name of the Cloudflare tunnel for AWS LB demo | `string` | `"Tunnel LB AWS - DC1"` | no |
-| <a name="input_lb_tunnel_name_azure"></a> [lb\_tunnel\_name\_azure](#input\_lb\_tunnel\_name\_azure) | Name of the Cloudflare tunnel for Azure LB demo | `string` | `"Tunnel LB Azure - DR"` | no |
-| <a name="input_lb_tunnel_name_gcp"></a> [lb\_tunnel\_name\_gcp](#input\_lb\_tunnel\_name\_gcp) | Name of the Cloudflare tunnel for GCP LB demo | `string` | `"Tunnel LB GCP - onprem"` | no |
-| <a name="input_lb_web_port"></a> [lb\_web\_port](#input\_lb\_web\_port) | Port for the web server on LB demo VMs | `number` | `80` | no |
 | <a name="input_okta_bob_user_linux_password"></a> [okta\_bob\_user\_linux\_password](#input\_okta\_bob\_user\_linux\_password) | Linux password for user bob in EC2 instance | `string` | n/a | yes |
 | <a name="input_okta_bob_user_login"></a> [okta\_bob\_user\_login](#input\_okta\_bob\_user\_login) | User login for bob, in an email format | `string` | n/a | yes |
-| <a name="input_okta_contractors_group_name"></a> [okta\_contractors\_group\_name](#input\_okta\_contractors\_group\_name) | Okta group name for Contractors | `string` | n/a | yes |
-| <a name="input_okta_infra_admin_group_name"></a> [okta\_infra\_admin\_group\_name](#input\_okta\_infra\_admin\_group\_name) | Okta group name for InfrastructureAdmin | `string` | n/a | yes |
-| <a name="input_okta_itadmin_group_name"></a> [okta\_itadmin\_group\_name](#input\_okta\_itadmin\_group\_name) | Okta group name for ITAdmin | `string` | n/a | yes |
+| <a name="input_okta_contractors_saml_group_name"></a> [okta\_contractors\_saml\_group\_name](#input\_okta\_contractors\_saml\_group\_name) | SAML Group name for Contractors group | `string` | n/a | yes |
+| <a name="input_okta_infra_admin_saml_group_name"></a> [okta\_infra\_admin\_saml\_group\_name](#input\_okta\_infra\_admin\_saml\_group\_name) | SAML Group name for InfrastructureAdmin group | `string` | n/a | yes |
+| <a name="input_okta_itadmin_saml_group_name"></a> [okta\_itadmin\_saml\_group\_name](#input\_okta\_itadmin\_saml\_group\_name) | SAML Group name for ITAdmin group | `string` | n/a | yes |
 | <a name="input_okta_matthieu_user_login"></a> [okta\_matthieu\_user\_login](#input\_okta\_matthieu\_user\_login) | User login for matthieu, in an email format | `string` | n/a | yes |
-| <a name="input_okta_sales_eng_group_name"></a> [okta\_sales\_eng\_group\_name](#input\_okta\_sales\_eng\_group\_name) | Okta group name for SalesEngineering | `string` | n/a | yes |
-| <a name="input_okta_sales_group_name"></a> [okta\_sales\_group\_name](#input\_okta\_sales\_group\_name) | Okta group name for Sales | `string` | n/a | yes |
+| <a name="input_okta_sales_eng_saml_group_name"></a> [okta\_sales\_eng\_saml\_group\_name](#input\_okta\_sales\_eng\_saml\_group\_name) | SAML Group name for SalesEngineering group | `string` | n/a | yes |
+| <a name="input_okta_sales_saml_group_name"></a> [okta\_sales\_saml\_group\_name](#input\_okta\_sales\_saml\_group\_name) | SAML Group name for Sales group | `string` | n/a | yes |
 
 ## Outputs
 
@@ -934,7 +833,7 @@ This project is provided as-is for educational and demonstration purposes. Pleas
 | <a name="output_aws_ec2_instances"></a> [aws\_ec2\_instances](#output\_aws\_ec2\_instances) | AWS instance details |
 | <a name="output_azure_vms"></a> [azure\_vms](#output\_azure\_vms) | Azure instance details |
 | <a name="output_gcp_compute_instances"></a> [gcp\_compute\_instances](#output\_gcp\_compute\_instances) | GCP instance details |
-| <a name="output_load_balanced_instances"></a> [load\_balanced\_instances](#output\_load\_balanced\_instances) | Load Balanced demo instances across all cloud providers |
+| <a name="output_my_ip"></a> [my\_ip](#output\_my\_ip) | This is your Public IP |
 | <a name="output_ssh_for_infrastructure_access"></a> [ssh\_for\_infrastructure\_access](#output\_ssh\_for\_infrastructure\_access) | SSH with Access for Infrastructure command |
 | <a name="output_training_status_admin_portal_aud"></a> [training\_status\_admin\_portal\_aud](#output\_training\_status\_admin\_portal\_aud) | Application Audience (AUD) Tag for the Training Status Admin Portal - use this value for ACCESS\_APP\_AUD in your worker |
 <!-- END_TF_DOCS -->

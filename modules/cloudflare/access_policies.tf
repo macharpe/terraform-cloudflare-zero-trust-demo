@@ -2,7 +2,7 @@
 # Local Variables
 #==========================================================
 locals {
-  # Group mapping for policies (supports both OIDC and composite groups)
+  # Group mapping for policies (supports both SAML and composite groups)
   policy_groups = {
     # Composite groups
     employees   = cloudflare_zero_trust_access_group.employees_rule_group.id
@@ -10,11 +10,11 @@ locals {
     admins      = cloudflare_zero_trust_access_group.admins_rule_group.id
     contractors = cloudflare_zero_trust_access_group.contractors_rule_group.id
 
-    # Individual Okta OIDC groups (migrated from SAML)
-    infrastructure_admin = cloudflare_zero_trust_access_group.okta_oidc_groups["infrastructure_admin"].id
-    sales_engineering    = cloudflare_zero_trust_access_group.okta_oidc_groups["sales_engineering"].id
-    sales                = cloudflare_zero_trust_access_group.okta_oidc_groups["sales"].id
-    it_admin             = cloudflare_zero_trust_access_group.okta_oidc_groups["it_admin"].id
+    # Individual SAML groups
+    infrastructure_admin = cloudflare_zero_trust_access_group.saml_groups["infrastructure_admin"].id
+    sales_engineering    = cloudflare_zero_trust_access_group.saml_groups["sales_engineering"].id
+    sales                = cloudflare_zero_trust_access_group.saml_groups["sales"].id
+    it_admin             = cloudflare_zero_trust_access_group.saml_groups["it_admin"].id
   }
 
   # Common access policy configurations
@@ -139,7 +139,7 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
     # Login method (for specific policies)
     try(each.value.require_login_method, false) ? [{
       login_method = {
-        id = var.cf_okta_new_identity_provider_id
+        id = var.cf_okta_identity_provider_id
       }
     }] : [],
     # Country requirements
@@ -177,7 +177,7 @@ resource "cloudflare_zero_trust_access_policy" "policies" {
     cloudflare_zero_trust_access_group.sales_team_rule_group,
     cloudflare_zero_trust_access_group.admins_rule_group,
     cloudflare_zero_trust_access_group.contractors_rule_group,
-    cloudflare_zero_trust_access_group.okta_oidc_groups
+    cloudflare_zero_trust_access_group.saml_groups
   ]
 
   # Note: lifecycle blocks cannot be conditional in for_each resources

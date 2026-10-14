@@ -40,29 +40,29 @@ output "gcp_windows_extracted_token" {
   sensitive   = true
 }
 
-output "azure_extracted_mesh_token" {
+output "azure_extracted_warp_token" {
   description = <<-EOT
-    Mesh Connector token for Azure VM routing.
+    WARP Connector token for Azure VM routing.
 
-    Purpose: Authenticates Azure Mesh Connector for private network routing
+    Purpose: Authenticates Azure WARP connector for private network routing
     Usage: Injected into Azure VM startup script via cloud-init
     Security: Marked as sensitive - do not expose in logs
-    Related: Used by azure_vm_linux[0] (Mesh Connector) for cross-cloud connectivity
+    Related: Used by azure_vm_linux[0] (WARP connector) for cross-cloud connectivity
   EOT
-  value       = local.azure_mesh_connector_token
+  value       = local.azure_warp_connector_token
   sensitive   = true
 }
 
-output "gcp_extracted_mesh_token" {
+output "gcp_extracted_warp_token" {
   description = <<-EOT
-    Mesh Connector token for GCP VM routing.
+    WARP Connector token for GCP VM routing.
 
-    Purpose: Authenticates GCP Mesh Connector for private network routing
+    Purpose: Authenticates GCP WARP connector for private network routing
     Usage: Injected into GCP VM startup script via cloud-init
     Security: Marked as sensitive - do not expose in logs
-    Related: Used by gcp_vm_mesh instance for cross-cloud connectivity
+    Related: Used by gcp_vm_warp instance for cross-cloud connectivity
   EOT
-  value       = local.gcp_mesh_connector_token
+  value       = local.gcp_warp_connector_token
   sensitive   = true
 }
 
@@ -129,7 +129,7 @@ output "aws_tunnel_id" {
 
 #output "azure_tunnel_id" {
 #  value       = cloudflare_zero_trust_tunnel_cloudflared.ssh_aws_tunnel.id
-#  description = "ID of the Cloudflare Zero Trust Mesh Connector Tunnel to Azure"
+#  description = "ID of the Cloudflare Zero Trust WARP Connector Tunnel to Azure"
 #  sensitive   = "true"
 #}
 
@@ -255,25 +255,4 @@ output "training_status_admin_portal_aud" {
     Related: Required for Workers accessing the training admin portal
   EOT
   value       = cloudflare_zero_trust_access_application.cf_app_training_portal.aud
-}
-
-#======================================================
-# Load Balancing Demo Tunnel Tokens
-#======================================================
-output "lb_aws_tunnel_token" {
-  description = "Cloudflared tunnel token for AWS LB Demo (DC1)"
-  value       = var.lb_demo_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.lb_tunnel_tokens["lb_aws_dc1"].token : null
-  sensitive   = true
-}
-
-output "lb_gcp_tunnel_token" {
-  description = "Cloudflared tunnel token for GCP LB Demo (On-Prem)"
-  value       = var.lb_demo_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.lb_tunnel_tokens["lb_gcp_onprem"].token : null
-  sensitive   = true
-}
-
-output "lb_azure_tunnel_token" {
-  description = "Cloudflared tunnel token for Azure LB Demo (DR)"
-  value       = var.lb_demo_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.lb_tunnel_tokens["lb_azure_dr"].token : null
-  sensitive   = true
 }

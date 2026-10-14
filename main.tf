@@ -12,7 +12,7 @@ resource "null_resource" "cleanup_known_hosts" {
     aws_cloudflared = join(",", aws_instance.aws_vm_cloudflared[*].id)
     gcp_cloudflared = google_compute_instance.gcp_vm_cloudflared.instance_id
     gcp_windows_rdp = google_compute_instance.gcp_vm_windows_rdp.instance_id
-    gcp_mesh        = join(",", google_compute_instance.gcp_vm_mesh[*].instance_id)
+    gcp_warp        = join(",", google_compute_instance.gcp_vm_warp[*].instance_id)
     azure_linux_vms = join(",", azurerm_linux_virtual_machine.azure_vm_linux[*].id)
   }
 
@@ -21,20 +21,20 @@ resource "null_resource" "cleanup_known_hosts" {
   }
 }
 
-# Cloudflare Device cleanup - for Mesh Connector management
+# Cloudflare Device cleanup - for WARP connector management
 resource "null_resource" "cleanup_devices" {
-  # Demo-First: Only trigger when Mesh-related infrastructure changes
+  # Demo-First: Only trigger when WARP-related infrastructure changes
   triggers = {
-    # Track Mesh Connector VMs specifically
-    gcp_mesh_vms    = join(",", google_compute_instance.gcp_vm_mesh[*].instance_id)
+    # Track WARP connector VMs specifically
+    gcp_warp_vms    = join(",", google_compute_instance.gcp_vm_warp[*].instance_id)
     azure_linux_vms = join(",", azurerm_linux_virtual_machine.azure_vm_linux[*].id)
 
     # Also track Cloudflare configuration changes
     cloudflare_config = md5(jsonencode([
       var.cloudflare_account_id,
       var.cloudflare_api_token,
-      var.cf_mesh_tunnel_azure_id,
-      var.cf_mesh_tunnel_gcp_id
+      var.cf_warp_tunnel_azure_id,
+      var.cf_warp_tunnel_gcp_id
     ]))
   }
 
@@ -45,7 +45,7 @@ resource "null_resource" "cleanup_devices" {
       CLOUDFLARE_ACCOUNT_ID = var.cloudflare_account_id
       DRY_RUN               = "false"
       FORCE_DELETE          = "true"
-      PREFIX                = "cloudflare-mesh-connector-"
+      PREFIX                = "cloudflare-warp-connector-"
     }
   }
 }
@@ -54,13 +54,16 @@ resource "null_resource" "cleanup_devices" {
 #==========================================
 # main.tf
 #==========================================
+data "http" "my_ip" {
+  url = "https://4.ident.me/"
+}
+
 module "ssh_keys" {
   source                = "./modules/keys"
   gcp_users             = toset(var.gcp_users)
   aws_cloudflared_count = var.aws_cloudflared_count
   azure_vm_count        = var.azure_vm_count
   gcp_vm_count          = var.gcp_vm_count
-  lb_demo_enabled       = var.lb_demo_enabled
 }
 
 module "cloudflare" {
@@ -75,13 +78,13 @@ module "cloudflare" {
   cf_tunnel_name_aws             = var.cf_tunnel_name_aws
   cf_windows_rdp_tunnel_name_gcp = var.cf_windows_rdp_tunnel_name
 
-  cf_tunnel_mesh_connector_azure_id = var.cf_mesh_tunnel_azure_id
-  cf_tunnel_mesh_connector_gcp_id   = var.cf_mesh_tunnel_gcp_id
+  cf_tunnel_warp_connector_azure_id = var.cf_warp_tunnel_azure_id
+  cf_tunnel_warp_connector_gcp_id   = var.cf_warp_tunnel_gcp_id
 
   gcp_vm_internal_ip         = google_compute_instance.gcp_vm_cloudflared.network_interface[0].network_ip
   gcp_windows_vm_internal_ip = google_compute_instance.gcp_vm_windows_rdp.network_interface[0].network_ip
   gcp_infra_cidr             = var.gcp_infra_cidr
-  gcp_mesh_cidr              = var.gcp_mesh_cidr
+  gcp_warp_cidr              = var.gcp_warp_cidr
   gcp_windows_rdp_cidr       = var.gcp_windows_rdp_cidr
 
   # Domain
@@ -91,21 +94,17 @@ module "cloudflare" {
   cf_subdomain_web_sensitive   = var.cf_subdomain_web_sensitive
   cf_subdomain_rdp             = var.cf_subdomain_rdp
   cf_subdomain_training_status = var.cf_subdomain_training_status
-  cf_subdomain_rbi_warning     = var.cf_subdomain_rbi_warning
-  cf_rbi_warning_worker_url    = var.cf_rbi_warning_worker_url
-  cf_rbi_source_cidr           = var.cf_rbi_source_cidr
-  cf_redirect_ai_worker_url    = var.cf_redirect_ai_worker_url
 
   # Targets
   cf_target_ssh_name = var.cf_target_ssh_name
   cf_target_rdp_name = var.cf_target_rdp_name
 
-  # Okta OIDC
-  okta_infra_admin_group_name = var.okta_infra_admin_group_name
-  okta_contractors_group_name = var.okta_contractors_group_name
-  okta_sales_eng_group_name   = var.okta_sales_eng_group_name
-  okta_itadmin_group_name     = var.okta_itadmin_group_name
-  okta_sales_group_name       = var.okta_sales_group_name
+  # SAML OKTA
+  okta_infra_admin_saml_group_name = var.okta_infra_admin_saml_group_name
+  okta_contractors_saml_group_name = var.okta_contractors_saml_group_name
+  okta_sales_eng_saml_group_name   = var.okta_sales_eng_saml_group_name
+  okta_itadmin_saml_group_name     = var.okta_itadmin_saml_group_name
+  okta_sales_saml_group_name       = var.okta_sales_saml_group_name
 
   okta_bob_user_login      = var.okta_bob_user_login
   okta_matthieu_user_login = var.okta_matthieu_user_login
@@ -139,8 +138,8 @@ module "cloudflare" {
   cf_macos_posture_id           = var.cf_macos_posture_id
   cf_windows_posture_id         = var.cf_windows_posture_id
   cf_linux_posture_id           = var.cf_linux_posture_id
-  cf_okta_new_identity_provider_id = var.cf_okta_new_identity_provider_id
-  cf_otp_identity_provider_id      = var.cf_otp_identity_provider_id
+  cf_okta_identity_provider_id  = var.cf_okta_identity_provider_id
+  cf_otp_identity_provider_id   = var.cf_otp_identity_provider_id
   cf_azure_identity_provider_id = var.cf_azure_identity_provider_id
   cf_azure_admin_rule_group_id  = var.cf_azure_admin_rule_group_id
 
@@ -157,22 +156,6 @@ module "cloudflare" {
 
   # Tags
   cf_cloudflare_tag = var.cf_cloudflare_tag
-
-  # DLP Profiles (AI Prompt Controls)
-  cf_dlp_profile_ai_prompt_ai_security           = var.cf_dlp_profile_ai_prompt_ai_security
-  cf_dlp_profile_ai_prompt_ai_customer           = var.cf_dlp_profile_ai_prompt_ai_customer
-  cf_dlp_profile_ai_prompt_financial_information = var.cf_dlp_profile_ai_prompt_financial_information
-  cf_dlp_profile_ai_prompt_pii                   = var.cf_dlp_profile_ai_prompt_pii
-  cf_dlp_profile_ai_prompt_technical             = var.cf_dlp_profile_ai_prompt_technical
-
-  # Load Balancing Demo
-  lb_demo_enabled      = var.lb_demo_enabled
-  lb_tunnel_name_aws   = var.lb_tunnel_name_aws
-  lb_tunnel_name_gcp   = var.lb_tunnel_name_gcp
-  lb_tunnel_name_azure = var.lb_tunnel_name_azure
-  lb_web_port          = var.lb_web_port
-  lb_subdomain         = var.lb_subdomain
-  cf_domain            = var.cf_domain
 
   # variable name defined in module == var.variable name defined in variables in main folder
 }
@@ -194,7 +177,7 @@ module "warp_routing" {
 
   azure_subnet_cidr    = var.azure_subnet_cidr
   gcp_infra_cidr       = var.gcp_infra_cidr
-  gcp_warp_cidr        = var.gcp_mesh_cidr
+  gcp_warp_cidr        = var.gcp_warp_cidr
   aws_private_cidr     = var.aws_private_cidr
   gcp_windows_rdp_cidr = var.gcp_windows_rdp_cidr
 }
