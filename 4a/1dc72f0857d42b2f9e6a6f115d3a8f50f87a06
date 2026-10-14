@@ -1,0 +1,71 @@
+README.md
+  s_1144ebde4e4820::t_1ffd6b3b8f171e 8,48-49,51,58,128-129,135-136,138,140-141,149-150,323,325,327,330,333-334,336-337,341-342,381,390-392,403,581,593,623-624,626,630,637,640,684,696,702,706,710,751,754,775,789-791,811-813,822-824,826-827,836
+global-locals.tf
+  s_1144ebde4e4820::t_de1a27e31748da 111-112,146
+main.tf
+  s_1144ebde4e4820::t_5b4485033375f2 15,24,26,28-29,36-37,48,57-60,81-82,87,102-107,141-142,180
+modules/azure/version.tf
+  s_1144ebde4e4820::t_8d3ea5adbbab65 2
+modules/cloudflare/access_applications.tf
+  s_1144ebde4e4820::t_6401d266554d05 20,37,43-46,50-53,104,115,138,149,169,180,201,212,243,262
+modules/cloudflare/access_applications_optional.tf
+  s_1144ebde4e4820::t_9df3a7c4ab673d 2,4-7,9-11,91
+modules/cloudflare/access_policies.tf
+  s_1144ebde4e4820::t_a8b220cfcd000b 5,13-17,142,180
+modules/cloudflare/device_profiles.tf
+  s_1144ebde4e4820::t_0319fabe643a4e 119,150,153-156,158,203-206
+modules/cloudflare/gateway_policies.tf
+  s_1144ebde4e4820::t_6b80e6339bb16c 7,10,13-14,17-21,24,27-32,47,52-53,57,62,69,74,77,82-85,88,90-102,107,112,118,123,129,134,139,145,152-164,168-169,173-176,179,181-182,186-192,194-197,200-202,205,207-209,214,218,220,222,252,257
+modules/cloudflare/outputs.tf
+  s_1144ebde4e4820::t_3ad22122a9611a 43,45,47,50,52,56,58,60,63,65,132
+modules/cloudflare/provider.tf
+  s_1144ebde4e4820::t_5720c1a0a9f4f5 7
+modules/cloudflare/rule_groups.tf
+  s_1144ebde4e4820::t_a81aec041bce50 5-11,34,36-37,42-45,99,112,125,138
+modules/cloudflare/tunnels.tf
+  s_1144ebde4e4820::t_d7ce4efd120452 7-9,65-66,70-71
+modules/cloudflare/variables.tf
+  s_1144ebde4e4820::t_bd0c85a336d129 33-34,206,208-209,213-214,218-219,223-224,228-229,264-265,311,330,361,364-365,369-370,379,381
+modules/keys/README.md
+  s_1144ebde4e4820::t_3b5f770cc5fd10 39
+modules/keys/outputs.tf
+  s_1144ebde4e4820::t_702a042293e3df 74,164
+modules/keys/ssh_key.tf
+  s_1144ebde4e4820::t_077a42d9001f60 64
+outputs.tf
+  s_1144ebde4e4820::t_5887ce1a4b3343 1-8,25,30,83,86-87
+provider.tf
+  s_1144ebde4e4820::t_e72dc805131a5a 22,27,36,41,61
+scripts/cleanup/cloudflare_devices_cleanup.sh
+  s_1144ebde4e4820::t_cc7288d706bf2a 4,10,40
+scripts/cloud-init/azure-init.tftpl
+  s_1144ebde4e4820::t_a6ae731bf6f4f8 27-28,30,38,42,46-47,56,59,66-67,69,90
+scripts/cloud-init/gcp-init.tpl
+  s_1144ebde4e4820::t_7256876f91b368 25-26,28,38,49,59,65,67
+terraform.tfvars.example
+  s_1144ebde4e4820::t_46123fb3f1f9f3 15,24,29,80,109-111,139,150,152,156,160,176-183,204
+variables.tf
+  s_1144ebde4e4820::t_40868938039ee7 75-76,103-104,114-115,333-334,339,514-515,579,603,611-615,619-620,624-625,629-630,634-635,677,680-681,685-686
+vm-aws-instance.tf
+  s_1144ebde4e4820::t_13ea3aeb39f1f8 412,414
+vm-azure-instance.tf
+  s_1144ebde4e4820::t_24d5d86a3518d6 37,115,147,165,167-168,195,197-198,203-204,211,228,269,271,282,284,291
+vm-gcp-instance.tf
+  s_1144ebde4e4820::t_e04065fc92fe29 16-18,76,118,125-126,245,247,253-254,260,272-274,277,281,284,293,295-296,300-301,311-312,322-323,348,365,417
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4a1dc72f0857d42b2f9e6a6f115d3a8f50f87a06",
+  "prompts": {},
+  "sessions": {
+    "s_1144ebde4e4820": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ec360a7a1ffel0x9f54CZK0nUp",
+        "model": "unknown"
+      },
+      "human_author": "macharpe <macharpe@protonmail.com>"
+    }
+  }
+}
